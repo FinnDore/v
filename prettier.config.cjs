@@ -1,8 +1,8 @@
 /** @type {import("prettier").Config & { [key:string]: any }} */
 const config = {
     plugins: [
-        '@ianvs/prettier-plugin-sort-imports',
-        'prettier-plugin-tailwindcss',
+        require.resolve('@ianvs/prettier-plugin-sort-imports'),
+        require.resolve('prettier-plugin-tailwindcss'),
     ],
     singleQuote: true,
     arrowParens: 'avoid',
