@@ -1,16 +1,11 @@
-import { Main, NextScript } from 'next/document';
+import { Head, Html, Main, NextScript } from 'next/document';
 
-export default function Document({
-    Html,
-    Head,
-    Body,
-    children,
-    ...props
-}: DocumentProps) {
+export default function Document() {
     return (
         <Html
             style={{
                 background: '#000',
+                color: 'white',
             }}
         >
             <title>Finn</title>
