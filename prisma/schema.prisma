@@ -7,10 +7,6 @@ generator client {
 
 datasource db {
   provider     = "mysql"
-  // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
@@ -20,6 +16,21 @@ model Vote {
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   VoteChoice VoteChoice[]
+  Votes      Votes[]
+}
+
+model Votes {
+  id           String     @id @default(cuid())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  vote         Vote       @relation(fields: [voteId], references: [id])
+  voteId       String
+  voteChoice   VoteChoice @relation(fields: [voteChoiceId], references: [id])
+  voteChoiceId String
+  userName     String?
+
+  @@index([voteChoiceId])
+  @@index([voteId])
 }
 
 model VoteChoice {
@@ -29,6 +40,7 @@ model VoteChoice {
   vote      Vote     @relation(fields: [voteId], references: [id])
   voteId    String
   choice    String
+  Votes     Votes[]
 
   @@index([voteId])
 }
