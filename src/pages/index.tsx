@@ -15,13 +15,6 @@ const Home: NextPage = () => {
     });
     return (
         <div className="grid h-screen w-screen place-items-center">
-            {/* //     {session.data && <div>Logged in as {session.data.user.email}</div>}
-        //     {!session.data && (
-        //         <button onClick={() => void signIn('github')}>Sign in</button>
-        //     )}
-        //     {session.data && (
-        //         <button onClick={() => void signOut()}>Sign out</button>
-        //     )} */}
             <button onClick={() => createVote()}>createVote</button>
         </div>
     );
