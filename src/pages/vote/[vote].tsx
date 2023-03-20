@@ -1,4 +1,5 @@
 import { api } from '@/utils/api';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -17,8 +18,16 @@ export default function Vote() {
             enabled: typeof vote !== 'undefined',
         }
     );
+    const queryClient = useQueryClient();
 
-    const { mutate: createVote } = api.vote.vote.useMutation({});
+    const { mutate: createVote } = api.vote.vote.useMutation({
+        onSuccess: args =>
+            queryClient.invalidateQueries(
+                api.vote.getVote.getQueryKey({
+                    voteId: args.voteId,
+                })
+            ),
+    });
 
     return (
         <div className="grid h-screen w-screen place-items-center">
