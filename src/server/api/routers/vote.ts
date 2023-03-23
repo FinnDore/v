@@ -1,17 +1,9 @@
 import { z } from 'zod';
 
-import { publicProcedure, t } from '@/server/api/trpc';
+import { createTRPCRouter, publicProcedure } from '@/server/api/trpc';
 import { prisma } from '../../db';
 
-export const vote = t.router({
-    getVotes: publicProcedure.query(() => {
-        return prisma.vote.findMany({
-            include: {
-                VoteChoice: true,
-            },
-        });
-    }),
-
+export const vote = createTRPCRouter({
     getVote: publicProcedure
         .input(z.object({ voteId: z.string() }))
         .query(({ input }) => {
@@ -46,7 +38,7 @@ export const vote = t.router({
             const vote = await prisma.voteChoice.create({
                 data: {
                     choice: input.choice,
-                    // userName: input.userName,
+                    userName: input.userName,
                     voteId: input.voteId,
                 },
             });

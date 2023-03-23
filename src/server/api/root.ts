@@ -1,12 +1,12 @@
 import { vote } from '@/server/api/routers/vote';
-import { t } from '@/server/api/trpc';
+import { createTRPCRouter } from '@/server/api/trpc';
 
 /**
  * This is the primary router for your server.
  *
  * All routers added in /api/routers should be manually added here.
  */
-export const appRouter = t.router({
+export const appRouter = createTRPCRouter({
     vote,
 });
 
