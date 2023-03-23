@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { api } from '@/utils/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
@@ -10,6 +11,7 @@ export default function Vote() {
     const [userName, setUserName] = useState('finn');
     const [choice, setChoice] = useState("I don't know");
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { data: voteData } = api.vote.getVote.useQuery(
         {
             voteId: vote as string,
@@ -20,14 +22,14 @@ export default function Vote() {
     );
     const queryClient = useQueryClient();
 
-    const { mutate: createVote } = api.vote.vote.useMutation({
-        onSuccess: args =>
-            queryClient.invalidateQueries(
-                api.vote.getVote.getQueryKey({
-                    voteId: args.voteId,
-                })
-            ),
-    });
+    // const { mutate: createVote } = api.vote.vote.useMutation({
+    //     onSuccess: args =>
+    //         queryClient.invalidateQueries(
+    //             api.vote.getVote.getQueryKey({
+    //                 voteId: args.voteId,
+    //             })
+    //         ),
+    // });
 
     return (
         <div className="grid h-screen w-screen place-items-center">
@@ -46,7 +48,7 @@ export default function Vote() {
                         value={"I don't know"}
                         onChange={e => setChoice(e.target.value)}
                     />
-                    <button
+                    {/* <button
                         onClick={() =>
                             createVote({
                                 userName,
@@ -56,7 +58,7 @@ export default function Vote() {
                         }
                     >
                         vote
-                    </button>
+                    </button> */}
                 </div>
             )}
         </div>
