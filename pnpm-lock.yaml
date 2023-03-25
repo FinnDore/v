@@ -3,9 +3,9 @@ lockfileVersion: 5.4
 specifiers:
   '@ianvs/prettier-plugin-sort-imports': 3.7.1
   '@next-auth/prisma-adapter': 1.0.5
-  '@onehop/client': ^1.5.5
-  '@onehop/js': ^1.30.0
-  '@onehop/react': ^1.5.5
+  '@onehop/client': 1.5.5
+  '@onehop/js': 1.30.0
+  '@onehop/react': 1.5.5
   '@paralleldrive/cuid2': ^2.2.0
   '@prisma/client': 4.9.0
   '@tanstack/react-query': 4.20.2
@@ -21,7 +21,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': 5.53.0
   '@typescript-eslint/parser': 5.53.0
   autoprefixer: 10.4.7
-  clsx: ^1.2.1
+  clsx: 1.2.1
   eslint: 8.34.0
   eslint-config-next: 13.2.1
   next: 13.2.1
