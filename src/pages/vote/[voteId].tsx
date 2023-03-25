@@ -24,7 +24,7 @@ export default function Vote() {
         v => v.anonUser.id === anonUser?.id
     )?.choice;
 
-    const { mutate: createVote } = api.vote.vote.useMutation({
+    const { mutate: doVote } = api.vote.vote.useMutation({
         onSuccess: args =>
             queryClient.invalidateQueries(
                 api.vote.getVote.getQueryKey({
@@ -44,13 +44,13 @@ export default function Vote() {
                                     'opacity-70': vote.toString() !== myVote,
                                 }
                             )}
-                            onClick={() =>
-                                createVote({
+                            onClick={() => {
+                                doVote({
                                     choice: vote.toString(),
                                     voteId,
                                     anonUser,
-                                })
-                            }
+                                });
+                            }}
                         >
                             <div className="-z-1 absolute -bottom-1 left-0 h-2 w-full rounded-b-sm bg-orange-600"></div>
                             <div className="z-1 absolute top-0 flex h-full w-full rounded-sm border-2 border-orange-400 bg-orange-600 text-white hover:bg-orange-500">

@@ -11,7 +11,7 @@ const Home: NextPage = () => {
         ? router.query.voteId[0]
         : router.query.voteId;
 
-    const { mutate: joinVote, isLoading } = api.vote.joinVote.useMutation({
+    const { mutate: joinVote, isLoading } = api.vote.joinPoker.useMutation({
         onSuccess: user => {
             storeUser(user);
             void router.push(`/vote/${user.voteId}`);

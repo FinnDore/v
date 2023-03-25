@@ -6,8 +6,8 @@ import {
 import { hop } from '@/server/hop';
 import { AnonHelper } from '@/utils/anon-users';
 import { to } from '@/utils/to';
-import { ChannelType, HopAPIError } from '@onehop/js';
-import { VoteChoice } from '@prisma/client';
+import { ChannelType, type HopAPIError } from '@onehop/js';
+import { type PokerVote } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { prisma } from '../../db';
@@ -17,7 +17,7 @@ export const vote = createTRPCRouter({
         .input(z.object({ voteId: z.string() }))
         .query(({ input }) => {
             return (
-                prisma.vote.findUnique({
+                prisma.poker.findUnique({
                     where: {
                         id: input.voteId,
                     },
@@ -29,14 +29,14 @@ export const vote = createTRPCRouter({
             );
         }),
 
-    createVote: publicProcedure.mutation(async ({}) => {
-        const vote = await prisma.vote.create({
+    createPoker: publicProcedure.mutation(async ({}) => {
+        const vote = await prisma.poker.create({
             data: {},
         });
         return vote;
     }),
 
-    joinVote: anonProcedure
+    joinPoker: anonProcedure
         .input(
             z.object({
                 voteId: z.string().cuid(),
@@ -101,7 +101,7 @@ export const vote = createTRPCRouter({
                 }
 
                 const [previousVote, previousVoteError] = await to(
-                    prisma.voteChoice.findFirst({
+                    prisma.pokerVote.findFirst({
                         where: {
                             voteId: input.voteId,
                             anonUserId: input.anonUser.id,
@@ -120,11 +120,11 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                let vote: VoteChoice | null;
+                let vote: PokerVote | null;
                 let voteError;
                 if (previousVote) {
                     [vote, voteError] = await to(
-                        prisma.voteChoice.update({
+                        prisma.pokerVote.update({
                             where: {
                                 id: previousVote.id,
                             },
@@ -135,7 +135,7 @@ export const vote = createTRPCRouter({
                     );
                 } else {
                     [vote, voteError] = await to(
-                        prisma.voteChoice.create({
+                        prisma.pokerVote.create({
                             data: {
                                 choice: input.choice,
                                 voteId: input.voteId,
@@ -167,7 +167,7 @@ export const vote = createTRPCRouter({
                 return vote;
             } else if (ctx.session?.user.id) {
                 const [previousVote, previousVoteError] = await to(
-                    prisma.voteChoice.findFirst({
+                    prisma.pokerVote.findFirst({
                         where: {
                             voteId: input.voteId,
                             userId: ctx.session.user.id,
@@ -186,11 +186,11 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                let vote: VoteChoice | null;
+                let vote: PokerVote | null;
                 let voteError;
                 if (previousVote) {
                     [vote, voteError] = await to(
-                        prisma.voteChoice.update({
+                        prisma.pokerVote.update({
                             where: {
                                 id: previousVote.id,
                             },
@@ -201,7 +201,7 @@ export const vote = createTRPCRouter({
                     );
                 } else {
                     [vote, voteError] = await to(
-                        prisma.voteChoice.create({
+                        prisma.pokerVote.create({
                             data: {
                                 choice: input.choice,
                                 voteId: input.voteId,
@@ -241,7 +241,7 @@ export const vote = createTRPCRouter({
 
 async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
     const [votes, votesError] = await to(
-        prisma.voteChoice.findMany({
+        prisma.pokerVote.findMany({
             where: {
                 voteId,
             },
