@@ -6,7 +6,7 @@ import { api } from '../utils/api';
 const Home: NextPage = () => {
     // const session = useSession();
     const router = useRouter();
-    const { mutate: createVote } = api.vote.upsertVote.useMutation({
+    const { mutate: createVote } = api.vote.createVote.useMutation({
         async onSuccess(vote) {
             await router.push('/vote/[...vote]', `/vote/${vote.id}`, {
                 shallow: true,
