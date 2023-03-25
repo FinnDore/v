@@ -11,26 +11,45 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Vote {
+model Poker {
   id         String       @id @default(cuid())
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
-  VoteChoice VoteChoice[]
+  anonUser  AnonUser[] 
+  VoteChoice PokerVote[]
 }
 
-model VoteChoice {
-  id        String   @id @default(cuid())
+model PokerVote {
+  id        String  @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  vote      Vote     @relation(fields: [voteId], references: [id])
+  vote      Poker     @relation(fields: [voteId], references: [id])
   voteId    String
   choice    String
   user      User?    @relation(fields: [userId], references: [id])
   userId    String?
-  userName String?
+  anonUser  AnonUser? @relation(fields: [anonUserId], references: [id])
+  anonUserId String?
 
   @@index([voteId])
   @@index([userId])
+  @@index([anonUserId])
+}
+
+model AnonUser {
+  id        String    @default(cuid()) @unique
+  secret    String   @default(cuid()) 
+  name      String 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  vote      Poker     @relation(fields: [voteId], references: [id])
+  voteId    String
+  voteChoice PokerVote[]
+
+  @@index([voteId])
+  @@index([secret])
+  @@index([id])
+  @@id([voteId, name]) 
 }
 
 // Necessary for Next auth
@@ -71,7 +90,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  VoteChoice    VoteChoice[]
+  VoteChoice    PokerVote[]
 }
 
 model VerificationToken {

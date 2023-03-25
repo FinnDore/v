@@ -4,6 +4,8 @@ specifiers:
   '@ianvs/prettier-plugin-sort-imports': 3.7.1
   '@next-auth/prisma-adapter': 1.0.5
   '@onehop/client': ^1.5.5
+  '@onehop/js': ^1.30.0
+  '@onehop/react': ^1.5.5
   '@paralleldrive/cuid2': ^2.2.0
   '@prisma/client': 4.9.0
   '@tanstack/react-query': 4.20.2
@@ -19,6 +21,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': 5.53.0
   '@typescript-eslint/parser': 5.53.0
   autoprefixer: 10.4.7
+  clsx: ^1.2.1
   eslint: 8.34.0
   eslint-config-next: 13.2.1
   next: 13.2.1
@@ -38,6 +41,8 @@ dependencies:
   '@ianvs/prettier-plugin-sort-imports': 3.7.1_prettier@2.8.1
   '@next-auth/prisma-adapter': 1.0.5_itdorc3kbufr4kntuocsjgxwwi
   '@onehop/client': 1.5.5
+  '@onehop/js': 1.30.0
+  '@onehop/react': 1.5.5_react@18.2.0
   '@paralleldrive/cuid2': 2.2.0
   '@prisma/client': 4.9.0_prisma@4.9.0
   '@tanstack/react-query': 4.20.2_biqbaboplfbrettd7655fr4n2y
@@ -45,6 +50,7 @@ dependencies:
   '@trpc/next': 10.9.0_m2qhjnvm3rky5irebpexbxwbge
   '@trpc/react-query': 10.9.0_c764obsmtugr5um2s2eq37b6ju
   '@trpc/server': 10.9.0
+  clsx: 1.2.1
   next: 13.2.1_biqbaboplfbrettd7655fr4n2y
   next-auth: 4.19.0_qgtcjgzkkjtbiyvnx7d32fl5vu
   react: 18.2.0
@@ -575,6 +581,21 @@ packages:
       ws: 8.13.0
     transitivePeerDependencies:
       - bufferutil
+      - utf-8-validate
+    dev: false
+
+  /@onehop/react/1.5.5_react@18.2.0:
+    resolution: {integrity: sha512-jZfmz8c4prtFv4XD8+5YN5nMzfX2bmen0GrTwqANZDWM/ZIpN2SLDmRVLJjVHEqtmGgE3QfkGKSYE/92XwoAnQ==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      '@onehop/client': 1.5.5
+      '@onehop/js': 1.30.0
+      '@onehop/leap-edge-js': 1.0.11
+      react: 18.2.0
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
       - utf-8-validate
     dev: false
 
@@ -1217,6 +1238,11 @@ packages:
 
   /client-only/0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+    dev: false
+
+  /clsx/1.2.1:
+    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
+    engines: {node: '>=6'}
     dev: false
 
   /color-convert/1.9.3:
