@@ -300,5 +300,8 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
                 updateChannelStateError.message
             } ${updateChannelStateError.stack ?? 'no stack'}`
         );
+        console.log(`${JSON.stringify(updateChannelStateError, null, 2)}`);
+    } else {
+        console.log(`Published votes for poker_${voteId} to channel `);
     }
 }
