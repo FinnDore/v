@@ -23,7 +23,6 @@ export const vote = createTRPCRouter({
                     },
                     include: {
                         VoteChoice: true,
-                        anonUser: true,
                     },
                 }) ?? null
             );
@@ -86,7 +85,6 @@ export const vote = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
-            const voteTimeStart = Date.now();
             if (!ctx.session?.user && !input.anonUser) {
                 console.log('No session or anon user');
                 throw new TRPCError({
@@ -96,14 +94,13 @@ export const vote = createTRPCRouter({
 
             if (!ctx.session?.user && input.anonUser) {
                 const [anonUser, error] =
-                    await AnonHelper.getAnonUserByIdSecretAndVote({
+                    await AnonHelper.getAnonUserByIdSecret({
                         userId: input.anonUser.id,
                         secret: input.anonUser.secret,
-                        voteId: input.voteId,
                     });
 
                 if (error) {
-                    console.log(
+                    console.error(
                         `Could not find anon user due to error: ${
                             error.message
                         } ${error.stack ?? 'no stack'}`
@@ -182,7 +179,6 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                console.log(`Vote took ${Date.now() - voteTimeStart}ms`);
                 await dispatchVoteUpdate({ voteId: vote.voteId });
                 return vote;
             } else if (ctx.session?.user.id) {
@@ -260,7 +256,6 @@ export const vote = createTRPCRouter({
 });
 
 async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
-    const timeStartGetVotes = Date.now();
     const [votes, votesError] = await to(
         prisma.pokerVote.findMany({
             where: {
@@ -283,8 +278,6 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
         })
     );
 
-    console.log(`getVotes took ${Date.now() - timeStartGetVotes}ms`);
-
     if (votesError) {
         console.error(
             `not publishing votes for ${voteId},Could not find votes due to error: ${
@@ -293,7 +286,6 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
         );
         return;
     }
-    const timeStartDispatch = Date.now();
     const [, updateChannelStateError] = await to(
         hop.channels.setState(`poker_${voteId}`, {
             votes,
@@ -304,11 +296,11 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
         console.error(
             `Could not publish votes for poker_${voteId} due to error: ${
                 updateChannelStateError.message
-            } ${updateChannelStateError.stack ?? 'no stack'}`
+            } ${updateChannelStateError.stack ?? 'no stack'}
+            ${JSON.stringify(updateChannelStateError, null, 2)}
+            `
         );
-        console.log(`${JSON.stringify(updateChannelStateError, null, 2)}`);
     } else {
-        console.log(`Published votes for poker_${voteId} to channel `);
+        console.log(`Published votes for poker_${voteId} to channel`);
     }
-    console.log(`dispatch took ${Date.now() - timeStartDispatch}ms`);
 }
