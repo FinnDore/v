@@ -30,26 +30,22 @@ const voteOptions = [1, 2, 4, 8, 16, 24, 48];
 export default function Vote() {
     const pokerId = usePokerId();
     const utils = api.useContext();
-    const a = useVotes();
 
-    console.log('VOTES', a);
     useChannelMessage(
         `poker_${pokerId ?? ''}`,
         'VOTE_UPDATE',
         (updatedVote: Vote) => {
-            console.log('VOTE_UPDATE', updatedVote);
-            // // utils.vote.pokerState.getVotes.setData(
-            // //     { pokerId: pokerId ?? '' },
-            // //     old => {
-            // //         if (!old) return [updatedVote];
-            // //         const index = old.findIndex(v => v.id === updatedVote.id);
-
-            // //         if (index === -1) return [...old, updatedVote];
-            // //         const copy = [...old];
-            // //         copy[index] = updatedVote;
-            // //         return copy;
-            // //     }
-            // );
+            utils.vote.pokerState.getVotes.setData(
+                { pokerId: pokerId ?? '' },
+                old => {
+                    if (!old) return [updatedVote];
+                    const index = old.findIndex(v => v.id === updatedVote.id);
+                    if (index === -1) return [...old, updatedVote];
+                    const copy = [...old];
+                    copy[index] = updatedVote;
+                    return copy;
+                }
+            );
         }
     );
 
