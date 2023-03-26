@@ -24,7 +24,7 @@ export default function Vote() {
     const anonUser = useAnonUser();
 
     const myVote = state?.votes?.find(
-        v => v.anonUser.id === anonUser?.id
+        v => v.anonUser?.id === anonUser?.id
     )?.choice;
 
     const { mutate: doVote } = api.vote.vote.useMutation({
