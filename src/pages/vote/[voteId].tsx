@@ -5,6 +5,7 @@ import { useReadChannelState } from '@onehop/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 const votes = [1, 2, 4, 8, 16, 24, 48];
 
@@ -16,7 +17,9 @@ export default function Vote() {
             : router.query.voteId) ?? 'TODO REMOVE';
 
     const { state } = useReadChannelState<PokerChannelState>(`poker_${voteId}`);
-
+    useEffect(() => {
+        console.log(state);
+    }, [state]);
     const queryClient = useQueryClient();
     const anonUser = useAnonUser();
 

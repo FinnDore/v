@@ -6,7 +6,7 @@ import {
 import { hop } from '@/server/hop';
 import { AnonHelper } from '@/utils/anon-users';
 import { to } from '@/utils/to';
-import { ChannelType, type HopAPIError } from '@onehop/js';
+import { ChannelType } from '@onehop/js';
 import { type PokerVote } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
@@ -33,6 +33,22 @@ export const vote = createTRPCRouter({
         const vote = await prisma.poker.create({
             data: {},
         });
+        const [, createChannelError] = await to(
+            hop.channels.create(ChannelType.UNPROTECTED, `poker_${vote.id}`)
+        );
+
+        if (createChannelError) {
+            console.error(
+                `Could not create channel poker_${
+                    vote.id
+                } ( attempting to publish anyway ): ${
+                    createChannelError.message ?? 'no error message'
+                } ${createChannelError.stack ?? 'no stack'}`
+            );
+            console.log(JSON.stringify(createChannelError));
+            return;
+        }
+
         return vote;
     }),
 
@@ -240,6 +256,8 @@ export const vote = createTRPCRouter({
 });
 
 async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
+    console.time('dispatchVoteUpdate');
+    console.time('getVotes');
     const [votes, votesError] = await to(
         prisma.pokerVote.findMany({
             where: {
@@ -261,29 +279,13 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
             },
         })
     );
+    console.timeEnd('getVotes');
 
     if (votesError) {
         console.error(
             `not publishing votes for ${voteId},Could not find votes due to error: ${
                 votesError.message
             } ${votesError.stack ?? 'no stack'}`
-        );
-        return;
-    }
-
-    const [, createChannelError] = await to(
-        hop.channels.create(ChannelType.UNPROTECTED, `poker_${voteId}`)
-    );
-
-    if (
-        createChannelError &&
-        (createChannelError as HopAPIError).data?.error?.code !==
-            'channel_already_exists'
-    ) {
-        console.error(
-            `Could not create channel poker_${voteId} ( attempting to publish anyway ): ${
-                createChannelError.message ?? 'no error message'
-            } ${createChannelError.stack ?? 'no stack'}`
         );
         return;
     }
@@ -304,4 +306,5 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
     } else {
         console.log(`Published votes for poker_${voteId} to channel `);
     }
+    console.timeEnd('dispatchVoteUpdate');
 }
