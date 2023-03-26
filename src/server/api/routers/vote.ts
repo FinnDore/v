@@ -46,7 +46,9 @@ export const vote = createTRPCRouter({
                 } ${createChannelError.stack ?? 'no stack'}`
             );
             console.log(JSON.stringify(createChannelError));
-            return;
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+            });
         }
 
         return vote;
