@@ -86,6 +86,7 @@ export const vote = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
+            const voteTimeStart = Date.now();
             if (!ctx.session?.user && !input.anonUser) {
                 console.log('No session or anon user');
                 throw new TRPCError({
@@ -182,6 +183,7 @@ export const vote = createTRPCRouter({
                 }
 
                 void dispatchVoteUpdate({ voteId: vote.voteId });
+                console.log(`Vote took ${Date.now() - voteTimeStart}ms`);
                 return vote;
             } else if (ctx.session?.user.id) {
                 const [previousVote, previousVoteError] = await to(
@@ -258,8 +260,7 @@ export const vote = createTRPCRouter({
 });
 
 async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
-    console.time('dispatchVoteUpdate');
-    console.time('getVotes');
+    const timeStartGetVotes = Date.now();
     const [votes, votesError] = await to(
         prisma.pokerVote.findMany({
             where: {
@@ -281,7 +282,8 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
             },
         })
     );
-    console.timeEnd('getVotes');
+
+    console.log(`getVotes took ${Date.now() - timeStartGetVotes}ms`);
 
     if (votesError) {
         console.error(
@@ -291,7 +293,7 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
         );
         return;
     }
-
+    const timeStartDispatch = Date.now();
     const [, updateChannelStateError] = await to(
         hop.channels.setState(`poker_${voteId}`, {
             votes,
@@ -308,5 +310,5 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
     } else {
         console.log(`Published votes for poker_${voteId} to channel `);
     }
-    console.timeEnd('dispatchVoteUpdate');
+    console.log(`dispatch took ${Date.now() - timeStartDispatch}ms`);
 }
