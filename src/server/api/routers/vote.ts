@@ -261,7 +261,7 @@ export const vote = createTRPCRouter({
 
 async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
     const timeStartGetVotes = Date.now();
-    const votes = await to(
+    const [votes, votesError] = await to(
         prisma.pokerVote.findMany({
             where: {
                 voteId,
@@ -285,14 +285,14 @@ async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
 
     console.log(`getVotes took ${Date.now() - timeStartGetVotes}ms`);
 
-    // if (votesError) {
-    //     console.error(
-    //         `not publishing votes for ${voteId},Could not find votes due to error: ${
-    //             votesError.message
-    //         } ${votesError.stack ?? 'no stack'}`
-    //     );
-    //     return;
-    // }
+    if (votesError) {
+        console.error(
+            `not publishing votes for ${voteId},Could not find votes due to error: ${
+                votesError.message
+            } ${votesError.stack ?? 'no stack'}`
+        );
+        return;
+    }
     const timeStartDispatch = Date.now();
     const [, updateChannelStateError] = await to(
         hop.channels.setState(`poker_${voteId}`, {
