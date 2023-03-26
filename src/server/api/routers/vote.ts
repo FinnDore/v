@@ -182,8 +182,8 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                void dispatchVoteUpdate({ voteId: vote.voteId });
                 console.log(`Vote took ${Date.now() - voteTimeStart}ms`);
+                await dispatchVoteUpdate({ voteId: vote.voteId });
                 return vote;
             } else if (ctx.session?.user.id) {
                 const [previousVote, previousVoteError] = await to(
@@ -249,7 +249,7 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                void dispatchVoteUpdate({ voteId: vote.voteId });
+                await dispatchVoteUpdate({ voteId: vote.voteId });
                 return vote;
             }
 
