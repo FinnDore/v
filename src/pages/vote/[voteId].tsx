@@ -1,14 +1,60 @@
-import { type PokerChannelState } from '@/server/hop';
-
+import { type Vote } from '@/server/hop';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
-import { useReadChannelState } from '@onehop/react';
+import { useChannelMessage } from '@onehop/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
+
+const usePokerId = () => {
+    const router = useRouter();
+    return Array.isArray(router.query.voteId)
+        ? router.query.voteId[0]
+        : router.query.voteId;
+};
+
+const useVotes = () => {
+    const pokerId = usePokerId();
+
+    const { data } = api.vote.pokerState.getVotes.useQuery(
+        { pokerId: pokerId ?? '' },
+        {
+            enabled: !!pokerId,
+        }
+    );
+
+    return data;
+};
 
 const votes = [1, 2, 4, 8, 16, 24, 48];
 
 export default function Vote() {
+    const pokerId = usePokerId();
+    const queryClient = useQueryClient();
+    const queryKey = api.vote.pokerState.getVotes.getQueryKey({
+        pokerId: pokerId ?? '',
+    });
+
+    console.log(queryKey);
+
+    useChannelMessage(
+        `poker_${pokerId ?? ''}`,
+        'VOTE_UPDATE',
+        (updatedVote: Vote) => {
+            console.log('VOTE_UPDATE', updatedVote);
+            queryClient.setQueriesData<Vote[]>(queryKey, old => {
+                if (!old) return [updatedVote];
+
+                const index = old.findIndex(v => v.id === updatedVote.id);
+
+                if (index === -1) return [...old, updatedVote];
+                const copy = [...old];
+                copy[index] = updatedVote;
+                return copy;
+            });
+        }
+    );
+
     return (
         <div className=" grid h-screen w-screen place-items-center text-white">
             <div className="flex gap-4">
@@ -22,47 +68,50 @@ export default function Vote() {
 
 function VoteButton({ vote }: { vote: number }) {
     const anonUser = useAnonUser();
-    const router = useRouter();
-    const voteId = Array.isArray(router.query.voteId)
-        ? router.query.voteId[0]
-        : router.query.voteId;
-
-    const { state } = useReadChannelState<PokerChannelState>(
-        `poker_${voteId ?? ''}`
-    );
+    const pokerId = usePokerId();
 
     const { mutate: doVote } = api.vote.vote.useMutation();
+    const votes = useVotes();
 
-    if (!voteId) return <div>Join a vote</div>;
+    if (!pokerId) return <div>Join a vote</div>;
 
-    const current =
-        state?.votes?.find(v => v.anonUser.id === anonUser?.id)?.choice ===
-        vote.toString();
+    const currentVote = votes?.find(
+        v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
+    );
+    const current = currentVote?.choice === vote.toString();
+    const voteCount = votes?.filter(v => v.choice === vote.toString()).length;
 
     return (
-        <button
-            className={clsx('relative h-12 w-16 text-white transition-all', {
-                'opacity-70': !current,
-            })}
-            onClick={() => {
-                doVote({
-                    choice: vote.toString(),
-                    voteId,
-                    anonUser,
-                });
-            }}
-        >
-            <div className="-z-1 absolute -bottom-1 left-0 h-4 w-full rounded-b-sm bg-orange-600"></div>
-            <div
+        <div>
+            <button
                 className={clsx(
-                    'z-1 absolute top-0 flex h-full w-full rounded-sm border-2 border-orange-400 bg-orange-600 text-white transition-all hover:bg-orange-500',
+                    'relative h-12 w-16 text-white transition-all',
                     {
-                        '-top-1': current,
+                        'opacity-70': !current,
                     }
                 )}
+                onClick={() => {
+                    doVote({
+                        choice: vote.toString(),
+                        voteId: pokerId,
+                        anonUser,
+                    });
+                }}
             >
-                <div className="m-auto">{vote}</div>
-            </div>
-        </button>
+                <div className="-z-1 absolute -bottom-1 left-0 h-4 w-full rounded-b-sm bg-orange-600"></div>
+                <div
+                    className={clsx(
+                        'z-1 absolute top-0 flex h-full w-full rounded-sm border-2 border-orange-400 bg-orange-600 text-white transition-all hover:bg-orange-500',
+                        {
+                            '-top-1 shadow-[inset_1px_1px_12px_#0000004f]':
+                                current,
+                        }
+                    )}
+                >
+                    <div className="m-auto">{vote}</div>
+                </div>
+            </button>
+            <div className="h-4 w-full py-2 text-center">{voteCount}</div>
+        </div>
     );
 }

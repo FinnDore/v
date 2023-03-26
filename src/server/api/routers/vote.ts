@@ -3,16 +3,17 @@ import {
     createTRPCRouter,
     publicProcedure,
 } from '@/server/api/trpc';
-import { hop } from '@/server/hop';
+import { hop, selectPokerVote, Vote } from '@/server/hop';
 import { AnonHelper } from '@/utils/anon-users';
 import { to } from '@/utils/to';
 import { ChannelType } from '@onehop/js';
-import { type PokerVote } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { prisma } from '../../db';
+import { pokerState } from './poker-state';
 
 export const vote = createTRPCRouter({
+    pokerState,
     getVote: publicProcedure
         .input(z.object({ voteId: z.string() }))
         .query(({ input }) => {
@@ -136,11 +137,12 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                let vote: PokerVote | null;
+                let vote: Vote | null;
                 let voteError;
                 if (previousVote) {
                     [vote, voteError] = await to(
                         prisma.pokerVote.update({
+                            select: selectPokerVote,
                             where: {
                                 id: previousVote.id,
                             },
@@ -152,6 +154,7 @@ export const vote = createTRPCRouter({
                 } else {
                     [vote, voteError] = await to(
                         prisma.pokerVote.create({
+                            select: selectPokerVote,
                             data: {
                                 choice: input.choice,
                                 voteId: input.voteId,
@@ -179,7 +182,7 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                await dispatchVoteUpdate({ voteId: vote.voteId });
+                await dispatchVoteUpdate({ pokerVote: vote });
                 return vote;
             } else if (ctx.session?.user.id) {
                 const [previousVote, previousVoteError] = await to(
@@ -202,11 +205,12 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                let vote: PokerVote | null;
+                let vote: Vote | null;
                 let voteError;
                 if (previousVote) {
                     [vote, voteError] = await to(
                         prisma.pokerVote.update({
+                            select: selectPokerVote,
                             where: {
                                 id: previousVote.id,
                             },
@@ -218,6 +222,7 @@ export const vote = createTRPCRouter({
                 } else {
                     [vote, voteError] = await to(
                         prisma.pokerVote.create({
+                            select: selectPokerVote,
                             data: {
                                 choice: input.choice,
                                 voteId: input.voteId,
@@ -245,7 +250,7 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                await dispatchVoteUpdate({ voteId: vote.voteId });
+                await dispatchVoteUpdate({ pokerVote: vote });
                 return vote;
             }
 
@@ -255,52 +260,26 @@ export const vote = createTRPCRouter({
         }),
 });
 
-async function dispatchVoteUpdate({ voteId }: { voteId: string }) {
-    const [votes, votesError] = await to(
-        prisma.pokerVote.findMany({
-            where: {
-                voteId,
-            },
-            include: {
-                anonUser: {
-                    select: {
-                        name: true,
-                        id: true,
-                    },
-                },
-                user: {
-                    select: {
-                        name: true,
-                        id: true,
-                    },
-                },
-            },
-        })
-    );
-
-    if (votesError) {
-        console.error(
-            `not publishing votes for ${voteId},Could not find votes due to error: ${
-                votesError.message
-            } ${votesError.stack ?? 'no stack'}`
-        );
-        return;
-    }
+async function dispatchVoteUpdate({ pokerVote }: { pokerVote: Vote }) {
     const [, updateChannelStateError] = await to(
-        hop.channels.setState(`poker_${voteId}`, {
-            votes,
-        })
+        hop.channels.publishMessage(
+            `poker_${pokerVote.voteId}`,
+            'VOTE_UPDATE',
+            pokerVote
+        )
     );
 
     if (updateChannelStateError) {
         console.error(
-            `Could not publish votes for poker_${voteId} due to error: ${
-                updateChannelStateError.message
-            } ${updateChannelStateError.stack ?? 'no stack'}
+            `Could not publish votes for poker_${
+                pokerVote.voteId
+            } due to error: ${updateChannelStateError.message} ${
+                updateChannelStateError.stack ?? 'no stack'
+            }
             ${JSON.stringify(updateChannelStateError, null, 2)}
             `
         );
     } else {
-        console.log(`Published votes for poker_${voteId} to channel`);
+        console.log(`Published votes for poker_${pokerVote.voteId} to channel`);
     }
 }
