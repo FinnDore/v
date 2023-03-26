@@ -8,7 +8,7 @@ const Home: NextPage = () => {
     const router = useRouter();
     const { mutate: createVote } = api.vote.createPoker.useMutation({
         async onSuccess(vote) {
-            await router.push('/vote/[...vote]', `/vote/${vote.id}`, {
+            await router.push('/join/[voteId]', `/join/${vote.id}`, {
                 shallow: true,
             });
         },
