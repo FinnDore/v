@@ -1,38 +1,25 @@
 import { type AnonUser } from '@prisma/client';
 import { useSession } from 'next-auth/react';
 
-import { useRouter } from 'next/router';
 import { useMemo, version } from 'react';
 import { z } from 'zod';
 
 const LocalUserStoreSchema = z.object({
     version: z.string(),
-    users: z.array(
-        z.object({
-            id: z.string(),
-            name: z.string(),
-            secret: z.string().cuid(),
-            voteId: z.string().cuid(),
-        })
-    ),
+    user: z.object({
+        id: z.string(),
+        name: z.string(),
+        secret: z.string().cuid(),
+    }),
 });
 
-type LocalUserStore = z.infer<typeof LocalUserStoreSchema>;
-
 export function useAnonUser() {
-    const router = useRouter();
-    const voteId = Array.isArray(router.query.voteId)
-        ? router.query.voteId[0]
-        : router.query.voteId;
-
     return useMemo(() => {
         if (typeof window === 'undefined') return null;
         const localUserStore = getLocalUserStore();
 
-        return (
-            localUserStore?.users.find(user => user.voteId === voteId) ?? null
-        );
-    }, [voteId]);
+        return localUserStore?.user ?? null;
+    }, []);
 }
 
 export function useSessionOrAnonUser() {
@@ -56,23 +43,23 @@ export function storeUser(user: AnonUser) {
             existingUsersParseResult.error
         );
     }
-    const existingUsers = existingUsersParseResult.success
+    const existingUser = existingUsersParseResult.success
         ? existingUsersParseResult.data
-        : { users: [] as LocalUserStore['users'][number][], version };
+        : {
+              user: {
+                  id: user.id,
+                  name: user.name,
+                  secret: user.secret,
+              },
+              version,
+          };
 
-    existingUsers.users.push({
-        id: user.id,
-        name: user.name,
-        secret: user.secret,
-        voteId: user.voteId,
-    });
-
-    localStorage.setItem('users', JSON.stringify(existingUsers));
+    localStorage.setItem('user', JSON.stringify(existingUser));
 }
 
 function getLocalUserStore() {
     const existingUsersParseResult = LocalUserStoreSchema.safeParse(
-        JSON.parse(localStorage.getItem('users') ?? 'null')
+        JSON.parse(localStorage.getItem('user') ?? 'null')
     );
     if (!existingUsersParseResult.success) {
         console.error(

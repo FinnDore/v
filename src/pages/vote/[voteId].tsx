@@ -31,11 +31,13 @@ function VoteButton({ vote }: { vote: number }) {
         `poker_${voteId ?? ''}`
     );
 
+    const { mutate: doVote } = api.vote.vote.useMutation();
+
     if (!voteId) return <div>Join a vote</div>;
+
     const current =
         state?.votes?.find(v => v.anonUser.id === anonUser?.id)?.choice ===
         vote.toString();
-    const { mutate: doVote } = api.vote.vote.useMutation();
 
     return (
         <button
