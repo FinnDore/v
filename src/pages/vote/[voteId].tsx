@@ -2,7 +2,6 @@ import { type Vote } from '@/server/hop';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { useChannelMessage } from '@onehop/react';
-import { useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
 
@@ -26,39 +25,38 @@ const useVotes = () => {
     return data;
 };
 
-const votes = [1, 2, 4, 8, 16, 24, 48];
+const voteOptions = [1, 2, 4, 8, 16, 24, 48];
 
 export default function Vote() {
     const pokerId = usePokerId();
-    const queryClient = useQueryClient();
-    const queryKey = api.vote.pokerState.getVotes.getQueryKey({
-        pokerId: pokerId ?? '',
-    });
+    const utils = api.useContext();
+    const a = useVotes();
 
-    console.log(queryKey);
-
+    console.log('VOTES', a);
     useChannelMessage(
         `poker_${pokerId ?? ''}`,
         'VOTE_UPDATE',
         (updatedVote: Vote) => {
             console.log('VOTE_UPDATE', updatedVote);
-            queryClient.setQueriesData<Vote[]>(queryKey, old => {
-                if (!old) return [updatedVote];
+            // // utils.vote.pokerState.getVotes.setData(
+            // //     { pokerId: pokerId ?? '' },
+            // //     old => {
+            // //         if (!old) return [updatedVote];
+            // //         const index = old.findIndex(v => v.id === updatedVote.id);
 
-                const index = old.findIndex(v => v.id === updatedVote.id);
-
-                if (index === -1) return [...old, updatedVote];
-                const copy = [...old];
-                copy[index] = updatedVote;
-                return copy;
-            });
+            // //         if (index === -1) return [...old, updatedVote];
+            // //         const copy = [...old];
+            // //         copy[index] = updatedVote;
+            // //         return copy;
+            // //     }
+            // );
         }
     );
 
     return (
         <div className=" grid h-screen w-screen place-items-center text-white">
             <div className="flex gap-4">
-                {votes.map(vote => (
+                {voteOptions.map(vote => (
                     <VoteButton key={vote} vote={vote} />
                 ))}
             </div>
@@ -69,9 +67,31 @@ export default function Vote() {
 function VoteButton({ vote }: { vote: number }) {
     const anonUser = useAnonUser();
     const pokerId = usePokerId();
-
-    const { mutate: doVote } = api.vote.vote.useMutation();
+    const utils = api.useContext();
     const votes = useVotes();
+
+    const { mutate: doVote } = api.vote.vote.useMutation({
+        onMutate: ({ anonUser, choice, voteId }) => {
+            utils.vote.pokerState.getVotes.setData(
+                {
+                    pokerId: voteId,
+                },
+                old => {
+                    const newVotes = [...(old ?? [])];
+                    const item = newVotes.find(
+                        v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
+                    );
+                    if (item) item.choice = choice;
+                    return newVotes;
+                }
+            );
+        },
+        onError: (_err, args) => {
+            void utils.vote.pokerState.getVotes.refetch({
+                pokerId: args.voteId,
+            });
+        },
+    });
 
     if (!pokerId) return <div>Join a vote</div>;
 
