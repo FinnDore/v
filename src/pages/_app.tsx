@@ -1,6 +1,7 @@
 import { env } from '@/env.mjs';
 import '@/styles/globals.css';
 import { api } from '@/utils/api';
+import { useAnonUser } from '@/utils/local-user';
 import { hop } from '@onehop/client';
 import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
@@ -19,8 +20,13 @@ const MyApp: AppType<{ session: Session | null }> = ({
         });
     }, []);
 
+    const anonUser = useAnonUser();
+
     return (
         <SessionProvider session={session}>
+            <nav className="flex w-full py-4 px-4">
+                <div className="ml-auto mr-4 text-2xl">{anonUser?.name}</div>
+            </nav>
             <Component {...pageProps} />
         </SessionProvider>
     );

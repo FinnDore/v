@@ -2,6 +2,7 @@ import { type Vote } from '@/server/hop';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { useChannelMessage } from '@onehop/react';
+import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
 
@@ -49,8 +50,8 @@ export default function Vote() {
     );
 
     return (
-        <div className=" grid h-screen w-screen place-items-center text-white">
-            <div className="flex gap-4">
+        <div className="grid h-screen w-screen max-w-screen-2xl place-items-center text-white">
+            <div className="mx-6 flex flex-wrap gap-4">
                 {voteOptions.map(vote => (
                     <VoteButton key={vote} vote={vote} />
                 ))}
@@ -87,17 +88,28 @@ function VoteButton({ vote }: { vote: number }) {
             });
         },
     });
-
-    if (!pokerId) return <div>Join a vote</div>;
-
     const currentVote = votes?.find(
         v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
     );
+
     const current = currentVote?.choice === vote.toString();
     const voteCount = votes?.filter(v => v.choice === vote.toString()).length;
+    const styles = useSpring({
+        height: ((voteCount ?? 0) / (votes?.length ?? 0)) * 100,
+        config: current ? config.default : config.wobbly,
+    });
+
+    if (!pokerId) return <div>Join a vote</div>;
 
     return (
-        <div>
+        <div className="my-2 flex flex-col">
+            <div className="relative mx-auto mb-1 h-24 rotate-180 ">
+                <div className="absolute z-10 h-1/3 w-full  bg-gradient-to-b from-white to-transparent dark:from-black"></div>
+                <animated.div
+                    style={styles}
+                    className="w-8 rounded-b-md border border-orange-400 bg-orange-600"
+                ></animated.div>
+            </div>
             <button
                 className={clsx(
                     'relative h-12 w-16 text-white transition-all',
