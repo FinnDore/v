@@ -7,6 +7,7 @@ import { hop, selectPokerVote, Vote } from '@/server/hop';
 import { AnonHelper } from '@/utils/anon-users';
 import { to } from '@/utils/to';
 import { ChannelType } from '@onehop/js';
+import cuid2 from '@paralleldrive/cuid2';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { prisma } from '../../db';
@@ -85,7 +86,7 @@ export const vote = createTRPCRouter({
                     .nullable(),
             })
         )
-        .mutation(async ({ input, ctx }) => {
+        .mutation(async ({ input, ctx }): Promise<Vote> => {
             if (!ctx.session?.user && !input.anonUser) {
                 console.log('No session or anon user');
                 throw new TRPCError({
@@ -94,17 +95,17 @@ export const vote = createTRPCRouter({
             }
 
             if (!ctx.session?.user && input.anonUser) {
-                const [anonUser, error] =
+                const [anonUser, getAnonUser] =
                     await AnonHelper.getAnonUserByIdSecret({
                         userId: input.anonUser.id,
                         secret: input.anonUser.secret,
                     });
 
-                if (error) {
+                if (getAnonUser) {
                     console.error(
                         `Could not find anon user due to error: ${
-                            error.message
-                        } ${error.stack ?? 'no stack'}`
+                            getAnonUser.message
+                        } ${getAnonUser.stack ?? 'no stack'}`
                     );
 
                     throw new TRPCError({
@@ -117,60 +118,31 @@ export const vote = createTRPCRouter({
                     });
                 }
 
-                const [previousVote, previousVoteError] = await to(
-                    prisma.pokerVote.findFirst({
+                const [vote, voteError] = await to(
+                    prisma.pokerVote.upsert({
+                        select: selectPokerVote,
                         where: {
-                            voteId: input.voteId,
+                            voteId_anonUserId: {
+                                voteId: input.voteId,
+                                anonUserId: input.anonUser.id,
+                            },
+                        },
+                        update: {
+                            choice: input.choice,
+                        },
+                        create: {
+                            choice: input.choice,
                             anonUserId: input.anonUser.id,
+                            voteId: cuid2.createId(),
                         },
                     })
                 );
 
-                if (previousVoteError) {
-                    console.log(
-                        `Could not find previous vote due to error: ${
-                            previousVoteError.message
-                        } ${previousVoteError.stack ?? 'no stack'}`
-                    );
-                    throw new TRPCError({
-                        code: 'INTERNAL_SERVER_ERROR',
-                    });
-                }
-
-                let vote: Vote | null;
-                let voteError;
-                if (previousVote) {
-                    [vote, voteError] = await to(
-                        prisma.pokerVote.update({
-                            select: selectPokerVote,
-                            where: {
-                                id: previousVote.id,
-                            },
-                            data: {
-                                choice: input.choice,
-                            },
-                        })
-                    );
-                } else {
-                    [vote, voteError] = await to(
-                        prisma.pokerVote.create({
-                            select: selectPokerVote,
-                            data: {
-                                choice: input.choice,
-                                voteId: input.voteId,
-                                anonUserId: input.anonUser.id,
-                            },
-                        })
-                    );
-                }
-
                 if (voteError) {
                     console.log(
-                        `Could not ${
-                            previousVote ? 'update' : 'create'
-                        } vote due to error: ${voteError.message} ${
-                            voteError.stack ?? 'no stack'
-                        }`
+                        `Could not upsert vote ${input.voteId} due to error: ${
+                            voteError.message
+                        } ${voteError.stack ?? 'no stack'}`
                     );
                     throw new TRPCError({
                         code: 'INTERNAL_SERVER_ERROR',
@@ -185,60 +157,32 @@ export const vote = createTRPCRouter({
                 await dispatchVoteUpdate({ pokerVote: vote });
                 return vote;
             } else if (ctx.session?.user.id) {
-                const [previousVote, previousVoteError] = await to(
-                    prisma.pokerVote.findFirst({
+                // todo validate this
+                const [vote, voteError] = await to(
+                    prisma.pokerVote.upsert({
+                        select: selectPokerVote,
                         where: {
-                            voteId: input.voteId,
+                            voteId_userId: {
+                                voteId: input.voteId,
+                                userId: ctx.session.user.id,
+                            },
+                        },
+                        update: {
+                            choice: input.choice,
+                        },
+                        create: {
+                            choice: input.choice,
                             userId: ctx.session.user.id,
+                            voteId: cuid2.createId(),
                         },
                     })
                 );
 
-                if (previousVoteError) {
-                    console.log(
-                        `Could not find previous vote due to error: ${
-                            previousVoteError.message
-                        } ${previousVoteError.stack ?? 'no stack'}`
-                    );
-                    throw new TRPCError({
-                        code: 'INTERNAL_SERVER_ERROR',
-                    });
-                }
-
-                let vote: Vote | null;
-                let voteError;
-                if (previousVote) {
-                    [vote, voteError] = await to(
-                        prisma.pokerVote.update({
-                            select: selectPokerVote,
-                            where: {
-                                id: previousVote.id,
-                            },
-                            data: {
-                                choice: input.choice,
-                            },
-                        })
-                    );
-                } else {
-                    [vote, voteError] = await to(
-                        prisma.pokerVote.create({
-                            select: selectPokerVote,
-                            data: {
-                                choice: input.choice,
-                                voteId: input.voteId,
-                                userId: ctx.session.user.id,
-                            },
-                        })
-                    );
-                }
-
                 if (voteError) {
                     console.log(
-                        `Could not ${
-                            previousVote ? 'update' : 'create'
-                        } vote due to error: ${voteError.message} ${
-                            voteError.stack ?? 'no stack'
-                        }`
+                        `Could not upsert vote ${input.voteId} due to error: ${
+                            voteError.message
+                        } ${voteError.stack ?? 'no stack'}`
                     );
                     throw new TRPCError({
                         code: 'INTERNAL_SERVER_ERROR',
