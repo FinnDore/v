@@ -133,7 +133,7 @@ export const vote = createTRPCRouter({
                         create: {
                             choice: input.choice,
                             anonUserId: input.anonUser.id,
-                            voteId: cuid2.createId(),
+                            voteId: input.voteId,
                         },
                     })
                 );
