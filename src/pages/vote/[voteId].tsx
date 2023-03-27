@@ -25,8 +25,7 @@ const useVotes = () => {
     return data;
 };
 
-const voteOptions = [1, 2, 4, 8, 16, 24, 48];
-
+const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 export default function Vote() {
     const pokerId = usePokerId();
     const utils = api.useContext();

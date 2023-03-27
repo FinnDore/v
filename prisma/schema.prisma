@@ -31,9 +31,9 @@ model PokerVote {
   anonUserId String?
 
   @@index([voteId])
-  @@index([userId])
   @@index([anonUserId, voteId])
-  @@index([voteId, userId])
+  @@index([userId, voteId])
+  
   @@unique([voteId, anonUserId])
   @@unique([voteId, userId])
 }
