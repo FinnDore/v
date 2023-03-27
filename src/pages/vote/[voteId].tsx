@@ -99,7 +99,7 @@ function VoteButton({ vote }: { vote: number }) {
         config: current ? config.default : config.wobbly,
     });
 
-    if (!pokerId) return <div>Join a vote</div>;
+    if (!pokerId) return null;
 
     return (
         <div className="my-2 flex flex-col">
