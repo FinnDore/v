@@ -66,7 +66,7 @@ export default function Vote() {
         });
     };
 
-    const { votesMap, highestVote } = useMemo(() => {
+    const { votesMap, currentVote } = useMemo(() => {
         const currentVote = votes?.find(
             v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
         );
@@ -101,7 +101,7 @@ export default function Vote() {
                             currentVotes={votesMap[vote.toString()] ?? 0}
                             totalVotes={votes?.length ?? 0}
                             doVote={doVote}
-                            current={highestVote === vote.toString()}
+                            current={currentVote?.choice === vote.toString()}
                         />
                     ))}
                 </div>
