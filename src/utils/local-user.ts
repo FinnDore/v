@@ -1,7 +1,7 @@
-import { useEffect, useState, version } from 'react';
 import { type AnonUser } from '@prisma/client';
-import { Session } from 'next-auth';
+import { type Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
+import { useEffect, useState, version } from 'react';
 import { z } from 'zod';
 
 const LocalUserStoreSchema = z.object({

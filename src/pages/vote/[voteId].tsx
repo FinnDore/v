@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
-import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
+import { useRouter } from 'next/router';
+import { memo, useMemo } from 'react';
 
+import { type Vote } from '@/server/hop';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
-import { type Vote } from '@/server/hop';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 
@@ -87,12 +87,12 @@ export default function Vote() {
         );
 
         return { currentVote, votesMap, highestVote: highestVote[0] };
-    }, [votes, anonUser?.id]);
+    }, [votes, anonUser]);
 
     return (
         <div className="grid h-full w-screen max-w-screen-2xl place-items-center text-white">
             <HandleUpdates />
-            <div className="big-shadow relative flex h-[80%] w-[90%] flex-col justify-center overflow-hidden rounded-3xl border border-[#C9C9C9]/30 bg-[#000]/60 px-4 shadow-2xl md:w-[600px] lg:w-[1200px]">
+            <div className="relative flex h-[80%] w-[90%] flex-col justify-center overflow-hidden rounded-3xl border border-[#C9C9C9]/30 bg-[#000]/60 px-4 shadow-2xl md:w-[600px] lg:w-[1200px]">
                 <div className="mx-auto flex flex-wrap gap-4">
                     {voteOptions.map(vote => (
                         <VoteButton
@@ -110,7 +110,7 @@ export default function Vote() {
     );
 }
 
-function VoteButton({
+const VoteButton = memo(function VoteButton({
     vote,
     doVote,
     currentVotes,
@@ -123,9 +123,10 @@ function VoteButton({
     currentVotes: number;
     totalVotes: number;
 }) {
+    const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({
-        height: (currentVotes / totalVotes) * 100,
-        config: current ? config.default : config.wobbly,
+        height: isNaN(height) ? "0%" :`${height}%` ,
+        config:  config.wobbly,
     });
 
     return (
@@ -161,7 +162,7 @@ function VoteButton({
             </button>
         </div>
     );
-}
+})
 
 const HandleUpdates = () => {
     const pokerId = usePokerId();
