@@ -1,11 +1,11 @@
-import { initTRPC, TRPCError } from '@trpc/server';
+import { type AnonUser } from '@prisma/client';
+import { TRPCError, initTRPC } from '@trpc/server';
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { type Session } from 'next-auth';
 import superjson from 'superjson';
 
 import { getServerAuthSession } from '@/server/auth';
 import { prisma } from '@/server/db';
-import { type AnonUser } from '@prisma/client';
 
 type CreateContextOptions = {
     session: Session | null;

@@ -1,10 +1,11 @@
-import { type Vote } from '@/server/hop';
-import { api } from '@/utils/api';
-import { useAnonUser } from '@/utils/local-user';
 import { useChannelMessage } from '@onehop/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
+
+import { type Vote } from '@/server/hop';
+import { api } from '@/utils/api';
+import { useAnonUser } from '@/utils/local-user';
 
 const usePokerId = () => {
     const router = useRouter();
@@ -104,7 +105,7 @@ function VoteButton({ vote }: { vote: number }) {
     return (
         <div className="my-2 flex flex-col">
             <div className="relative mx-auto mb-1 h-24 rotate-180 ">
-                <div className="absolute z-10 h-1/3 w-full  bg-gradient-to-b from-white to-transparent dark:from-black"></div>
+                <div className="absolute z-10 h-1/3 w-full bg-gradient-to-b from-white to-transparent dark:from-black"></div>
                 <animated.div
                     style={styles}
                     className="w-8 rounded-b-md border border-orange-400 bg-orange-600"

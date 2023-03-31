@@ -25,6 +25,7 @@ const config = {
     importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
     importOrderMergeDuplicateImports: true,
     importOrderCombineTypeAndValueImports: true,
+    tailwindConfig: './tailwind.config.ts',
 };
 
 module.exports = config;

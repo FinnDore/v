@@ -1,7 +1,8 @@
-import { storeUser } from '@/utils/local-user';
+import { useState } from 'react';
 import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+
+import { storeUser } from '@/utils/local-user';
 import { api } from '../../utils/api';
 
 const Home: NextPage = () => {

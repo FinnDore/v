@@ -1,5 +1,6 @@
-import { env } from '@/env.mjs';
 import { Hop, type APIAuthentication } from '@onehop/js';
+
+import { env } from '@/env.mjs';
 
 export const hop = new Hop(env.HOP_TOKEN as APIAuthentication);
 

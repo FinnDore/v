@@ -1,7 +1,7 @@
+import { useEffect, useState, version } from 'react';
 import { type AnonUser } from '@prisma/client';
+import { Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
-
-import { useMemo, version } from 'react';
 import { z } from 'zod';
 
 const LocalUserStoreSchema = z.object({
@@ -13,13 +13,20 @@ const LocalUserStoreSchema = z.object({
     }),
 });
 
+type LocalUserStore = z.infer<typeof LocalUserStoreSchema>;
+
 export function useAnonUser() {
-    return useMemo(() => {
-        if (typeof window === 'undefined') return null;
+    const [user, storeUser] = useState<LocalUserStore['user'] | null>(null);
+    useEffect(() => {
+        const cleanup = () => storeUser(null);
+        if (typeof window === 'undefined') return cleanup;
         const localUserStore = getLocalUserStore();
 
-        return localUserStore?.user ?? null;
+        storeUser(() => localUserStore?.user ?? null);
+        return cleanup;
     }, []);
+
+    return user;
 }
 
 export function useSessionOrAnonUser() {
@@ -70,3 +77,47 @@ function getLocalUserStore() {
     }
     return existingUsersParseResult.data;
 }
+
+const useUser = ():
+    | {
+          status: 'authenticated';
+          user: Session;
+      }
+    | {
+          status: 'loading';
+          user: null;
+      }
+    | {
+          status: 'anon';
+          user: LocalUserStore['user'];
+      }
+    | {
+          status: 'unauthenticated';
+          user: null;
+      } => {
+    const { data: session, status } = useSession();
+    const anonUser = useAnonUser();
+    const loading = status === 'loading';
+
+    if (loading) {
+        return {
+            status,
+            user: null,
+        };
+    } else if (session) {
+        return {
+            status: 'authenticated',
+            user: session,
+        };
+    } else if (anonUser) {
+        return {
+            status: 'anon',
+            user: anonUser,
+        };
+    } else {
+        return {
+            status: 'unauthenticated',
+            user: null,
+        };
+    }
+};
