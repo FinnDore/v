@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
-import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
+import { useRouter } from 'next/router';
+import { useMemo } from 'react';
 
+import { type Vote } from '@/server/hop';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
-import { type Vote } from '@/server/hop';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 
@@ -81,9 +81,8 @@ export default function Vote() {
             ) ?? {};
 
         /// get the highest vote
-        const highestVote = Object.entries(votesMap).reduce(
-            (a, e): [string, number] => (e[1] > a[1] ? e : a),
-            ['-1', 0] as [string, number]
+        const highestVote = Object.entries(votesMap).reduce((a, e) =>
+            e[1] > a[1] ? e : a, [-1, 0]
         );
 
         return { currentVote, votesMap, highestVote: highestVote[0] };
@@ -127,6 +126,7 @@ function VoteButton({
         height: (currentVotes / totalVotes) * 100,
         config: current ? config.default : config.wobbly,
     });
+
 
     return (
         <div className="my-2 flex flex-col">
