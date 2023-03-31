@@ -7,7 +7,7 @@ import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 
 import { api } from '@/utils/api';
-import { useAnonUser } from '@/utils/local-user';
+import { useUser } from '@/utils/local-user';
 
 const MyApp: AppType<{ session: Session | null }> = ({
     Component,
@@ -21,16 +21,23 @@ const MyApp: AppType<{ session: Session | null }> = ({
         });
     }, []);
 
-    const anonUser = useAnonUser();
-
     return (
         <SessionProvider session={session}>
-            <nav className="flex w-full px-4 py-4">
-                <div className="ml-auto mr-4 text-2xl">{anonUser?.name}</div>
-            </nav>
+            <Nav />
             <Component {...pageProps} />
         </SessionProvider>
     );
 };
 
 export default api.withTRPC(MyApp);
+
+const Nav = () => {
+    const { status, user } = useUser();
+    const name = status === 'authenticated' ? user.user.name : user?.name;
+
+    return (
+        <nav className="flex w-full px-4 py-4">
+            <div className="ml-auto mr-4 text-2xl">{name}</div>
+        </nav>
+    );
+};

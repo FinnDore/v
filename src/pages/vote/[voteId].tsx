@@ -1,11 +1,14 @@
+import { useMemo } from 'react';
+import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
-import { useRouter } from 'next/router';
 
-import { type Vote } from '@/server/hop';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
+import { type Vote } from '@/server/hop';
+
+const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 
 const usePokerId = () => {
     const router = useRouter();
@@ -16,7 +19,6 @@ const usePokerId = () => {
 
 const useVotes = () => {
     const pokerId = usePokerId();
-
     const { data } = api.vote.pokerState.getVotes.useQuery(
         { pokerId: pokerId ?? '' },
         {
@@ -27,35 +29,16 @@ const useVotes = () => {
     return data;
 };
 
-const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 export default function Vote() {
-    const pokerId = usePokerId();
-    const utils = api.useContext();
-
-    useChannelMessage(
-        `poker_${pokerId ?? ''}`,
-        'VOTE_UPDATE',
-        (updatedVote: Vote) => {
-            utils.vote.pokerState.getVotes.setData(
-                { pokerId: pokerId ?? '' },
-                old => {
-                    if (!old) return [updatedVote];
-                    const index = old.findIndex(v => v.id === updatedVote.id);
-                    if (index === -1) return [...old, updatedVote];
-                    const copy = [...old];
-                    copy[index] = updatedVote;
-                    return copy;
-                }
-            );
-        }
-    );
-
     return (
-        <div className="grid h-screen w-screen max-w-screen-2xl place-items-center text-white">
-            <div className="mx-6 flex flex-wrap gap-4">
-                {voteOptions.map(vote => (
-                    <VoteButton key={vote} vote={vote} />
-                ))}
+        <div className="grid h-full w-screen max-w-screen-2xl place-items-center text-white">
+            <HandleUpdates />
+            <div className="big-shadow relative flex h-[80%] w-[90%] flex-col justify-center overflow-hidden rounded-3xl border border-[#C9C9C9]/30 bg-[#000]/60 px-4 shadow-2xl md:w-[600px] lg:w-[1200px]">
+                <div className="mx-auto flex flex-wrap gap-4">
+                    {voteOptions.map(vote => (
+                        <VoteButton key={vote} vote={vote} />
+                    ))}
+                </div>
             </div>
         </div>
     );
@@ -89,12 +72,19 @@ function VoteButton({ vote }: { vote: number }) {
             });
         },
     });
-    const currentVote = votes?.find(
-        v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
-    );
 
-    const current = currentVote?.choice === vote.toString();
-    const voteCount = votes?.filter(v => v.choice === vote.toString()).length;
+    const { current, voteCount } = useMemo(() => {
+        const currentVote = votes?.find(
+            v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
+        );
+
+        const current = currentVote?.choice === vote.toString();
+        const voteCount = votes?.filter(
+            v => v.choice === vote.toString()
+        ).length;
+        return { current, voteCount };
+    }, [votes, vote, anonUser?.id]);
+
     const styles = useSpring({
         height: ((voteCount ?? 0) / (votes?.length ?? 0)) * 100,
         config: current ? config.default : config.wobbly,
@@ -139,7 +129,31 @@ function VoteButton({ vote }: { vote: number }) {
                     <div className="m-auto">{vote}</div>
                 </div>
             </button>
-            <div className="h-4 w-full py-2 text-center">{voteCount}</div>
         </div>
     );
 }
+
+const HandleUpdates = () => {
+    const pokerId = usePokerId();
+    const utils = api.useContext();
+
+    // This hook causes a re-render on every message
+    useChannelMessage(
+        `poker_${pokerId ?? ''}`,
+        'VOTE_UPDATE',
+        (updatedVote: Vote) => {
+            utils.vote.pokerState.getVotes.setData(
+                { pokerId: pokerId ?? '' },
+                old => {
+                    if (!old) return [updatedVote];
+                    const index = old.findIndex(v => v.id === updatedVote.id);
+                    if (index === -1) return [...old, updatedVote];
+                    const copy = [...old];
+                    copy[index] = updatedVote;
+                    return copy;
+                }
+            );
+        }
+    );
+    return null;
+};

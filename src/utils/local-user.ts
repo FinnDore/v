@@ -29,15 +29,6 @@ export function useAnonUser() {
     return user;
 }
 
-export function useSessionOrAnonUser() {
-    const anonUser = useAnonUser();
-    const sessionUser = useSession();
-
-    if (sessionUser.status === 'loading') return null;
-    if (sessionUser.status === 'authenticated') return sessionUser.data.user;
-    return anonUser;
-}
-
 export function storeUser(user: AnonUser) {
     if (typeof window === 'undefined') return;
 
@@ -78,7 +69,7 @@ function getLocalUserStore() {
     return existingUsersParseResult.data;
 }
 
-const useUser = ():
+export const useUser = ():
     | {
           status: 'authenticated';
           user: Session;
