@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
-import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
+import { useRouter } from 'next/router';
+import { useMemo } from 'react';
 
+import { type Vote } from '@/server/hop';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
-import { type Vote } from '@/server/hop';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 
@@ -30,27 +30,11 @@ const useVotes = () => {
 };
 
 export default function Vote() {
-    return (
-        <div className="grid h-full w-screen max-w-screen-2xl place-items-center text-white">
-            <HandleUpdates />
-            <div className="big-shadow relative flex h-[80%] w-[90%] flex-col justify-center overflow-hidden rounded-3xl border border-[#C9C9C9]/30 bg-[#000]/60 px-4 shadow-2xl md:w-[600px] lg:w-[1200px]">
-                <div className="mx-auto flex flex-wrap gap-4">
-                    {voteOptions.map(vote => (
-                        <VoteButton key={vote} vote={vote} />
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function VoteButton({ vote }: { vote: number }) {
-    const anonUser = useAnonUser();
     const pokerId = usePokerId();
     const utils = api.useContext();
     const votes = useVotes();
-
-    const { mutate: doVote } = api.vote.vote.useMutation({
+    const anonUser = useAnonUser();
+    const { mutate } = api.vote.vote.useMutation({
         onMutate: ({ anonUser, choice, voteId }) => {
             utils.vote.pokerState.getVotes.setData(
                 {
@@ -73,24 +57,76 @@ function VoteButton({ vote }: { vote: number }) {
         },
     });
 
-    const { current, voteCount } = useMemo(() => {
+    const doVote = (vote: number) => {
+        if (!pokerId || !anonUser) return;
+        mutate({
+            choice: vote.toString(),
+            voteId: pokerId,
+            anonUser,
+        });
+    };
+
+    const { votesMap, highestVote } = useMemo(() => {
         const currentVote = votes?.find(
             v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
         );
 
-        const current = currentVote?.choice === vote.toString();
-        const voteCount = votes?.filter(
-            v => v.choice === vote.toString()
-        ).length;
-        return { current, voteCount };
-    }, [votes, vote, anonUser?.id]);
+        const votesMap =
+            votes?.reduce(
+                (acc, v) => ({
+                    ...acc,
+                    [v.choice]: (acc[v.choice] ?? 0) + 1,
+                }),
+                {} as Record<string, number>
+            ) ?? {};
 
+        /// get the highest vote
+        const highestVote = Object.entries(votesMap).reduce((a, e) =>
+            e[1] > a[1] ? e : a, [-1, 0]
+        );
+
+        return { currentVote, votesMap, highestVote: highestVote[0] };
+    }, [votes, anonUser?.id]);
+
+    return (
+        <div className="grid h-full w-screen max-w-screen-2xl place-items-center text-white">
+            <HandleUpdates />
+            <div className="big-shadow relative flex h-[80%] w-[90%] flex-col justify-center overflow-hidden rounded-3xl border border-[#C9C9C9]/30 bg-[#000]/60 px-4 shadow-2xl md:w-[600px] lg:w-[1200px]">
+                <div className="mx-auto flex flex-wrap gap-4">
+                    {voteOptions.map(vote => (
+                        <VoteButton
+                            key={vote}
+                            vote={vote}
+                            currentVotes={votesMap[vote.toString()] ?? 0}
+                            totalVotes={votes?.length ?? 0}
+                            doVote={doVote}
+                            current={highestVote === vote.toString()}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function VoteButton({
+    vote,
+    doVote,
+    currentVotes,
+    totalVotes,
+    current,
+}: {
+    current: boolean;
+    vote: number;
+    doVote: (vote: number) => void;
+    currentVotes: number;
+    totalVotes: number;
+}) {
     const styles = useSpring({
-        height: ((voteCount ?? 0) / (votes?.length ?? 0)) * 100,
+        height: (currentVotes / totalVotes) * 100,
         config: current ? config.default : config.wobbly,
     });
 
-    if (!pokerId) return null;
 
     return (
         <div className="my-2 flex flex-col">
@@ -108,13 +144,7 @@ function VoteButton({ vote }: { vote: number }) {
                         'opacity-70': !current,
                     }
                 )}
-                onClick={() => {
-                    doVote({
-                        choice: vote.toString(),
-                        voteId: pokerId,
-                        anonUser,
-                    });
-                }}
+                onClick={() => doVote(vote)}
             >
                 <div className="-z-1 absolute -bottom-1 left-0 h-4 w-full rounded-b-sm bg-orange-600"></div>
                 <div
