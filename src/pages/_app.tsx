@@ -1,10 +1,10 @@
 import { env } from '@/env.mjs';
 import '@/styles/globals.css';
+import { useEffect } from 'react';
+import { type AppType } from 'next/app';
 import { hop } from '@onehop/client';
 import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
-import { type AppType } from 'next/app';
-import { useEffect } from 'react';
 
 import { api } from '@/utils/api';
 import { useUser } from '@/utils/local-user';
@@ -36,7 +36,7 @@ const Nav = () => {
     const name = status === 'authenticated' ? user.user.name : user?.name;
 
     return (
-        <nav className="flex w-full px-4 py-4 absolute">
+        <nav className="absolute flex w-full px-4 py-4">
             <div className="ml-auto mr-4 text-2xl">{name}</div>
         </nav>
     );
