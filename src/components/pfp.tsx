@@ -15,7 +15,7 @@ export const Pfp = forwardRef<
         >
             <div className="relative h-full w-full cursor-pointer transition-all hover:scale-110">
                 <div className="absolute z-10 h-full w-full overflow-clip rounded-full border border-white/40 ">
-                    <picture className="block h-[100px] w-[100px] overflow-clip">
+                    <picture className="block h-[70px] w-[70px] overflow-clip">
                         <source srcSet={'/NOISE.webp'} type="image/webp" />
                         <img alt={`profile picture for ${name}`} />
                     </picture>

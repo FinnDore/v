@@ -142,7 +142,7 @@ const VoteButton = memo(function VoteButton({
 
     return (
         <div className="my-2 flex flex-col">
-            <div className="relative mx-auto mb-1 h-24 rotate-180 ">
+            <div className="relative mx-auto mb-1 h-48 rotate-180 ">
                 <div className="absolute z-10 h-1/3 w-full bg-gradient-to-b from-white to-transparent dark:from-black"></div>
                 <animated.div
                     style={styles}
