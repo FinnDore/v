@@ -6,6 +6,7 @@ import { useHopUpdates } from 'hooks/use-hop-updates';
 
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
+import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
 import { Switch } from '@/components/switch';
 
@@ -50,7 +51,13 @@ const Vote = () => {
     const anonUser = useAnonUser();
     const { doVote } = useVote();
     const [showResults, setShowResults] = useState(false);
+    const [showVotes, setShowVotes] = useState(false);
     useHopUpdates();
+
+    const styles = useSpring({
+        height: showResults ? 300 : 48,
+        config: config.gentle,
+    });
 
     const { votesMap, currentVote } = useMemo(() => {
         const currentVote = votes?.find(
@@ -84,12 +91,33 @@ const Vote = () => {
 
     return (
         <div className="flex h-full w-screen max-w-screen-2xl flex-col place-items-center justify-center text-white">
-            <div className="mx-auto flex flex-wrap gap-4">
+            <div className="mb-4 flex gap-4">
+                <Button
+                    onClick={() =>
+                        setShowResults(x => {
+                            setShowVotes(!x);
+                            return !x;
+                        })
+                    }
+                >
+                    {showResults ? 'Hide Results' : 'Show Results'}
+                </Button>
+                <Switch
+                    onClick={() => setShowVotes(x => !x)}
+                    className="my-auto"
+                >
+                    Show Results
+                </Switch>
+            </div>
+            <animated.div
+                style={styles}
+                className="mx-auto flex flex-wrap gap-4 overflow-hidden"
+            >
                 {voteOptions.map(vote => (
                     <VoteButton
                         key={vote}
                         vote={vote}
-                        showResults={showResults}
+                        showVotes={showVotes}
                         users={votesMap[vote.toString()]?.users ?? []}
                         currentVotes={votesMap[vote.toString()]?.count ?? 0}
                         totalVotes={votes?.length ?? 0}
@@ -97,12 +125,7 @@ const Vote = () => {
                         current={currentVote?.choice === vote.toString()}
                     />
                 ))}
-            </div>
-            <div className="mt-4 flex justify-end">
-                <Switch onClick={() => setShowResults(x => !x)}>
-                    Show Results
-                </Switch>
-            </div>
+            </animated.div>
         </div>
     );
 };
@@ -114,7 +137,7 @@ const VoteButton = memo(function VoteButton({
     totalVotes,
     current,
     users,
-    showResults,
+    showVotes,
 }: {
     current: boolean;
     vote: number;
@@ -122,11 +145,11 @@ const VoteButton = memo(function VoteButton({
     currentVotes: number;
     totalVotes: number;
     users: string[];
-    showResults: boolean;
+    showVotes: boolean;
 }) {
     const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({
-        height: !showResults || isNaN(height) ? '0%' : `${height}%`,
+        height: !showVotes || isNaN(height) ? '0%' : `${height}%`,
         config: config.wobbly,
     });
 
@@ -160,7 +183,7 @@ const VoteButton = memo(function VoteButton({
                 >
                     <div className="m-auto">{vote}</div>
                 </div>
-                {showResults && (
+                {showVotes && (
                     <div className="absolute -top-2 right-0 flex">
                         {users.map((user, i) => (
                             <div
