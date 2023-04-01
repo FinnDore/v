@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
 import { usePokerId, useVotes } from 'hooks/poker-hooks';
@@ -7,6 +7,7 @@ import { useHopUpdates } from 'hooks/use-hop-updates';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { Pfp } from '@/components/pfp';
+import { Switch } from '@/components/switch';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 const useVote = () => {
@@ -48,7 +49,7 @@ const Vote = () => {
     const votes = useVotes();
     const anonUser = useAnonUser();
     const { doVote } = useVote();
-
+    const [showResults, setShowResults] = useState(false);
     useHopUpdates();
 
     const { votesMap, currentVote } = useMemo(() => {
@@ -82,12 +83,13 @@ const Vote = () => {
     }, [votes, anonUser]);
 
     return (
-        <div className="grid h-full w-screen max-w-screen-2xl place-items-center text-white">
+        <div className="flex h-full w-screen max-w-screen-2xl flex-col place-items-center justify-center text-white">
             <div className="mx-auto flex flex-wrap gap-4">
                 {voteOptions.map(vote => (
                     <VoteButton
                         key={vote}
                         vote={vote}
+                        showResults={showResults}
                         users={votesMap[vote.toString()]?.users ?? []}
                         currentVotes={votesMap[vote.toString()]?.count ?? 0}
                         totalVotes={votes?.length ?? 0}
@@ -95,6 +97,11 @@ const Vote = () => {
                         current={currentVote?.choice === vote.toString()}
                     />
                 ))}
+            </div>
+            <div className="mt-4 flex justify-end">
+                <Switch onClick={() => setShowResults(x => !x)}>
+                    Show Results
+                </Switch>
             </div>
         </div>
     );
@@ -107,6 +114,7 @@ const VoteButton = memo(function VoteButton({
     totalVotes,
     current,
     users,
+    showResults,
 }: {
     current: boolean;
     vote: number;
@@ -114,16 +122,17 @@ const VoteButton = memo(function VoteButton({
     currentVotes: number;
     totalVotes: number;
     users: string[];
+    showResults: boolean;
 }) {
     const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({
-        height: isNaN(height) ? '0%' : `${height}%`,
+        height: !showResults || isNaN(height) ? '0%' : `${height}%`,
         config: config.wobbly,
     });
 
     return (
         <div className="my-2 flex flex-col">
-            <div className="relative mx-auto mb-1 h-48 rotate-180 ">
+            <div className="relative mx-auto mb-1 h-48 rotate-180">
                 <div className="absolute z-10 h-1/3 w-full bg-gradient-to-b from-white to-transparent dark:from-black"></div>
                 <animated.div
                     style={styles}
@@ -134,7 +143,7 @@ const VoteButton = memo(function VoteButton({
                 className={clsx(
                     'relative h-12 w-16 text-white transition-all',
                     {
-                        'opacity-70': !current,
+                        'opacity-60': !current,
                     }
                 )}
                 onClick={() => doVote(vote)}
@@ -144,32 +153,35 @@ const VoteButton = memo(function VoteButton({
                     className={clsx(
                         'z-1 absolute top-0 flex h-full w-full rounded-sm border-2 border-orange-400 bg-orange-600 text-white transition-all hover:bg-orange-500',
                         {
-                            '-top-1 shadow-[inset_1px_1px_12px_#0000004f]':
+                            '-top-1 border shadow-[inset_1px_1px_12px_#0000004f]':
                                 current,
                         }
                     )}
                 >
                     <div className="m-auto">{vote}</div>
                 </div>
-                <div className="absolute -top-2 right-0 flex">
-                    {users.map((user, i) => (
-                        <div
-                            className="animate-[floatIn_250ms_ease-out] "
-                            style={{
-                                zIndex: i + 1,
-                            }}
-                            key={i}
-                        >
-                            <Pfp
+                {showResults && (
+                    <div className="absolute -top-2 right-0 flex">
+                        {users.map((user, i) => (
+                            <div
+                                className="animate-[floatIn_250ms_ease-out] "
                                 style={{
-                                    right: `${i * 0.5}rem`,
+                                    zIndex: i + 1,
                                 }}
-                                name={user === '' ? 'Anonymous' : user}
-                                className={clsx(`absolute h-4 `, {})}
-                            />
-                        </div>
-                    ))}
-                </div>
+                                key={i}
+                            >
+                                <Pfp
+                                    style={{
+                                        right: `${i * 0.5}rem`,
+                                    }}
+                                    border={current ? 'border-white' : ''}
+                                    name={user === '' ? 'Anonymous' : user}
+                                    className={clsx(`absolute h-4 `, {})}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
             </button>
         </div>
     );

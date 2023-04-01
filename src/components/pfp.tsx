@@ -3,8 +3,8 @@ import clsx from 'clsx';
 
 export const Pfp = forwardRef<
     HTMLDivElement,
-    HTMLProps<HTMLDivElement> & { name: string }
->(function Pfp({ name, ...props }, ref) {
+    HTMLProps<HTMLDivElement> & { name: string; border?: string }
+>(function Pfp({ name, border, ...props }, ref) {
     const pictureName = encodeURIComponent(name ?? '');
 
     return (
@@ -14,7 +14,12 @@ export const Pfp = forwardRef<
             className={clsx('aspect-square', props.className)}
         >
             <div className="relative h-full w-full cursor-pointer transition-all hover:scale-110">
-                <div className="absolute z-10 h-full w-full overflow-clip rounded-full border border-white/40 ">
+                <div
+                    className={clsx(
+                        border,
+                        'absolute z-10 h-full w-full overflow-clip rounded-full border border-white/40'
+                    )}
+                >
                     <picture className="block h-[70px] w-[70px] overflow-clip">
                         <source srcSet={'/NOISE.webp'} type="image/webp" />
                         <img alt={`profile picture for ${name}`} />
