@@ -1,39 +1,17 @@
 import { memo, useMemo } from 'react';
-import { useRouter } from 'next/router';
-import { useChannelMessage } from '@onehop/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
+import { usePokerId, useVotes } from 'hooks/poker-hooks';
+import { useHopUpdates } from 'hooks/use-hop-updates';
 
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { Pfp } from '@/components/pfp';
-import { type Vote } from '@/server/hop';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
-
-const usePokerId = () => {
-    const router = useRouter();
-    return Array.isArray(router.query.voteId)
-        ? router.query.voteId[0]
-        : router.query.voteId;
-};
-
-const useVotes = () => {
-    const pokerId = usePokerId();
-    const { data } = api.vote.pokerState.getVotes.useQuery(
-        { pokerId: pokerId ?? '' },
-        {
-            enabled: !!pokerId,
-        }
-    );
-
-    return data;
-};
-
-export default function Vote() {
+const useVote = () => {
     const pokerId = usePokerId();
     const utils = api.useContext();
-    const votes = useVotes();
     const anonUser = useAnonUser();
     const { mutate } = api.vote.vote.useMutation({
         onMutate: ({ anonUser, choice, voteId }) => {
@@ -58,14 +36,20 @@ export default function Vote() {
         },
     });
 
-    const doVote = (vote: number) => {
-        if (!pokerId || !anonUser) return;
-        mutate({
-            choice: vote.toString(),
-            voteId: pokerId,
-            anonUser,
-        });
+    return {
+        doVote: (choice: number) =>
+            pokerId &&
+            anonUser &&
+            mutate({ choice: choice.toString(), voteId: pokerId, anonUser }),
     };
+};
+
+const Vote = () => {
+    const votes = useVotes();
+    const anonUser = useAnonUser();
+    const { doVote } = useVote();
+
+    useHopUpdates();
 
     const { votesMap, currentVote } = useMemo(() => {
         const currentVote = votes?.find(
@@ -99,25 +83,22 @@ export default function Vote() {
 
     return (
         <div className="grid h-full w-screen max-w-screen-2xl place-items-center text-white">
-            <HandleUpdates />
-            <div className="relative flex h-[80%] w-[90%] flex-col justify-center overflow-hidden rounded-3xl border border-[#C9C9C9]/30 bg-[#000]/60 px-4 shadow-2xl md:w-[600px] lg:w-[1200px]">
-                <div className="mx-auto flex flex-wrap gap-4">
-                    {voteOptions.map(vote => (
-                        <VoteButton
-                            key={vote}
-                            vote={vote}
-                            users={votesMap[vote.toString()]?.users ?? []}
-                            currentVotes={votesMap[vote.toString()]?.count ?? 0}
-                            totalVotes={votes?.length ?? 0}
-                            doVote={doVote}
-                            current={currentVote?.choice === vote.toString()}
-                        />
-                    ))}
-                </div>
+            <div className="mx-auto flex flex-wrap gap-4">
+                {voteOptions.map(vote => (
+                    <VoteButton
+                        key={vote}
+                        vote={vote}
+                        users={votesMap[vote.toString()]?.users ?? []}
+                        currentVotes={votesMap[vote.toString()]?.count ?? 0}
+                        totalVotes={votes?.length ?? 0}
+                        doVote={doVote}
+                        current={currentVote?.choice === vote.toString()}
+                    />
+                ))}
             </div>
         </div>
     );
-}
+};
 
 const VoteButton = memo(function VoteButton({
     vote,
@@ -194,27 +175,4 @@ const VoteButton = memo(function VoteButton({
     );
 });
 
-const HandleUpdates = () => {
-    const pokerId = usePokerId();
-    const utils = api.useContext();
-
-    // This hook causes a re-render on every message
-    useChannelMessage(
-        `poker_${pokerId ?? ''}`,
-        'VOTE_UPDATE',
-        (updatedVote: Vote) => {
-            utils.vote.pokerState.getVotes.setData(
-                { pokerId: pokerId ?? '' },
-                old => {
-                    if (!old) return [updatedVote];
-                    const index = old.findIndex(v => v.id === updatedVote.id);
-                    if (index === -1) return [...old, updatedVote];
-                    const copy = [...old];
-                    copy[index] = updatedVote;
-                    return copy;
-                }
-            );
-        }
-    );
-    return null;
-};
+export default Vote;

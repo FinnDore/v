@@ -1,4 +1,4 @@
-import { HTMLProps, forwardRef } from 'react';
+import { forwardRef, type HTMLProps } from 'react';
 import clsx from 'clsx';
 
 export const Pfp = forwardRef<
