@@ -21,18 +21,14 @@ export const Pfp = forwardRef<
                     </picture>
                 </div>
                 <picture className="absolute block h-full w-full rounded-full">
-                    <source
-                        srcSet={`https://avatars.jakerunzer.com/${pictureName}`}
-                    />
+                    <source srcSet={`/api/gradient/${pictureName}`} />
                     <img
                         className="h-full w-full"
                         alt={`profile picture for ${name}`}
                     />
                 </picture>
                 <picture className="absolute block h-full w-full blur-md saturate-150">
-                    <source
-                        srcSet={`https://avatars.jakerunzer.com/${pictureName}`}
-                    />
+                    <source srcSet={`/api/gradient/${pictureName}`} />
                     <img
                         className="h-full w-full"
                         alt={`profile picture for ${name}`}

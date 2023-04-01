@@ -172,15 +172,21 @@ const VoteButton = memo(function VoteButton({
                 </div>
                 <div className="absolute -top-2 right-0 flex">
                     {users.map((user, i) => (
-                        <Pfp
-                            name={user === '' ? 'Anonymous' : user}
-                            key={i}
+                        <div
+                            className="animate-[floatIn_250ms_ease-out] "
                             style={{
                                 zIndex: i + 1,
-                                right: `${i * 0.5}rem`,
                             }}
-                            className={clsx(`absolute h-4`, {})}
-                        />
+                            key={i}
+                        >
+                            <Pfp
+                                style={{
+                                    right: `${i * 0.5}rem`,
+                                }}
+                                name={user === '' ? 'Anonymous' : user}
+                                className={clsx(`absolute h-4 `, {})}
+                            />
+                        </div>
                     ))}
                 </div>
             </button>
