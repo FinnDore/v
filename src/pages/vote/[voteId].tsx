@@ -8,7 +8,6 @@ import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
-import { Switch } from '@/components/switch';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 const useVote = () => {
@@ -51,11 +50,10 @@ const Vote = () => {
     const anonUser = useAnonUser();
     const { doVote } = useVote();
     const [showResults, setShowResults] = useState(false);
-    const [showVotes, setShowVotes] = useState(false);
     useHopUpdates();
 
     const styles = useSpring({
-        height: showResults ? 300 : 48,
+        height: showResults ? 300 : 80,
         config: config.gentle,
     });
 
@@ -93,31 +91,22 @@ const Vote = () => {
         <div className="flex h-full w-screen max-w-screen-2xl flex-col place-items-center justify-center text-white">
             <div className="mb-4 flex gap-4">
                 <Button
-                    onClick={() =>
-                        setShowResults(x => {
-                            setShowVotes(!x);
-                            return !x;
-                        })
-                    }
+                    onClick={() => {
+                        setShowResults(x => !x);
+                    }}
                 >
                     {showResults ? 'Hide Results' : 'Show Results'}
                 </Button>
-                <Switch
-                    onClick={() => setShowVotes(x => !x)}
-                    className="my-auto"
-                >
-                    Show Results
-                </Switch>
             </div>
             <animated.div
                 style={styles}
-                className="mx-auto flex flex-wrap gap-4 overflow-hidden"
+                className="mx-auto flex flex-wrap gap-4"
             >
                 {voteOptions.map(vote => (
                     <VoteButton
                         key={vote}
                         vote={vote}
-                        showVotes={showVotes}
+                        showVotes={showResults}
                         users={votesMap[vote.toString()]?.users ?? []}
                         currentVotes={votesMap[vote.toString()]?.count ?? 0}
                         totalVotes={votes?.length ?? 0}
@@ -153,15 +142,24 @@ const VoteButton = memo(function VoteButton({
         config: config.wobbly,
     });
 
+    const outerStyles = useSpring({
+        height: !showVotes ? 0 : 196,
+        opacity: !showVotes ? 0 : 1,
+        config: config.gentle,
+    });
+
     return (
         <div className="my-2 flex flex-col">
-            <div className="relative mx-auto mb-1 h-48 rotate-180">
+            <animated.div
+                className="relative mx-auto mb-1 rotate-180"
+                style={outerStyles}
+            >
                 <div className="absolute z-10 h-1/3 w-full bg-gradient-to-b from-white to-transparent dark:from-black"></div>
                 <animated.div
                     style={styles}
                     className="w-8 rounded-b-md border border-orange-400 bg-orange-600"
                 ></animated.div>
-            </div>
+            </animated.div>
             <button
                 className={clsx(
                     'relative h-12 w-16 text-white transition-all',
