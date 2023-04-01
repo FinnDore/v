@@ -1,12 +1,13 @@
+import { memo, useMemo } from 'react';
+import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
-import { useRouter } from 'next/router';
-import { memo, useMemo } from 'react';
 
-import { type Vote } from '@/server/hop';
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
+import { Pfp } from '@/components/pfp';
+import { type Vote } from '@/server/hop';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 
@@ -75,14 +76,21 @@ export default function Vote() {
             votes?.reduce(
                 (acc, v) => ({
                     ...acc,
-                    [v.choice]: (acc[v.choice] ?? 0) + 1,
+                    [v.choice]: {
+                        count: (acc[v.choice]?.count ?? 0) + 1,
+                        users: [
+                            ...(acc[v.choice]?.users ?? []),
+                            v.user?.name ?? v.anonUser?.name ?? '',
+                        ],
+                    },
                 }),
-                {} as Record<string, number>
+                {} as Record<string, { count: number; users: string[] }>
             ) ?? {};
 
         /// get the highest vote
         const highestVote = Object.entries(votesMap).reduce(
-            (a, e): [string, number] => (e[1] > a[1] ? e : a),
+            (a, e): [string, number] =>
+                e[1].count > a[1] ? [e[0], e[1].count] : a,
             ['-1', 0] as [string, number]
         );
 
@@ -98,7 +106,8 @@ export default function Vote() {
                         <VoteButton
                             key={vote}
                             vote={vote}
-                            currentVotes={votesMap[vote.toString()] ?? 0}
+                            users={votesMap[vote.toString()]?.users ?? []}
+                            currentVotes={votesMap[vote.toString()]?.count ?? 0}
                             totalVotes={votes?.length ?? 0}
                             doVote={doVote}
                             current={currentVote?.choice === vote.toString()}
@@ -116,17 +125,19 @@ const VoteButton = memo(function VoteButton({
     currentVotes,
     totalVotes,
     current,
+    users,
 }: {
     current: boolean;
     vote: number;
     doVote: (vote: number) => void;
     currentVotes: number;
     totalVotes: number;
+    users: string[];
 }) {
     const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({
-        height: isNaN(height) ? "0%" :`${height}%` ,
-        config:  config.wobbly,
+        height: isNaN(height) ? '0%' : `${height}%`,
+        config: config.wobbly,
     });
 
     return (
@@ -159,10 +170,23 @@ const VoteButton = memo(function VoteButton({
                 >
                     <div className="m-auto">{vote}</div>
                 </div>
+                <div className="absolute -top-2 right-0 flex">
+                    {users.map((user, i) => (
+                        <Pfp
+                            name={user === '' ? 'Anonymous' : user}
+                            key={i}
+                            style={{
+                                zIndex: i + 1,
+                                right: `${i * 0.5}rem`,
+                            }}
+                            className={clsx(`absolute h-4`, {})}
+                        />
+                    ))}
+                </div>
             </button>
         </div>
     );
-})
+});
 
 const HandleUpdates = () => {
     const pokerId = usePokerId();

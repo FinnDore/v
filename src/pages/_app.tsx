@@ -8,6 +8,7 @@ import { SessionProvider } from 'next-auth/react';
 
 import { api } from '@/utils/api';
 import { useUser } from '@/utils/local-user';
+import { Pfp } from '@/components/pfp';
 
 const MyApp: AppType<{ session: Session | null }> = ({
     Component,
@@ -34,13 +35,13 @@ export default api.withTRPC(MyApp);
 const Nav = () => {
     const { status, user } = useUser();
     const name = status === 'authenticated' ? user.user.name : user?.name;
-    console.log(user);
-    const pictureName = encodeURIComponent(name ?? '');
+
     return (
         <nav className="absolute flex w-full px-4 py-4">
             {name && (
                 <>
-                    <div className="relative my-auto ms-auto aspect-square w-6 cursor-pointer transition-all hover:scale-110">
+                    <Pfp name={name} className="my-auto ms-auto w-6" />
+                    {/* <div className="relative my-auto ms-auto aspect-square w-6 cursor-pointer transition-all hover:scale-110">
                         <div className="absolute z-10 h-full w-full overflow-clip rounded-full border border-white/40 ">
                             <picture className="block h-[100px] w-[100px] overflow-clip">
                                 <source
@@ -65,7 +66,7 @@ const Nav = () => {
                                 alt={`profile picture for ${name}`}
                             />
                         </picture>
-                    </div>
+                    </div> */}
                     <div className="ml-3 mr-4 text-2xl">{name}</div>
                 </>
             )}
