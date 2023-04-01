@@ -1,7 +1,7 @@
+import { useEffect, useState, version } from 'react';
 import { type AnonUser } from '@prisma/client';
 import { type Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState, version } from 'react';
 import { z } from 'zod';
 
 const LocalUserStoreSchema = z.object({
@@ -30,8 +30,6 @@ export function useAnonUser() {
 }
 
 export function storeUser(user: AnonUser) {
-    if (typeof window === 'undefined') return;
-
     const existingUsersParseResult = LocalUserStoreSchema.safeParse(
         JSON.parse(localStorage.getItem('users') ?? 'null')
     );
