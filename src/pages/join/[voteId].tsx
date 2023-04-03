@@ -25,26 +25,24 @@ const Home: NextPage = () => {
 
     return (
         <div className="grid h-screen w-screen place-items-center">
-            <div className="big-shadow relative flex h-3/5  w-[90%] flex-col justify-center overflow-hidden rounded-3xl border border-[#C9C9C9]/30 bg-[#000]/60 shadow-2xl md:w-[600px]">
-                <input
-                    className="border-2 border-gray-800 bg-black text-white"
-                    max={20}
-                    min={1}
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                />
-                <button
-                    onClick={() =>
-                        !isLoading &&
-                        joinVote({
-                            voteId,
-                            name,
-                        })
-                    }
-                >
-                    join vote
-                </button>
-            </div>
+            <input
+                className="border-2 border-gray-800 bg-black text-white"
+                max={20}
+                min={1}
+                value={name}
+                onChange={e => setName(e.target.value)}
+            />
+            <button
+                onClick={() =>
+                    !isLoading &&
+                    joinVote({
+                        voteId,
+                        name,
+                    })
+                }
+            >
+                join vote
+            </button>
         </div>
     );
 };
