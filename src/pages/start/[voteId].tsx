@@ -11,6 +11,7 @@ const Start = () => {
     const url = useRef<string | null>(null);
 
     const [expand, setExpand] = useState(false);
+    const [hovering, setHovering] = useState(false);
 
     useEffect(() => {
         if (typeof window !== undefined) {
@@ -30,12 +31,21 @@ const Start = () => {
         config: expand ? config.gentle : config.default,
     });
 
+    const scaleSpring = useSpring({
+        scale: hovering ? 1.05 : 1,
+        config: config.gentle,
+    });
+
     return (
         <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 lg:max-w-screen-lg">
             <div className="m-auto flex" onClick={() => setExpand(x => !x)}>
                 <div>
                     {url.current && (
-                        <button>
+                        <animated.button
+                            style={scaleSpring}
+                            onMouseEnter={() => setHovering(true)}
+                            onMouseLeave={() => setHovering(false)}
+                        >
                             <picture>
                                 <img
                                     className="aspect-square w-64 rounded-md"
@@ -49,7 +59,7 @@ const Start = () => {
                                 {pokerId}
                                 <Link2Icon className="ml-1 inline-block h-4 w-4" />
                             </p>
-                        </button>
+                        </animated.button>
                     )}
                 </div>
                 <animated.div
