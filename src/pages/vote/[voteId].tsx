@@ -38,10 +38,13 @@ const useVote = () => {
     });
 
     return {
-        doVote: (choice: number) =>
-            pokerId &&
-            anonUser &&
-            mutate({ choice: choice.toString(), voteId: pokerId, anonUser }),
+        doVote: (choice: number) => {
+            if (!pokerId || !anonUser) return;
+
+            mutate({ choice: choice.toString(), voteId: pokerId, anonUser });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            window.navigator.vibrate([200, 100, ...Array(1000).fill(1)]);
+        },
     };
 };
 
@@ -51,11 +54,6 @@ const Vote = () => {
     const { doVote } = useVote();
     const [showResults, setShowResults] = useState(false);
     useHopUpdates();
-
-    const styles = useSpring({
-        height: showResults ? 300 : 80,
-        config: config.gentle,
-    });
 
     const { votesMap, currentVote } = useMemo(() => {
         const currentVote = votes?.find(
@@ -88,7 +86,7 @@ const Vote = () => {
     }, [votes, anonUser]);
 
     return (
-        <div className="flex h-full w-screen max-w-screen-2xl flex-col place-items-center justify-center text-white">
+        <div className="flex h-full w-screen max-w-screen-2xl flex-col place-items-center text-white">
             <div className="mb-4 flex gap-4">
                 <Button
                     onClick={() => {
@@ -98,10 +96,7 @@ const Vote = () => {
                     {showResults ? 'Hide Results' : 'Show Results'}
                 </Button>
             </div>
-            <animated.div
-                style={styles}
-                className="mx-auto flex flex-wrap gap-4"
-            >
+            <animated.div className="mx-auto flex flex-wrap gap-4">
                 {voteOptions.map(vote => (
                     <VoteButton
                         key={vote}
@@ -154,7 +149,7 @@ const VoteButton = memo(function VoteButton({
                 className="relative mx-auto mb-1 rotate-180"
                 style={outerStyles}
             >
-                <div className="absolute z-10 h-1/3 w-full bg-gradient-to-b from-white to-transparent dark:from-black"></div>
+                <div className="absolute -top-1 z-10 h-1/3 w-full bg-gradient-to-b from-white to-transparent dark:from-black"></div>
                 <animated.div
                     style={styles}
                     className="w-8 rounded-b-md border border-orange-400 bg-orange-600"
@@ -182,7 +177,7 @@ const VoteButton = memo(function VoteButton({
                     <div className="m-auto">{vote}</div>
                 </div>
                 {showVotes && (
-                    <div className="absolute -top-2 right-0 flex">
+                    <div className="absolute -top-2 right-0 flex place-content-center">
                         {users.map((user, i) => (
                             <div
                                 className="animate-[floatIn_250ms_ease-out] "
