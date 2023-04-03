@@ -71,7 +71,7 @@ const Start = () => {
                         {users.map((name, i) => (
                             <div className="flex" key={i}>
                                 <Pfp name={name} className="mr-4 w-6" />
-                                <span>FInn</span>
+                                <span>{name}</span>
                             </div>
                         ))}
                     </div>

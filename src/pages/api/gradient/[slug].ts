@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { type NextApiRequest, type NextApiResponse } from 'next';
 import ColorHash from 'color-hash';
 
 // TODO CREDDIT JR
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-const colorHash = new ColorHash({ saturation: 1.0 });
+const colorHash = new ColorHash({ saturation: 1 });
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 export const stringToColour = (s: string): string => colorHash.hex(s);
