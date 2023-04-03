@@ -87,29 +87,61 @@ const Vote = () => {
 
     return (
         <div className="flex h-full w-screen max-w-screen-2xl flex-col place-items-center text-white">
-            <div className="mb-4 flex gap-4">
-                <Button
-                    onClick={() => {
-                        setShowResults(x => !x);
-                    }}
-                >
-                    {showResults ? 'Hide Results' : 'Show Results'}
-                </Button>
+            <div className="mx-auto mt-4 w-max min-w-max max-w-screen-lg">
+                <div className="mx-auto flex h-full flex-col align-middle">
+                    <animated.div className="mx-auto mt-24 flex flex-wrap gap-4">
+                        {voteOptions.map(vote => (
+                            <VoteButton
+                                key={vote}
+                                vote={vote}
+                                showVotes={showResults}
+                                users={votesMap[vote.toString()]?.users ?? []}
+                                currentVotes={
+                                    votesMap[vote.toString()]?.count ?? 0
+                                }
+                                totalVotes={votes?.length ?? 0}
+                                doVote={doVote}
+                                current={
+                                    currentVote?.choice === vote.toString()
+                                }
+                            />
+                        ))}
+                    </animated.div>
+                    <div className="mt-8 max-w-[80ch]">
+                        <h1 className="mb-4 text-2xl">
+                            <b>EUI-420</b>
+                        </h1>
+                        {`
+ Contrary to popular belief, Lorem Ipsum is not simply
+random text. It has roots in a piece of classical Latin
+literature from 45 BC, making it over 2000 years old.
+Richard McClintock, a Latin professor at Hampden-Sydney
+College in Virginia, looked up one of the more obscure
+Latin words, consectetur, from a Lorem Ipsum passage,
+and going through the cites of the word in classical
+literature, discovered the undoubtable source. Lorem
+Ipsum comes from sections 1.10.32 and 1.10.33 of "de
+Finibus Bonorum et Malorum" (The Extremes of Good and
+Evil) by Cicero, written in 45 BC. This book is a
+treatise on the theory of ethics, very popular during
+the Renaissance. The first line of Lorem Ipsum, "Lorem
+ipsum dolor sit amet..", comes from a line in section
+1.10.32.
+ `}
+                        <div className="mb-4 flex w-full gap-4">
+                            <Button
+                                size={'sm'}
+                                className="ms-auto"
+                                onClick={() => {
+                                    setShowResults(x => !x);
+                                }}
+                            >
+                                {showResults ? 'Hide Results' : 'Show Results'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <animated.div className="mx-auto flex flex-wrap gap-4">
-                {voteOptions.map(vote => (
-                    <VoteButton
-                        key={vote}
-                        vote={vote}
-                        showVotes={showResults}
-                        users={votesMap[vote.toString()]?.users ?? []}
-                        currentVotes={votesMap[vote.toString()]?.count ?? 0}
-                        totalVotes={votes?.length ?? 0}
-                        doVote={doVote}
-                        current={currentVote?.choice === vote.toString()}
-                    />
-                ))}
-            </animated.div>
         </div>
     );
 };
