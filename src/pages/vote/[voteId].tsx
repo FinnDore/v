@@ -172,7 +172,7 @@ const VoteButton = memo(function VoteButton({
     const outerStyles = useSpring({
         height: !showVotes ? 0 : 196,
         opacity: !showVotes ? 0 : 1,
-        config: config.gentle,
+        config: showVotes ? config.wobbly : config.default,
     });
 
     return (
