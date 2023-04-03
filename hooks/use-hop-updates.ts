@@ -1,7 +1,7 @@
 import { useChannelMessage } from '@onehop/react';
 
 import { api } from '@/utils/api';
-import { Vote } from '@/server/hop';
+import { type Vote } from '@/server/hop';
 import { usePokerId } from './poker-hooks';
 
 export const useHopUpdates = () => {

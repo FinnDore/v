@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { to } from '@/utils/to';
 import { prisma } from '@/server/db';
-import { Vote, selectPokerVote } from '@/server/hop';
+import { selectPokerVote, type Vote } from '@/server/hop';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 
 export const pokerState = createTRPCRouter({
@@ -29,6 +29,8 @@ export const pokerState = createTRPCRouter({
                 });
             }
 
-            return votes;
+            return votes.sort(
+                (a, b) => a.updatedAt.getTime() - b.updatedAt.getTime()
+            );
         }),
 });

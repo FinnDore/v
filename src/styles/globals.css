@@ -4,6 +4,8 @@
 
 #__next {
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes floatIn {

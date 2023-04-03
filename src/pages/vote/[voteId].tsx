@@ -1,57 +1,17 @@
-import { memo, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
-import { usePokerId, useVotes } from 'hooks/poker-hooks';
+import { useVotes } from 'hooks/poker-hooks';
 import { useHopUpdates } from 'hooks/use-hop-updates';
 
-import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
-const useVote = () => {
-    const pokerId = usePokerId();
-    const utils = api.useContext();
-    const anonUser = useAnonUser();
-    const { mutate } = api.vote.vote.useMutation({
-        onMutate: ({ anonUser, choice, voteId }) => {
-            utils.vote.pokerState.getVotes.setData(
-                {
-                    pokerId: voteId,
-                },
-                old => {
-                    const newVotes = [...(old ?? [])];
-                    const item = newVotes.find(
-                        v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
-                    );
-                    if (item) item.choice = choice;
-                    return newVotes;
-                }
-            );
-        },
-        onError: (_err, args) => {
-            void utils.vote.pokerState.getVotes.refetch({
-                pokerId: args.voteId,
-            });
-        },
-    });
-
-    return {
-        doVote: (choice: number) => {
-            if (!pokerId || !anonUser) return;
-
-            mutate({ choice: choice.toString(), voteId: pokerId, anonUser });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            window.navigator.vibrate([10]);
-        },
-    };
-};
-
 const Vote = () => {
-    const votes = useVotes();
     const anonUser = useAnonUser();
-    const { doVote } = useVote();
+    const { doVote, votes } = useVotes();
     const [showResults, setShowResults] = useState(false);
     useHopUpdates();
 
@@ -86,32 +46,27 @@ const Vote = () => {
     }, [votes, anonUser]);
 
     return (
-        <div className="flex h-full w-screen max-w-screen-2xl flex-col place-items-center text-white">
-            <div className="mx-auto mt-4 w-max min-w-max max-w-screen-lg">
-                <div className="mx-auto flex h-full flex-col align-middle">
-                    <animated.div className="mx-auto mt-24 flex flex-wrap gap-4">
-                        {voteOptions.map(vote => (
-                            <VoteButton
-                                key={vote}
-                                vote={vote}
-                                showVotes={showResults}
-                                users={votesMap[vote.toString()]?.users ?? []}
-                                currentVotes={
-                                    votesMap[vote.toString()]?.count ?? 0
-                                }
-                                totalVotes={votes?.length ?? 0}
-                                doVote={doVote}
-                                current={
-                                    currentVote?.choice === vote.toString()
-                                }
-                            />
-                        ))}
-                    </animated.div>
-                    <div className="mt-8 max-w-[80ch]">
-                        <h1 className="mb-4 text-2xl">
-                            <b>EUI-420</b>
-                        </h1>
-                        {`
+        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 text-white lg:max-w-screen-lg ">
+            <div className="mx-auto flex h-full flex-col align-middle">
+                <animated.div className="mx-auto mt-6 flex flex-wrap gap-4 ">
+                    {voteOptions.map(vote => (
+                        <VoteButton
+                            key={vote}
+                            vote={vote}
+                            showVotes={showResults}
+                            users={votesMap[vote.toString()]?.users ?? []}
+                            currentVotes={votesMap[vote.toString()]?.count ?? 0}
+                            totalVotes={votes?.length ?? 0}
+                            doVote={doVote}
+                            current={currentVote?.choice === vote.toString()}
+                        />
+                    ))}
+                </animated.div>
+                <div className="mt-8 max-w-[80ch]">
+                    <h1 className="mb-4 text-2xl">
+                        <b>EUI-420</b>
+                    </h1>
+                    {`
  Contrary to popular belief, Lorem Ipsum is not simply
 random text. It has roots in a piece of classical Latin
 literature from 45 BC, making it over 2000 years old.
@@ -128,17 +83,16 @@ the Renaissance. The first line of Lorem Ipsum, "Lorem
 ipsum dolor sit amet..", comes from a line in section
 1.10.32.
  `}
-                        <div className="mb-4 flex w-full gap-4">
-                            <Button
-                                size={'sm'}
-                                className="ms-auto"
-                                onClick={() => {
-                                    setShowResults(x => !x);
-                                }}
-                            >
-                                {showResults ? 'Hide Results' : 'Show Results'}
-                            </Button>
-                        </div>
+                    <div className="mb-4 flex w-full gap-4">
+                        <Button
+                            size={'sm'}
+                            className="ms-auto"
+                            onClick={() => {
+                                setShowResults(x => !x);
+                            }}
+                        >
+                            {showResults ? 'Hide Results' : 'Show Results'}
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -146,7 +100,7 @@ ipsum dolor sit amet..", comes from a line in section
     );
 };
 
-const VoteButton = memo(function VoteButton({
+const VoteButton = function VoteButton({
     vote,
     doVote,
     currentVotes,
@@ -176,7 +130,7 @@ const VoteButton = memo(function VoteButton({
     });
 
     return (
-        <div className="my-2 flex flex-col">
+        <div className="mx-auto my-2 flex flex-col">
             <animated.div
                 className="relative mx-auto mb-1 rotate-180"
                 style={outerStyles}
@@ -233,6 +187,6 @@ const VoteButton = memo(function VoteButton({
             </button>
         </div>
     );
-});
+};
 
 export default Vote;
