@@ -41,7 +41,7 @@ const Start = () => {
             <div className="m-auto flex" onClick={() => setExpand(x => !x)}>
                 <div>
                     {url.current && (
-                        <animated.button
+                        <animated.div
                             style={scaleSpring}
                             onMouseEnter={() => setHovering(true)}
                             onMouseLeave={() => setHovering(false)}
@@ -55,11 +55,11 @@ const Start = () => {
                                     }`}
                                 />
                             </picture>
-                            <p className="mt-2 w-full text-center text-sm underline">
+                            <button className="mt-2 w-full text-center text-sm underline">
                                 {pokerId}
                                 <Link2Icon className="ml-1 inline-block h-4 w-4" />
-                            </p>
-                        </animated.button>
+                            </button>
+                        </animated.div>
                     )}
                 </div>
                 <animated.div
