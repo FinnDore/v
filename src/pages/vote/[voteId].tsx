@@ -43,7 +43,7 @@ const useVote = () => {
 
             mutate({ choice: choice.toString(), voteId: pokerId, anonUser });
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            window.navigator.vibrate([100]);
+            window.navigator.vibrate([10]);
         },
     };
 };

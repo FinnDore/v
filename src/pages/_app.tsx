@@ -37,8 +37,12 @@ const Nav = () => {
 
     return (
         <nav className="pointer-events-none flex w-full px-4 py-4">
+            <div className="pointer-events-auto text-2xl">
+                <b>V</b>
+                <i>ote</i>
+            </div>
             {name && (
-                <div className="pointer-events-auto ml-3 mr-4 text-2xl">
+                <div className="pointer-events-auto ml-auto mr-4 text-2xl">
                     {name}
                 </div>
             )}
