@@ -46,7 +46,7 @@ const Vote = () => {
     }, [votes, anonUser]);
 
     return (
-        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 text-white lg:max-w-screen-lg ">
+        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 lg:max-w-screen-lg ">
             <animated.div className="mx-auto mt-6 flex flex-wrap gap-4">
                 {voteOptions.map(vote => (
                     <VoteButton

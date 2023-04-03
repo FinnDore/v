@@ -14,7 +14,7 @@ const QRcodeHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const { text } = parseResult.data;
-    const svg = await creatQr(text, { type: 'svg' });
+    const svg = await creatQr(text, { type: 'svg', margin: 1 });
 
     res.setHeader('Content-Type', 'image/svg+xml');
     res.send(svg);
