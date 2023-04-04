@@ -1,17 +1,19 @@
 import { useChannelMessage } from '@onehop/react';
 
 import { api } from '@/utils/api';
-import { type Vote } from '@/server/hop';
+import { ChannelEvents } from '@/server/channel-events';
+import { type UsersInVote, type Vote } from '@/server/hop';
 import { usePokerId } from './poker-hooks';
 
 export const useHopUpdates = () => {
     const pokerId = usePokerId();
     const utils = api.useContext();
+    const channelId = `poker_${pokerId ?? ''}`;
 
     // This hook causes a re-render on every message
     useChannelMessage(
-        `poker_${pokerId ?? ''}`,
-        'VOTE_UPDATE',
+        channelId,
+        ChannelEvents.VOTE_UPDATED,
         (updatedVote: Vote) => {
             utils.vote.pokerState.getVotes.setData(
                 { pokerId: pokerId ?? '' },
@@ -23,6 +25,17 @@ export const useHopUpdates = () => {
                     copy[index] = updatedVote;
                     return copy;
                 }
+            );
+        }
+    );
+
+    useChannelMessage(
+        channelId,
+        ChannelEvents.USER_JOINED,
+        ({ users }: { users: UsersInVote }) => {
+            utils.vote.lobby.listUsersInVote.setData(
+                { voteId: pokerId ?? '' },
+                () => users
             );
         }
     );

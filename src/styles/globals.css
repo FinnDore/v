@@ -19,6 +19,15 @@
     }
 }
 
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 @keyframes clipPathKeyframes {
     0% {
         -webkit-clip-path: polygon(

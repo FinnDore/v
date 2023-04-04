@@ -18,6 +18,23 @@ model Poker {
   VoteChoice PokerVote[]
 }
 
+model UsersInVote {
+  id     String  @id @default(cuid())
+  voteId String
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  anonUser   AnonUser? @relation(fields: [anonUserId], references: [id])
+  anonUserId String?
+
+  @@unique([voteId, anonUserId])
+  @@unique([voteId, userId])
+  @@index([voteId, anonUserId])
+  @@index([voteId, userId])
+  @@index([anonUserId])
+  @@index([userId])
+}
+
 model PokerVote {
   id         String    @id @default(cuid())
   createdAt  DateTime  @default(now())
@@ -30,12 +47,11 @@ model PokerVote {
   anonUser   AnonUser? @relation(fields: [anonUserId], references: [id])
   anonUserId String?
 
+  @@unique([voteId, anonUserId])
+  @@unique([voteId, userId])
   @@index([voteId])
   @@index([anonUserId, voteId])
   @@index([userId, voteId])
-  
-  @@unique([voteId, anonUserId])
-  @@unique([voteId, userId])
 }
 
 model AnonUser {
@@ -47,6 +63,7 @@ model AnonUser {
   voteId    String
 
   voteChoice PokerVote[]
+  userInVote UsersInVote[]
 
   @@index([voteId])
   @@index([secret])
@@ -84,14 +101,15 @@ model Session {
 }
 
 model User {
-  id            String      @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String?     @unique
+  email         String?       @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  VoteChoice    PokerVote[]
+  voteChoice    PokerVote[]
+  usrInVote     UsersInVote[]
 }
 
 model VerificationToken {

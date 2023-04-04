@@ -12,30 +12,34 @@ const Home: NextPage = () => {
         ? router.query.voteId[0]
         : router.query.voteId;
 
-    const { mutate: joinVote, isLoading } = api.vote.joinPoker.useMutation({
-        onSuccess: user => {
-            storeUser(user);
-            void router.push(`/vote/${user.voteId}`);
-        },
-    });
+    const { mutateAsync: joinVote } = api.vote.lobby.joinVote.useMutation();
 
-    if (!voteId) {
-        return <div>no voteId</div>;
-    }
+    const { mutate: createAccount, isLoading } =
+        api.vote.createAccount.useMutation({
+            onSuccess: async user => {
+                storeUser(user);
+                if (!voteId) return;
+                await joinVote({ voteId, anonUser: user });
+                void router.push(`/vote/${user.voteId}`);
+            },
+        });
+
+    if (!voteId) return <div>no voteId</div>;
 
     return (
         <div className="grid h-screen w-screen place-items-center">
             <input
                 className="border-2 border-gray-800 bg-black text-white"
                 max={20}
-                min={1}
+                min={3}
                 value={name}
                 onChange={e => setName(e.target.value)}
             />
+            Min name length 3
             <button
                 onClick={() =>
                     !isLoading &&
-                    joinVote({
+                    createAccount({
                         voteId,
                         name,
                     })

@@ -6,7 +6,7 @@ import { prisma } from '@/server/db';
 import { selectPokerVote, type Vote } from '@/server/hop';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 
-export const pokerState = createTRPCRouter({
+export const pokerStateRouter = createTRPCRouter({
     getVotes: publicProcedure
         .input(
             z.object({

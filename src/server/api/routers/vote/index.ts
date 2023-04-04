@@ -10,26 +10,14 @@ import {
     createTRPCRouter,
     publicProcedure,
 } from '@/server/api/trpc';
-import { Vote, hop, selectPokerVote } from '@/server/hop';
-import { prisma } from '../../db';
-import { pokerState } from './poker-state';
+import { hop, selectPokerVote, type Vote } from '@/server/hop';
+import { prisma } from '../../../db';
+import { pokerStateRouter } from '../poker-state';
+import { lobbyRouter } from './lobby';
 
 export const vote = createTRPCRouter({
-    pokerState,
-    getVote: publicProcedure
-        .input(z.object({ voteId: z.string() }))
-        .query(({ input }) => {
-            return (
-                prisma.poker.findUnique({
-                    where: {
-                        id: input.voteId,
-                    },
-                    include: {
-                        VoteChoice: true,
-                    },
-                }) ?? null
-            );
-        }),
+    pokerState: pokerStateRouter,
+    lobby: lobbyRouter,
 
     createPoker: publicProcedure.mutation(async ({}) => {
         const vote = await prisma.poker.create({
@@ -56,11 +44,11 @@ export const vote = createTRPCRouter({
         return vote;
     }),
 
-    joinPoker: anonProcedure
+    createAccount: anonProcedure
         .input(
             z.object({
                 voteId: z.string().cuid(),
-                name: z.string().max(20),
+                name: z.string().max(20).min(3),
             })
         )
         .mutation(async ({ input }) => {
@@ -96,17 +84,17 @@ export const vote = createTRPCRouter({
             }
 
             if (!ctx.session?.user && input.anonUser) {
-                const [anonUser, getAnonUser] =
+                const [anonUser, getAnonUserError] =
                     await AnonHelper.getAnonUserByIdSecret({
                         userId: input.anonUser.id,
                         secret: input.anonUser.secret,
                     });
 
-                if (getAnonUser) {
+                if (getAnonUserError) {
                     console.error(
                         `Could not find anon user due to error: ${
-                            getAnonUser.message
-                        } ${getAnonUser.stack ?? 'no stack'}`
+                            getAnonUserError.message
+                        } ${getAnonUserError.stack ?? 'no stack'}`
                     );
 
                     throw new TRPCError({

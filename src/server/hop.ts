@@ -1,6 +1,9 @@
 import { Hop, type APIAuthentication } from '@onehop/js';
 
 import { env } from '@/env.mjs';
+import { ChannelEvents } from './channel-events';
+
+export type ChannelEvent = typeof ChannelEvents[keyof typeof ChannelEvents];
 
 export const hop = new Hop(env.HOP_TOKEN as APIAuthentication);
 
@@ -33,3 +36,8 @@ export const selectPokerVote = {
     updatedAt: true,
     voteId: true,
 };
+
+export type UsersInVote = {
+    id: string;
+    name: string;
+}[];
