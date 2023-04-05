@@ -1,13 +1,15 @@
+import { AnonUser } from '@prisma/client';
+
 import { prisma } from '@/server/db';
 import { to } from './to';
 
-async function getAnonUserByIdSecretAndVote({
+async function getAnonUserByIdAndSecret({
     userId,
     secret,
 }: {
     userId: string;
     secret: string;
-}): Promise<readonly [boolean, null] | readonly [null, Error]> {
+}): Promise<readonly [AnonUser | null, null] | readonly [null, Error]> {
     const [anonUser, error] = await to(
         prisma.anonUser.findFirst({
             where: {
@@ -17,9 +19,9 @@ async function getAnonUserByIdSecretAndVote({
         })
     );
 
-    return error ? [null, error] : [!!anonUser, null];
+    return error ? [null, error] : [anonUser, null];
 }
 
 export const AnonHelper = {
-    getAnonUserByIdSecret: getAnonUserByIdSecretAndVote,
+    getAnonUserByIdAndSecret,
 } as const;

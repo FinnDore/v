@@ -1,11 +1,12 @@
-import { type AnonUser } from '@prisma/client';
+import { AnonUser } from '@prisma/client';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { type Session } from 'next-auth';
 import superjson from 'superjson';
+import { z } from 'zod';
 
+import { AnonHelper } from '@/utils/anon-users';
 import { getServerAuthSession } from '@/server/auth';
-import { prisma } from '@/server/db';
 
 type CreateContextOptions = {
     session: Session | null;
@@ -15,7 +16,7 @@ type CreateContextOptions = {
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
     return {
         session: opts.session,
-        anonSession: prisma,
+        anonSession: opts.anonSession,
     };
 };
 
@@ -24,11 +25,10 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
     // Get the session from the server using the getServerSession wrapper function
     const session = await getServerAuthSession({ req, res });
-    const anonSession = null;
 
     return createInnerTRPCContext({
         session,
-        anonSession,
+        anonSession: null,
     });
 };
 
@@ -65,3 +65,95 @@ export const anonProcedure = t.procedure.use(async ({ ctx, next }) => {
         ctx,
     });
 });
+
+export const anonOrUserProcedure = t.procedure
+    .input(
+        z.object({
+            anonUser: z
+                .object({
+                    id: z.string().cuid(),
+                    secret: z.string().cuid(),
+                })
+                .optional(),
+        })
+    )
+    .use(async ({ ctx, input, next }) => {
+        if (ctx.session?.user) {
+            return next({
+                ctx: {
+                    // infers the `session` as non-nullable
+                    session: { ...ctx.session, user: ctx.session.user },
+                },
+            });
+        } else if (input.anonUser) {
+            const [anonUser, getAnonUserError] =
+                await AnonHelper.getAnonUserByIdAndSecret({
+                    userId: input.anonUser.id,
+                    secret: input.anonUser.secret,
+                } as const);
+
+            if (getAnonUserError) {
+                console.error(
+                    `anonOrUserProcedure: Could not find anon user due to error: ${
+                        getAnonUserError.message
+                    } ${getAnonUserError.stack ?? 'no stack'}`
+                );
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            }
+
+            if (!anonUser) {
+                console.error(
+                    `anonOrUserProcedure: Could not find anon user with id: ${input.anonUser.id}`
+                );
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            }
+
+            return next({
+                ctx: {
+                    session: null,
+                    anonSession: anonUser,
+                },
+            } as { ctx: { session: null; anonSession: AnonUser } });
+        } else {
+            throw new TRPCError({
+                code: 'UNAUTHORIZED',
+            });
+        }
+    });
+
+const test = t.procedure
+    .use(({ next }) => {
+        const randomNumber = Math.random();
+        if (randomNumber > 0.5) {
+            return next({
+                ctx: {
+                    session: {} as Session,
+                    anonSession: null,
+                },
+            });
+        } else if (randomNumber > 0.5) {
+            return next({
+                ctx: {
+                    session: null,
+                    anonSession: {} as AnonUser,
+                },
+            });
+        } else {
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+            });
+        }
+    })
+    .query(({ ctx }) => {
+        if (ctx.session) {
+            return console.log(ctx.anonSession);
+            //                  ^ null :)
+        }
+
+        console.log(ctx.anonSession);
+        //                  ^ null :(
+    });

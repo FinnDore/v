@@ -85,7 +85,7 @@ export const vote = createTRPCRouter({
 
             if (!ctx.session?.user && input.anonUser) {
                 const [anonUser, getAnonUserError] =
-                    await AnonHelper.getAnonUserByIdSecret({
+                    await AnonHelper.getAnonUserByIdAndSecret({
                         userId: input.anonUser.id,
                         secret: input.anonUser.secret,
                     });

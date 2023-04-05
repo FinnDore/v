@@ -1,9 +1,8 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
-import { AnonHelper } from '@/utils/anon-users';
 import { to } from '@/utils/to';
-import { createTRPCRouter } from '@/server/api/trpc';
+import { anonOrUserProcedure, createTRPCRouter } from '@/server/api/trpc';
 import { ChannelEvents } from '@/server/channel-events';
 import { prisma } from '@/server/db';
 import { hop, type UsersInVote } from '@/server/hop';
@@ -25,102 +24,85 @@ const usersInVoteSelect = {
 };
 
 export const lobbyRouter = createTRPCRouter({
-    joinVote: publicProcedure
+    joinVote: anonOrUserProcedure
         .input(
             z.object({
                 voteId: z.string().cuid(),
-                anonUser: z
-                    .object({
-                        id: z.string().cuid(),
-                        secret: z.string().cuid(),
-                    })
-                    .nullable(),
             })
         )
         .mutation(async ({ input, ctx }) => {
-            if (!ctx.session?.user && !input.anonUser) {
-                console.log('No session or anon user');
+            if (!ctx.session?.user && !ctx.anonSession) {
                 throw new TRPCError({
-                    code: 'UNAUTHORIZED',
+                    code: 'INTERNAL_SERVER_ERROR',
                 });
             }
 
-            if (!ctx.session?.user && input.anonUser) {
-                const [anonUser, getAnonUserError] =
-                    await AnonHelper.getAnonUserByIdSecret({
-                        userId: input.anonUser.id,
-                        secret: input.anonUser.secret,
-                    });
+            const userUpsert = {
+                userId: ctx.session.user.id,
+                voteId: input.voteId,
+            };
 
-                if (getAnonUserError) {
-                    console.error(
-                        `Could not find anon user due to error: ${
-                            getAnonUserError.message
-                        } ${getAnonUserError.stack ?? 'no stack'}`
-                    );
+            const upsertWhere = ctx.session?.user
+                ? {
+                      voteId_userId: userUpsert,
+                  }
+                : {
+                      voteId_anonUserId: {
+                          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                          anonUserId: ctx.anonSession!.id,
+                          voteId: input.voteId,
+                      },
+                  };
 
-                    throw new TRPCError({
-                        code: 'INTERNAL_SERVER_ERROR',
-                    });
-                } else if (!anonUser) {
-                    console.log('No anon user found');
-                    throw new TRPCError({
-                        code: 'UNAUTHORIZED',
-                    });
-                }
+            const userIdAndVoteId = ctx.session.user
+                ? userUpsert
+                : {
+                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                      anonUserId: ctx.anonSession!.id,
+                      voteId: input.voteId,
+                  };
 
-                const userIdAndVoteId = {
-                    anonUserId: input.anonUser.id,
-                    voteId: input.voteId,
-                } as const;
+            const [, joinVoteError] = await to(
+                prisma.usersInVote.upsert({
+                    where: upsertWhere,
+                    create: userIdAndVoteId,
+                    update: userIdAndVoteId,
+                })
+            );
 
-                const [, joinVoteError] = await to(
-                    prisma.usersInVote.upsert({
-                        where: { voteId_anonUserId: userIdAndVoteId },
-                        create: userIdAndVoteId,
-                        update: userIdAndVoteId,
-                    })
+            if (joinVoteError) {
+                console.error(
+                    `Could not join vote due to error: ${
+                        joinVoteError.message
+                    } ${joinVoteError.stack ?? 'no stack'}`
                 );
 
-                if (joinVoteError) {
-                    console.error(
-                        `Could not join vote due to error: ${
-                            joinVoteError.message
-                        } ${joinVoteError.stack ?? 'no stack'}`
-                    );
-
-                    throw new TRPCError({
-                        code: 'INTERNAL_SERVER_ERROR',
-                    });
-                }
-
-                const [usersInVote, error] = await to(
-                    prisma.usersInVote.findMany({
-                        where: {
-                            voteId: input.voteId,
-                        },
-                        select: usersInVoteSelect,
-                    })
-                );
-
-                if (error) {
-                    console.error(
-                        `Could dispatch updated user list in vote due to error: ${
-                            error.message
-                        } ${error.stack ?? 'no stack'}`
-                    );
-                    return;
-                }
-                return await dispatchVoteUpdate({
-                    pokerId: input.voteId,
-                    users: formatUsers(usersInVote),
-                });
-            } else if (ctx.session?.user) {
                 throw new TRPCError({
-                    code: 'METHOD_NOT_SUPPORTED',
+                    code: 'INTERNAL_SERVER_ERROR',
                 });
             }
-            return;
+
+            const [usersInVote, error] = await to(
+                prisma.usersInVote.findMany({
+                    where: {
+                        voteId: input.voteId,
+                    },
+                    select: usersInVoteSelect,
+                })
+            );
+
+            if (error) {
+                console.error(
+                    `Could dispatch updated user list in vote due to error: ${
+                        error.message
+                    } ${error.stack ?? 'no stack'}`
+                );
+                return;
+            }
+            return await dispatchVoteUpdate({
+                pokerId: input.voteId,
+                users: formatUsers(usersInVote),
+            });
         }),
 
     listUsersInVote: publicProcedure
