@@ -31,35 +31,27 @@ export const lobbyRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
-            console.log(ctx);
-            if (!ctx?.session?.user && !ctx.anonSession) {
-                throw new TRPCError({
-                    code: 'INTERNAL_SERVER_ERROR',
-                });
-            }
-
-            const userUpsert = {
-                userId: ctx?.session?.user?.id,
-                voteId: input.voteId,
-            };
-
-            const upsertWhere = ctx?.session?.user
+            const upsertWhere = !ctx.anonSession
                 ? {
-                      voteId_userId: userUpsert,
+                      voteId_userId: {
+                          userId: ctx?.session?.user?.id,
+                          voteId: input.voteId,
+                      },
                   }
                 : {
                       voteId_anonUserId: {
-                          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                          anonUserId: ctx.anonSession!.id,
+                          anonUserId: ctx.anonSession.id,
                           voteId: input.voteId,
                       },
                   };
 
-            const userIdAndVoteId = ctx?.session?.user
-                ? userUpsert
+            const userIdAndVoteId = !ctx.anonSession
+                ? {
+                      userId: ctx.session.user.id,
+                      voteId: input.voteId,
+                  }
                 : {
-                      //   eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      anonUserId: ctx.anonSession!.id,
+                      anonUserId: ctx.anonSession.id,
                       voteId: input.voteId,
                   };
 
@@ -158,13 +150,13 @@ const formatUsers = (
             (x): x is UsersInVote[number] => x !== null && x.name !== null
         ) ?? [];
 
-async function dispatchVoteUpdate({
+const dispatchVoteUpdate = async ({
     pokerId,
     users,
 }: {
     pokerId: string;
     users: UsersInVote;
-}) {
+}) => {
     const [, updateChannelStateError] = await to(
         hop.channels.publishMessage(
             `poker_${pokerId}`,
@@ -186,4 +178,4 @@ async function dispatchVoteUpdate({
     } else {
         console.log(`Published updated users for poker_${pokerId}`);
     }
-}
+};

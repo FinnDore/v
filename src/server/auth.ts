@@ -75,10 +75,3 @@ export const getServerAuthSession = (ctx: {
 }) => {
     return getServerSession(ctx.req, ctx.res, authOptions);
 };
-
-export const getServerAnonSession = (ctx: {
-    req: GetServerSidePropsContext['req'];
-    res: GetServerSidePropsContext['res'];
-}) => {
-    return getServerSession(ctx.req, ctx.res, authOptions);
-};

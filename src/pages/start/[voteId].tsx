@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link2Icon } from '@radix-ui/react-icons';
 import { animated, config, useSpring } from '@react-spring/web';
-import { usePokerId } from 'hooks/poker-hooks';
-import { useHopUpdates } from 'hooks/use-hop-updates';
 
 import { api } from '@/utils/api';
 import { Pfp } from '@/components/pfp';
+import { usePokerId } from '@/hooks/poker-hooks';
+import { useHopUpdates } from '@/hooks/use-hop-updates';
 
 const Start = () => {
     const pokerId = usePokerId();

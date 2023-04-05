@@ -1,4 +1,4 @@
-import { AnonUser } from '@prisma/client';
+import { type AnonUser } from '@prisma/client';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { type Session } from 'next-auth';
@@ -10,13 +10,11 @@ import { getServerAuthSession } from '@/server/auth';
 
 type CreateContextOptions = {
     session: Session | null;
-    anonSession: AnonUser | null;
 };
 
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
     return {
         session: opts.session,
-        anonSession: opts.anonSession,
     };
 };
 
@@ -28,7 +26,6 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
     return createInnerTRPCContext({
         session,
-        anonSession: null,
     });
 };
 
@@ -78,13 +75,25 @@ export const anonOrUserProcedure = t.procedure
         })
     )
     .use(async ({ ctx, input, next }) => {
+        let result: {
+            ctx:
+                | {
+                      session: Session;
+                      anonSession: null;
+                  }
+                | {
+                      session: null;
+                      anonSession: AnonUser;
+                  };
+        } | null = null;
         if (ctx.session?.user) {
-            return next({
+            result = {
                 ctx: {
                     // infers the `session` as non-nullable
                     session: { ...ctx.session, user: ctx.session.user },
+                    anonSession: null,
                 },
-            });
+            } as const;
         } else if (input.anonUser) {
             const [anonUser, getAnonUserError] =
                 await AnonHelper.getAnonUserByIdAndSecret({
@@ -112,46 +121,53 @@ export const anonOrUserProcedure = t.procedure
                 });
             }
 
-            return next({
+            result = {
                 ctx: {
                     session: null,
                     anonSession: anonUser,
                 },
-            } as { ctx: { session: null; anonSession: AnonUser } });
+            } as const;
+        }
+
+        if (result) {
+            return next(result);
         } else {
-            throw new TRPCError({
-                code: 'UNAUTHORIZED',
-            });
+            throw new TRPCError({ code: 'UNAUTHORIZED' });
         }
     });
 
 const test = t.procedure
     .use(({ next }) => {
         const randomNumber = Math.random();
+        let result: {
+            ctx:
+                | {
+                      session: Session;
+                      anonSession: null;
+                  }
+                | { session: null; anonSession: AnonUser };
+        };
         if (randomNumber > 0.5) {
-            return next({
+            result = {
                 ctx: {
                     session: {} as Session,
                     anonSession: null,
                 },
-            });
-        } else if (randomNumber > 0.5) {
-            return next({
+            };
+        } else {
+            result = {
                 ctx: {
                     session: null,
                     anonSession: {} as AnonUser,
                 },
-            });
-        } else {
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-            });
+            };
         }
+        return next(result);
     })
     .query(({ ctx }) => {
         if (ctx.session) {
             return console.log(ctx.anonSession);
-            //                  ^ null :)
+            //                  ^ null :):w
         }
 
         console.log(ctx.anonSession);

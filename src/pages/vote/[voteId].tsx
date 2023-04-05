@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
-import { useVotes } from 'hooks/poker-hooks';
-import { useHopUpdates } from 'hooks/use-hop-updates';
 
 import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
+import { useVotes } from '@/hooks/poker-hooks';
+import { useHopUpdates } from '@/hooks/use-hop-updates';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 const Vote = () => {
