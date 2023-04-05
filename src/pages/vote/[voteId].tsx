@@ -15,7 +15,7 @@ const Vote = () => {
     const [showResults, setShowResults] = useState(false);
     useHopUpdates();
 
-    const { votesMap, currentVote } = useMemo(() => {
+    const { votesMap, currentVote, highestVote } = useMemo(() => {
         const currentVote = votes?.find(
             v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
         );
@@ -42,11 +42,11 @@ const Vote = () => {
             ['-1', 0] as [string, number]
         );
 
-        return { currentVote, votesMap, highestVote: highestVote[0] };
+        return { currentVote, votesMap, highestVote: highestVote };
     }, [votes, anonUser]);
 
     return (
-        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 lg:max-w-screen-lg ">
+        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 lg:max-w-screen-lg">
             <animated.div className="mx-auto mt-6 flex flex-wrap gap-4">
                 {voteOptions.map(vote => (
                     <VoteButton
@@ -55,7 +55,7 @@ const Vote = () => {
                         showVotes={showResults}
                         users={votesMap[vote.toString()]?.users ?? []}
                         currentVotes={votesMap[vote.toString()]?.count ?? 0}
-                        totalVotes={votes?.length ?? 0}
+                        totalVotes={highestVote[1]}
                         doVote={doVote}
                         current={currentVote?.choice === vote.toString()}
                     />
@@ -121,7 +121,7 @@ const VoteButton = function VoteButton({
     });
 
     const outerStyles = useSpring({
-        height: !showVotes ? 0 : 196,
+        height: !showVotes ? 0 : 120,
         opacity: !showVotes ? 0 : 1,
         config: showVotes ? config.wobbly : config.default,
     });
