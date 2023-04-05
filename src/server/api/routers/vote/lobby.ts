@@ -135,15 +135,7 @@ export const lobbyRouter = createTRPCRouter({
                     code: 'INTERNAL_SERVER_ERROR',
                 });
             }
-            console.log('usersInVote', usersInVote);
-            console.log(
-                formatUsers(
-                    usersInVote.map(x => ({
-                        ...x,
-                        updatedAt: x.updatedAt.getTime(),
-                    }))
-                )
-            );
+
             return formatUsers(
                 usersInVote.map(x => ({
                     ...x,
