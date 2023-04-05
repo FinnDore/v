@@ -3,8 +3,8 @@ import { Glitch } from './glitch';
 import { Pfp } from './pfp';
 
 export const Nav = () => {
-    const { status, user } = useUser();
-    const name = status === 'authenticated' ? user.user.name : user?.name;
+    const { user } = useUser();
+    const name = user?.name;
 
     return (
         <nav className="pointer-events-none mx-auto flex w-full min-w-max max-w-[90ch] px-12 py-4">

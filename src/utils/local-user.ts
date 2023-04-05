@@ -72,6 +72,7 @@ export const useUser = ():
           status: 'authenticated';
           user: {
               id: Session['user']['id'];
+              name: Session['user']['name'];
           };
       }
     | {
@@ -100,6 +101,7 @@ export const useUser = ():
             status: 'authenticated',
             user: {
                 id: session.user.id,
+                name: session.user.name,
             },
         };
     } else if (anonUser) {
