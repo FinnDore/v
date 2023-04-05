@@ -70,7 +70,9 @@ function getLocalUserStore() {
 export const useUser = ():
     | {
           status: 'authenticated';
-          user: Session;
+          user: {
+              id: Session['user']['id'];
+          };
       }
     | {
           status: 'loading';
@@ -96,7 +98,9 @@ export const useUser = ():
     } else if (session) {
         return {
             status: 'authenticated',
-            user: session,
+            user: {
+                id: session.user.id,
+            },
         };
     } else if (anonUser) {
         return {

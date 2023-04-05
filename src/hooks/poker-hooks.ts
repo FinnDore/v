@@ -1,9 +1,7 @@
 import { useRouter } from 'next/router';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/utils/api';
-import { useAnonUser } from '@/utils/local-user';
-import { Vote } from '@/server/hop';
+import { useAnonUser, useUser } from '@/utils/local-user';
 
 export const usePokerId = () => {
     const router = useRouter();
@@ -14,78 +12,37 @@ export const usePokerId = () => {
 
 export const useVotes = () => {
     const pokerId = usePokerId();
+    const session = useUser();
     const { data } = api.vote.pokerState.getVotes.useQuery(
         { pokerId: pokerId ?? '' },
         {
             enabled: !!pokerId,
         }
     );
-    const queryClient = useQueryClient();
+
     const utils = api.useContext();
     const anonUser = useAnonUser();
     const { mutate } = api.vote.vote.useMutation({
-        onMutate: async ({ anonUser, choice, voteId }) => {
-            console.log(pokerId);
-            // utils.vote.pokerState.getVotes.setData(
-            //     {
-            //         pokerId: voteId,
-            //     },
-            //     old => {
-            //         console.log('mutating');
-            //         const newVotes = [...(old ?? [])];
-
-            //         const item = newVotes.find(
-            //             v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
-            //         );
-
-            //         const outputVotes = newVotes.filter(
-            //             v => (v.user?.id ?? v.anonUser?.id) !== anonUser?.id
-            //         );
-
-            //         if (item) {
-            //             outputVotes.push({ ...item, choice: choice });
-            //         }
-
-            //         return newVotes;
-            //     }
-            // );
-            await queryClient.cancelQueries(
-                api.vote.pokerState.getVotes.getQueryKey({
+        onMutate: ({ choice, voteId }) => {
+            utils.vote.pokerState.getVotes.setData(
+                {
                     pokerId: voteId,
-                })
-            );
-            console.log(
-                api.vote.pokerState.getVotes.getQueryKey(
-                    {
-                        pokerId: voteId,
-                    },
-                    'query'
-                )
-            );
-            queryClient.setQueryData(
-                api.vote.pokerState.getVotes.getQueryKey(
-                    {
-                        pokerId: voteId,
-                    },
-                    'query'
-                ),
-                (old: Vote[]): Vote[] => {
-                    console.log('mutating');
+                },
+                old => {
+                    const userId = session.user?.id;
+                    if (!userId) return old;
+
                     const newVotes = [...(old ?? [])];
-
-                    const item = newVotes.find(
-                        v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
+                    const itemIndex = newVotes.findIndex(
+                        v => (v.user?.id ?? v.anonUser?.id) === userId
                     );
 
-                    const outputVotes = newVotes.filter(
-                        v => (v.user?.id ?? v.anonUser?.id) !== anonUser?.id
-                    );
-
-                    if (item) {
-                        outputVotes.push({ ...item, choice: choice });
+                    if (itemIndex === -1) return old;
+                    const oldItem = newVotes.splice(itemIndex, 1)[0];
+                    if (oldItem) {
+                        newVotes.push({ ...oldItem, choice });
                     }
-
-                    return newVotes;
+                    return [...newVotes];
                 }
             );
         },
