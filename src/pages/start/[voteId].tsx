@@ -40,6 +40,8 @@ const Start = () => {
         }
     );
 
+    if (!url.current) return null;
+
     return (
         <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 lg:max-w-screen-lg">
             <div className="m-auto flex">
