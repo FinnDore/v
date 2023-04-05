@@ -2,13 +2,17 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { to } from '@/utils/to';
-import { anonOrUserProcedure, createTRPCRouter } from '@/server/api/trpc';
+import {
+    anonOrUserProcedure,
+    createTRPCRouter,
+    publicProcedure,
+} from '@/server/api/trpc';
 import { ChannelEvents } from '@/server/channel-events';
 import { prisma } from '@/server/db';
 import { hop, type UsersInVote } from '@/server/hop';
-import { publicProcedure } from '../../trpc';
 
 const usersInVoteSelect = {
+    updatedAt: true,
     anonUser: {
         select: {
             id: true,
@@ -95,7 +99,12 @@ export const lobbyRouter = createTRPCRouter({
             }
             return await dispatchVoteUpdate({
                 pokerId: input.voteId,
-                users: formatUsers(usersInVote),
+                users: formatUsers(
+                    usersInVote.map(x => ({
+                        ...x,
+                        updatedAt: x.updatedAt.getTime(),
+                    }))
+                ),
             });
         }),
 
@@ -126,13 +135,28 @@ export const lobbyRouter = createTRPCRouter({
                     code: 'INTERNAL_SERVER_ERROR',
                 });
             }
-            return formatUsers(usersInVote);
+            console.log('usersInVote', usersInVote);
+            console.log(
+                formatUsers(
+                    usersInVote.map(x => ({
+                        ...x,
+                        updatedAt: x.updatedAt.getTime(),
+                    }))
+                )
+            );
+            return formatUsers(
+                usersInVote.map(x => ({
+                    ...x,
+                    updatedAt: x.updatedAt.getTime(),
+                }))
+            );
         }),
 });
 
 const formatUsers = (
     users:
         | {
+              updatedAt: number;
               anonUser: {
                   id: string;
                   name: string;
@@ -145,10 +169,13 @@ const formatUsers = (
         | null
 ): UsersInVote =>
     users
-        ?.map(u => (u.user ? u.user : u.anonUser))
-        .filter(
-            (x): x is UsersInVote[number] => x !== null && x.name !== null
-        ) ?? [];
+        ?.map(u =>
+            u.user
+                ? { ...u.user, updatedAt: u.updatedAt }
+                : { ...u.anonUser, updatedAt: u.updatedAt }
+        )
+        .filter((x): x is UsersInVote[number] => x !== null && x.name !== null)
+        .sort((a, b) => b.updatedAt - a.updatedAt) ?? [];
 
 const dispatchVoteUpdate = async ({
     pokerId,

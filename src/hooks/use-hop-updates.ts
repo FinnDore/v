@@ -6,7 +6,7 @@ import { ChannelEvents } from '@/server/channel-events';
 import { type UsersInVote, type Vote } from '@/server/hop';
 import { usePokerId } from './poker-hooks';
 
-export const useHopUpdates = () => {
+export const useHopUpdates = (): { channelId: string } => {
     const pokerId = usePokerId();
     const utils = api.useContext();
     const { user } = useUser();
@@ -36,11 +36,13 @@ export const useHopUpdates = () => {
     useChannelMessage(
         channelId,
         ChannelEvents.USER_JOINED,
-        ({ users }: { users: UsersInVote }) => {
+        ({ users: incomingUsers }: { users: UsersInVote }) => {
             utils.vote.lobby.listUsersInVote.setData(
                 { voteId: pokerId ?? '' },
-                () => users
+                () => incomingUsers
             );
         }
     );
+
+    return { channelId };
 };

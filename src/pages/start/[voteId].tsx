@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useChannelMessage } from '@onehop/react';
 import { Link2Icon } from '@radix-ui/react-icons';
 import { animated, config, useSpring } from '@react-spring/web';
 
@@ -6,15 +7,16 @@ import { api } from '@/utils/api';
 import { Pfp } from '@/components/pfp';
 import { usePokerId } from '@/hooks/poker-hooks';
 import { useHopUpdates } from '@/hooks/use-hop-updates';
+import { ChannelEvents } from '@/server/channel-events';
+import { type UsersInVote } from '@/server/hop';
 
 const Start = () => {
     const pokerId = usePokerId();
     const url = useRef<string | null>(null);
-    useHopUpdates();
     const [hovering, setHovering] = useState(false);
 
     useEffect(() => {
-        if (typeof window !== undefined) {
+        if (typeof window !== undefined && pokerId) {
             url.current = `/api/qrcode/${encodeURIComponent(
                 window.location.origin + '/join/' + (pokerId ?? '')
             )}`;
@@ -29,7 +31,6 @@ const Start = () => {
         scale: hovering ? 1.05 : 1,
         config: config.gentle,
     });
-
     const { data: users } = api.vote.lobby.listUsersInVote.useQuery(
         {
             voteId: pokerId ?? '',
@@ -39,12 +40,6 @@ const Start = () => {
         }
     );
 
-    const expand = !!users?.length;
-    const widthSpring = useSpring({
-        width: expand ? 256 : 0,
-        opacity: expand ? 1 : 0,
-        config: expand ? config.gentle : config.default,
-    });
     return (
         <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 lg:max-w-screen-lg">
             <div className="m-auto flex">
@@ -71,29 +66,65 @@ const Start = () => {
                         </animated.div>
                     )}
                 </div>
-                <animated.div
-                    style={widthSpring}
-                    className="m-h-64 flex flex-col overflow-clip ps-8"
-                >
-                    <div className="mb-4 text-2xl font-bold">Users</div>
-                    <div className="flex flex-col gap-3">
-                        {users?.map((x, i) => (
-                            <div
-                                className="flex animate-[fadeIn_250ms_ease-out]"
-                                key={i}
-                            >
-                                <Pfp
-                                    name={x.name ?? 'Unknown user'}
-                                    className="mr-4 w-6"
-                                />
-                                <span>{x.name ?? 'Unknown user'}</span>
-                            </div>
-                        ))}
+                <div className="flex max-h-[285px] w-64 flex-col overflow-y-auto ps-8">
+                    <div className="mb-4 text-2xl font-bold">
+                        Users{' '}
+                        {!!users?.length && (
+                            <span className="mx- text-sm opacity-80">
+                                <i>( {users?.length} ) </i>
+                            </span>
+                        )}
                     </div>
-                </animated.div>
+                    <div className="flex flex-col gap-2">
+                        <Users />
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
 export default Start;
+
+const Users = () => {
+    const pokerId = usePokerId();
+    const utils = api.useContext();
+
+    const { channelId } = useHopUpdates();
+    const { data: users } = api.vote.lobby.listUsersInVote.useQuery(
+        {
+            voteId: pokerId ?? '',
+        },
+        {
+            enabled: !!pokerId,
+        }
+    );
+
+    useChannelMessage(
+        channelId,
+        ChannelEvents.USER_JOINED,
+        ({ users: incomingUsers }: { users: UsersInVote }) => {
+            utils.vote.lobby.listUsersInVote.setData(
+                { voteId: pokerId ?? '' },
+                () => incomingUsers
+            );
+        }
+    );
+
+    return (
+        <>
+            {users?.map(item => (
+                <li
+                    className="flex animate-[fadeIn_250ms_ease-out]"
+                    key={item.id}
+                >
+                    <Pfp
+                        name={item?.name ?? 'Unknown user'}
+                        className="mr-4 w-6"
+                    />
+                    <span>{item?.name ?? 'Unknown user'}</span>
+                </li>
+            ))}
+        </>
+    );
+};

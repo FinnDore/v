@@ -20,6 +20,7 @@ model Poker {
 
 model UsersInVote {
   id     String  @id @default(cuid())
+  updatedAt DateTime @updatedAt 
   voteId String
   userId String?
   user   User?   @relation(fields: [userId], references: [id])

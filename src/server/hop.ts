@@ -39,6 +39,7 @@ export const selectPokerVote = {
 };
 
 export type UsersInVote = {
+    updatedAt: number;
     id: string;
     name: string;
 }[];
