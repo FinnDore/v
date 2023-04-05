@@ -1,6 +1,7 @@
 import { useChannelMessage } from '@onehop/react';
 
 import { api } from '@/utils/api';
+import { useUser } from '@/utils/local-user';
 import { ChannelEvents } from '@/server/channel-events';
 import { type UsersInVote, type Vote } from '@/server/hop';
 import { usePokerId } from './poker-hooks';
@@ -8,9 +9,9 @@ import { usePokerId } from './poker-hooks';
 export const useHopUpdates = () => {
     const pokerId = usePokerId();
     const utils = api.useContext();
+    const { user } = useUser();
     const channelId = `poker_${pokerId ?? ''}`;
 
-    // This hook causes a re-render on every message
     useChannelMessage(
         channelId,
         ChannelEvents.VOTE_UPDATED,
@@ -19,6 +20,9 @@ export const useHopUpdates = () => {
                 { pokerId: pokerId ?? '' },
                 old => {
                     if (!old) return [updatedVote];
+                    // We probably know our own vote.
+                    if (updatedVote.id === user?.id) return old;
+
                     const index = old.findIndex(v => v.id === updatedVote.id);
                     if (index === -1) return [...old, updatedVote];
                     const copy = [...old];
