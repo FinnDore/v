@@ -20,5 +20,8 @@ const config = {
         locales: ['en'],
         defaultLocale: 'en',
     },
+    images: {
+        minimumCacheTTL: 60,
+    },
 };
 export default config;

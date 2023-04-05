@@ -43,5 +43,6 @@ export default function returnSvg(req: NextApiRequest, res: NextApiResponse) {
     );
     res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader('pragma', 'cache');
     res.send(svg);
 }
