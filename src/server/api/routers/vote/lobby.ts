@@ -31,18 +31,19 @@ export const lobbyRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
-            if (!ctx.session?.user && !ctx.anonSession) {
+            console.log(ctx);
+            if (!ctx?.session?.user && !ctx.anonSession) {
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',
                 });
             }
 
             const userUpsert = {
-                userId: ctx.session.user.id,
+                userId: ctx?.session?.user?.id,
                 voteId: input.voteId,
             };
 
-            const upsertWhere = ctx.session?.user
+            const upsertWhere = ctx?.session?.user
                 ? {
                       voteId_userId: userUpsert,
                   }
@@ -54,10 +55,10 @@ export const lobbyRouter = createTRPCRouter({
                       },
                   };
 
-            const userIdAndVoteId = ctx.session.user
+            const userIdAndVoteId = ctx?.session?.user
                 ? userUpsert
                 : {
-                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                      //   eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                       anonUserId: ctx.anonSession!.id,
                       voteId: input.voteId,
                   };
@@ -97,6 +98,7 @@ export const lobbyRouter = createTRPCRouter({
                         error.message
                     } ${error.stack ?? 'no stack'}`
                 );
+
                 return;
             }
             return await dispatchVoteUpdate({
