@@ -17,7 +17,11 @@ export const useHopUpdates = (): { channelId: string } => {
         ChannelEvents.VOTE_UPDATED,
         (updatedVote: Vote) => {
             // We probably know our own vote.
-            if (updatedVote.id === user?.id) return;
+            if (
+                updatedVote.anonUser?.id === user?.id ||
+                updatedVote.user?.id === user?.id
+            )
+                return;
 
             utils.vote.pokerState.getVotes.setData(
                 { pokerId: pokerId ?? '' },
