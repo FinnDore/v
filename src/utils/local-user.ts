@@ -1,4 +1,4 @@
-import { useEffect, useState, version } from 'react';
+import { useEffect, useRef, version } from 'react';
 import { type AnonUser } from '@prisma/client';
 import { type Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
@@ -16,17 +16,19 @@ const LocalUserStoreSchema = z.object({
 type LocalUserStore = z.infer<typeof LocalUserStoreSchema>;
 
 export function useAnonUser() {
-    const [user, storeUser] = useState<LocalUserStore['user'] | null>(null);
+    const user = useRef<LocalUserStore['user'] | null>();
     useEffect(() => {
-        const cleanup = () => storeUser(null);
+        const cleanup = () => {
+            user.current = null;
+        };
         if (typeof window === 'undefined') return cleanup;
         const localUserStore = getLocalUserStore();
 
-        storeUser(() => localUserStore?.user ?? null);
+        user.current = localUserStore?.user ?? null;
         return cleanup;
     }, []);
 
-    return user;
+    return user.current;
 }
 
 export function storeUser(user: AnonUser) {
