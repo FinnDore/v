@@ -12,7 +12,7 @@ export default function Document() {
             <Head>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <body className="h-screen">
+            <body className="h-screen bg-white text-black dark:bg-black dark:text-white">
                 <Main />
                 <NextScript />
             </body>

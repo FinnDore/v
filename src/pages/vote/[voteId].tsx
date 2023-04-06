@@ -142,7 +142,7 @@ const VoteButton = function VoteButton({
                 <div className="absolute top-0 z-10 h-1/3 w-full bg-gradient-to-b from-white dark:from-black"></div>
                 <animated.div
                     style={styles}
-                    className="w-8 rounded-b-md border border-orange-400 border-b-transparent bg-orange-600"
+                    className="w-8 rounded-b-md border-2 border-orange-400 border-t-transparent bg-orange-600"
                 ></animated.div>
             </animated.div>
             <button

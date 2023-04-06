@@ -81,7 +81,7 @@ const Start = () => {
 
                             <picture>
                                 <img
-                                    className=" absolute z-10 aspect-square w-full rounded-md"
+                                    className=" absolute z-10 aspect-square w-full rounded-md border border-black/20 dark:border-white"
                                     src={url.current}
                                     alt={`QR code to join vote ${
                                         pokerId ?? ''

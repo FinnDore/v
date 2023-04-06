@@ -17,7 +17,7 @@ export const Pfp = forwardRef<
                 <div
                     className={clsx(
                         border,
-                        'absolute z-10 h-full w-full overflow-clip rounded-full border border-white/40'
+                        'absolute z-10 h-full w-full overflow-clip rounded-full border border-black/20 dark:border-white/40'
                     )}
                 >
                     <picture className="block h-[70px] w-[70px] overflow-clip">
