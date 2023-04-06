@@ -72,28 +72,36 @@ const Start = () => {
                                 alt={`QR code to join vote ${pokerId ?? ''}`}
                             />
                         </picture>
-                        <TooltipProvider delayDuration={300}>
-                            <Tooltip>
-                                <TooltipTrigger
-                                    onClick={() => {
-                                        if (!pokerId) return;
+                        <div className="mt-2 w-full min-w-full text-center text-sm underline transition-transform hover:scale-105">
+                            <a
+                                target="__blank"
+                                href={'/join/' + (pokerId ?? '')}
+                            >
+                                {pokerId}
+                            </a>
+                            <TooltipProvider delayDuration={300}>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <button
+                                            onClick={() => {
+                                                if (!pokerId) return;
 
-                                        void navigator.clipboard.writeText(
-                                            window.location.origin +
-                                                '/join/' +
-                                                pokerId
-                                        );
-                                    }}
-                                    className="mt-2 w-full min-w-full text-center text-sm underline transition-transform hover:scale-105"
-                                >
-                                    {pokerId}
-                                    <Link2Icon className="ml-1 inline-block h-4 w-4" />
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom">
-                                    <p>Copy join link</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                                                void navigator.clipboard.writeText(
+                                                    window.location.origin +
+                                                        '/join/' +
+                                                        pokerId
+                                                );
+                                            }}
+                                        >
+                                            <Link2Icon className="ml-1 inline-block h-4 w-4" />
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom">
+                                        <p>Copy join link</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
                     </div>
                 )}
                 <div className="flex max-h-[285px] w-full flex-col overflow-y-auto text-center sm:w-64 sm:ps-8 sm:text-start">

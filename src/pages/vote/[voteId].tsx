@@ -117,6 +117,7 @@ const VoteButton = function VoteButton({
     const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({
         height: !showVotes || isNaN(height) ? '0%' : `${height}%`,
+        opacity: !showVotes || isNaN(height) || !height ? 0 : 1,
         config: config.wobbly,
     });
 
@@ -132,7 +133,7 @@ const VoteButton = function VoteButton({
                 className="relative mx-auto mb-1 rotate-180"
                 style={outerStyles}
             >
-                <div className="absolute -top-1  z-10 h-1/3 w-full bg-gradient-to-b from-white to-transparent dark:from-black"></div>
+                <div className="absolute -top-2 z-10 h-[30%] w-full bg-gradient-to-b from-white dark:from-black"></div>
                 <animated.div
                     style={styles}
                     className="w-8 rounded-b-md border border-orange-400 bg-orange-600"
