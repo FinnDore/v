@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
 import { Link2Icon } from '@radix-ui/react-icons';
-import { animated, config, useSpring } from '@react-spring/web';
 
 import { api } from '@/utils/api';
+import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/tool-tip';
 import { usePokerId } from '@/hooks/poker-hooks';
 import { useHopUpdates } from '@/hooks/use-hop-updates';
 import { ChannelEvents } from '@/server/channel-events';
@@ -13,7 +20,9 @@ import { type UsersInVote } from '@/server/hop';
 const Start = () => {
     const pokerId = usePokerId();
     const url = useRef<string | null>(null);
-    const [hovering, setHovering] = useState(false);
+    const { channelId } = useHopUpdates();
+    const utils = api.useContext();
+    const router = useRouter();
 
     useEffect(() => {
         if (typeof window !== undefined && pokerId) {
@@ -27,72 +36,6 @@ const Start = () => {
         };
     }, [pokerId]);
 
-    const scaleSpring = useSpring({
-        scale: hovering ? 1.05 : 1,
-        config: config.gentle,
-    });
-    const { data: users } = api.vote.lobby.listUsersInVote.useQuery(
-        {
-            voteId: pokerId ?? '',
-        },
-        {
-            enabled: !!pokerId,
-        }
-    );
-
-    if (!url.current) return null;
-
-    return (
-        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center px-12 lg:max-w-screen-lg">
-            <div className="m-auto flex">
-                <div>
-                    {url.current && (
-                        <animated.div
-                            style={scaleSpring}
-                            onMouseEnter={() => setHovering(true)}
-                            onMouseLeave={() => setHovering(false)}
-                        >
-                            <picture>
-                                <img
-                                    className="aspect-square w-64 rounded-md"
-                                    src={url.current}
-                                    alt={`QR code to join vote ${
-                                        pokerId ?? ''
-                                    }`}
-                                />
-                            </picture>
-                            <button className="mt-2 w-full text-center text-sm underline">
-                                {pokerId}
-                                <Link2Icon className="ml-1 inline-block h-4 w-4" />
-                            </button>
-                        </animated.div>
-                    )}
-                </div>
-                <div className="flex max-h-[285px] w-64 flex-col overflow-y-auto ps-8">
-                    <div className="mb-4 text-2xl font-bold">
-                        Users{' '}
-                        {!!users?.length && (
-                            <span className="mx- text-sm opacity-80">
-                                <i>( {users?.length} ) </i>
-                            </span>
-                        )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <Users />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default Start;
-
-const Users = () => {
-    const pokerId = usePokerId();
-    const utils = api.useContext();
-
-    const { channelId } = useHopUpdates();
     const { data: users } = api.vote.lobby.listUsersInVote.useQuery(
         {
             voteId: pokerId ?? '',
@@ -113,20 +56,89 @@ const Users = () => {
         }
     );
 
+    const noUsers = !users?.length;
+
+    if (!url.current) return null;
+
     return (
-        <>
-            {users?.map(item => (
-                <li
-                    className="flex animate-[fadeIn_250ms_ease-out]"
-                    key={item.id}
-                >
-                    <Pfp
-                        name={item?.name ?? 'Unknown user'}
-                        className="mr-4 w-6"
-                    />
-                    <span>{item?.name ?? 'Unknown user'}</span>
-                </li>
-            ))}
-        </>
+        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center gap-4 px-12 lg:max-w-screen-lg">
+            <div className="mt-auto flex flex-col sm:flex-row">
+                {url.current && (
+                    <div className="mx-auto mb-4 sm:mb-0">
+                        <picture>
+                            <img
+                                className="mx-auto aspect-square w-full rounded-md sm:w-64"
+                                src={url.current}
+                                alt={`QR code to join vote ${pokerId ?? ''}`}
+                            />
+                        </picture>
+                        <TooltipProvider delayDuration={300}>
+                            <Tooltip>
+                                <TooltipTrigger
+                                    onClick={() => {
+                                        if (!pokerId) return;
+
+                                        void navigator.clipboard.writeText(
+                                            window.location.origin +
+                                                '/join/' +
+                                                pokerId
+                                        );
+                                    }}
+                                    className="mt-2 w-full min-w-full text-center text-sm underline transition-transform hover:scale-105"
+                                >
+                                    {pokerId}
+                                    <Link2Icon className="ml-1 inline-block h-4 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                    <p>Copy join link</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                )}
+                <div className="flex max-h-[285px] w-full flex-col overflow-y-auto text-center sm:w-64 sm:ps-8 sm:text-start">
+                    <div className="mb-3 text-2xl font-bold">
+                        Users{' '}
+                        {!!users?.length && (
+                            <span className="mx- text-sm opacity-80">
+                                <i>( {users?.length} ) </i>
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        {!noUsers &&
+                            users.map(item => (
+                                <li
+                                    className="flex animate-[fadeIn_250ms_ease-out]"
+                                    key={item.id}
+                                >
+                                    <Pfp
+                                        name={item?.name ?? 'Unknown user'}
+                                        className="mr-4 w-6"
+                                    />
+                                    <span>{item?.name ?? 'Unknown user'}</span>
+                                </li>
+                            ))}
+                        {noUsers && (
+                            <div className="text-sm opacity-75">
+                                Theres no one here yet! Scan the QR code or
+                                share the join link
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+            <Button
+                className="mb-auto w-full shadow-md shadow-orange-600"
+                onClick={() => {
+                    if (!pokerId) return;
+                    void router.push(`/vote/${pokerId}`);
+                }}
+            >
+                START
+            </Button>
+        </div>
     );
 };
+
+export default Start;
