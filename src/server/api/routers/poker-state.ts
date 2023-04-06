@@ -30,7 +30,7 @@ export const pokerStateRouter = createTRPCRouter({
             }
 
             return votes.sort(
-                (a, b) => a.updatedAt.getTime() - b.updatedAt.getTime()
+                (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
             );
         }),
 });

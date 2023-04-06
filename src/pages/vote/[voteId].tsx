@@ -34,11 +34,14 @@ const Vote = () => {
                         count: (acc[v.choice]?.count ?? 0) + 1,
                         users: [
                             ...(acc[v.choice]?.users ?? []),
-                            v.user?.name ?? v.anonUser?.name ?? '',
-                        ],
+                            v.user ?? v.anonUser,
+                        ].filter((x): x is { id: string; name: string } => !!x),
                     },
                 }),
-                {} as Record<string, { count: number; users: string[] }>
+                {} as Record<
+                    string,
+                    { count: number; users: { name: string; id: string }[] }
+                >
             ) ?? {};
 
         /// get the highest vote
@@ -117,7 +120,7 @@ const VoteButton = function VoteButton({
     doVote: (vote: number) => void;
     currentVotes: number;
     totalVotes: number;
-    users: string[];
+    users: { name: string; id: string }[];
     showVotes: boolean;
 }) {
     const height = (currentVotes / totalVotes) * 100;
@@ -169,7 +172,7 @@ const VoteButton = function VoteButton({
                 {showVotes && (
                     <div className="absolute right-0 top-0 flex place-content-center">
                         {users.map((user, i) => (
-                            <TooltipProvider delayDuration={300} key={i}>
+                            <TooltipProvider delayDuration={300} key={user.id}>
                                 <Tooltip>
                                     <TooltipTrigger
                                         className="relative -top-2 aspect-square h-4 animate-[floatIn_250ms_ease-out]"
@@ -185,7 +188,9 @@ const VoteButton = function VoteButton({
                                                 current ? 'border-white' : ''
                                             }
                                             name={
-                                                user === '' ? 'Anonymous' : user
+                                                user.name === ''
+                                                    ? 'Anonymous'
+                                                    : user.name
                                             }
                                             className="h-4"
                                         />
@@ -194,7 +199,7 @@ const VoteButton = function VoteButton({
                                         side="bottom"
                                         className="text-xs"
                                     >
-                                        <p>{user}</p>
+                                        <p>{user.name}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>

@@ -40,7 +40,7 @@ export const useVotes = () => {
                     if (itemIndex === -1) return old;
                     const oldItem = newVotes.splice(itemIndex, 1)[0];
                     if (oldItem) {
-                        newVotes.push({ ...oldItem, choice });
+                        newVotes.unshift({ ...oldItem, choice });
                     }
                     return [...newVotes];
                 }
