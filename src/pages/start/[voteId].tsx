@@ -36,14 +36,15 @@ const Start = () => {
         };
     }, [pokerId]);
 
-    const { data: users } = api.vote.lobby.listUsersInVote.useQuery(
-        {
-            voteId: pokerId ?? '',
-        },
-        {
-            enabled: !!pokerId,
-        }
-    );
+    const { data: users, status: userStatus } =
+        api.vote.lobby.listUsersInVote.useQuery(
+            {
+                voteId: pokerId ?? '',
+            },
+            {
+                enabled: !!pokerId,
+            }
+        );
 
     useChannelMessage(
         channelId,
@@ -64,26 +65,30 @@ const Start = () => {
         <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center gap-4 px-12 lg:max-w-screen-lg">
             <div className="mt-auto flex flex-col sm:flex-row">
                 {url.current && (
-                    <div className="relative mx-auto mb-4 aspect-square sm:mb-0 sm:w-64">
-                        {lastUser && (
+                    <div>
+                        <div className="relative mx-auto mb-4 aspect-square sm:mb-0 sm:w-64">
+                            {lastUser && (
+                                <picture>
+                                    <img
+                                        className="-z-1 absolute aspect-square w-full animate-spin rounded-md opacity-50 blur-2xl"
+                                        src={`/api/gradient/${encodeURIComponent(
+                                            lastUser
+                                        )}`}
+                                        alt=""
+                                    />
+                                </picture>
+                            )}
+
                             <picture>
                                 <img
-                                    className="-z-1 absolute aspect-square w-full animate-spin rounded-md opacity-50 blur-2xl"
-                                    src={`/api/gradient/${encodeURIComponent(
-                                        lastUser
-                                    )}`}
-                                    alt=""
+                                    className=" absolute z-10 aspect-square w-full rounded-md"
+                                    src={url.current}
+                                    alt={`QR code to join vote ${
+                                        pokerId ?? ''
+                                    }`}
                                 />
                             </picture>
-                        )}
-
-                        <picture>
-                            <img
-                                className=" absolute z-10 aspect-square w-full rounded-md"
-                                src={url.current}
-                                alt={`QR code to join vote ${pokerId ?? ''}`}
-                            />
-                        </picture>
+                        </div>
                         <div className="mt-2 w-full min-w-full text-center text-sm underline transition-transform hover:scale-105">
                             <a
                                 target="__blank"
@@ -93,20 +98,18 @@ const Start = () => {
                             </a>
                             <TooltipProvider delayDuration={300}>
                                 <Tooltip>
-                                    <TooltipTrigger>
-                                        <button
-                                            onClick={() => {
-                                                if (!pokerId) return;
+                                    <TooltipTrigger
+                                        onClick={() => {
+                                            if (!pokerId) return;
 
-                                                void navigator.clipboard.writeText(
-                                                    window.location.origin +
-                                                        '/join/' +
-                                                        pokerId
-                                                );
-                                            }}
-                                        >
-                                            <Link2Icon className="ml-1 inline-block h-4 w-4" />
-                                        </button>
+                                            void navigator.clipboard.writeText(
+                                                window.location.origin +
+                                                    '/join/' +
+                                                    pokerId
+                                            );
+                                        }}
+                                    >
+                                        <Link2Icon className="ml-1 inline-block h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom">
                                         <p>Copy join link</p>
@@ -139,7 +142,7 @@ const Start = () => {
                                     <span>{item?.name ?? 'Unknown user'}</span>
                                 </li>
                             ))}
-                        {noUsers && (
+                        {noUsers && userStatus !== 'loading' && (
                             <div className="text-sm opacity-75">
                                 Theres no one here yet! Scan the QR code or
                                 share the join link
