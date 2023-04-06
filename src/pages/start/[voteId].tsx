@@ -57,17 +57,29 @@ const Start = () => {
     );
 
     const noUsers = !users?.length;
-
+    const lastUser = users?.[0]?.name;
     if (!url.current) return null;
 
     return (
         <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center gap-4 px-12 lg:max-w-screen-lg">
             <div className="mt-auto flex flex-col sm:flex-row">
                 {url.current && (
-                    <div className="mx-auto mb-4 sm:mb-0">
+                    <div className="relative mx-auto mb-4 aspect-square sm:mb-0 sm:w-64">
+                        {lastUser && (
+                            <picture>
+                                <img
+                                    className="-z-1 absolute aspect-square w-full animate-spin rounded-md opacity-50 blur-2xl"
+                                    src={`/api/gradient/${encodeURIComponent(
+                                        lastUser
+                                    )}`}
+                                    alt=""
+                                />
+                            </picture>
+                        )}
+
                         <picture>
                             <img
-                                className="mx-auto aspect-square w-full rounded-md sm:w-64"
+                                className=" absolute z-10 aspect-square w-full rounded-md"
                                 src={url.current}
                                 alt={`QR code to join vote ${pokerId ?? ''}`}
                             />
@@ -104,7 +116,7 @@ const Start = () => {
                         </div>
                     </div>
                 )}
-                <div className="flex max-h-[285px] w-full flex-col overflow-y-auto text-center sm:w-64 sm:ps-8 sm:text-start">
+                <div className="-ml-4 flex max-h-[285px] w-full flex-col overflow-y-auto overflow-x-visible ps-4 text-center sm:ml-0 sm:w-64 sm:ps-8 sm:text-start">
                     <div className="mb-3 text-2xl font-bold">
                         Users{' '}
                         {!!users?.length && (
@@ -113,7 +125,7 @@ const Start = () => {
                             </span>
                         )}
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 overflow-x-visible">
                         {!noUsers &&
                             users.map(item => (
                                 <li
