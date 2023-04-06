@@ -24,6 +24,9 @@ export const useVotes = () => {
     const anonUser = useAnonUser();
     const { mutate } = api.vote.vote.useMutation({
         onMutate: ({ choice, voteId }) => {
+            void utils.vote.pokerState.getVotes.cancel({
+                pokerId: voteId,
+            });
             utils.vote.pokerState.getVotes.setData(
                 {
                     pokerId: voteId,
@@ -40,7 +43,7 @@ export const useVotes = () => {
                     if (itemIndex === -1) return old;
                     const oldItem = newVotes.splice(itemIndex, 1)[0];
                     if (oldItem) {
-                        newVotes.unshift({ ...oldItem, choice });
+                        newVotes.push({ ...oldItem, choice });
                     }
                     return [...newVotes];
                 }

@@ -170,40 +170,45 @@ const VoteButton = function VoteButton({
                     <div className="m-auto">{vote}</div>
                 </div>
                 {showVotes && (
-                    <div className="absolute right-0 top-0 flex place-content-center">
-                        {users.map((user, i) => (
-                            <TooltipProvider delayDuration={300} key={user.id}>
-                                <Tooltip>
-                                    <TooltipTrigger
-                                        className="relative -top-2 aspect-square h-4 animate-[floatIn_250ms_ease-out]"
-                                        style={{
-                                            zIndex: i + 1,
-                                        }}
-                                    >
-                                        <Pfp
+                    <div className="absolute -right-0 -top-2 h-4  w-full ">
+                        <div className="relative">
+                            {users.map((user, i) => (
+                                <TooltipProvider
+                                    delayDuration={300}
+                                    key={user.id}
+                                >
+                                    <Tooltip>
+                                        <TooltipTrigger
+                                            className="absolute aspect-square h-4 animate-[floatIn_250ms_ease-out]"
                                             style={{
+                                                zIndex: i,
                                                 right: `${i * 0.5}rem`,
                                             }}
-                                            border={
-                                                current ? 'border-white' : ''
-                                            }
-                                            name={
-                                                user.name === ''
-                                                    ? 'Anonymous'
-                                                    : user.name
-                                            }
-                                            className="h-4"
-                                        />
-                                    </TooltipTrigger>
-                                    <TooltipContent
-                                        side="bottom"
-                                        className="text-xs"
-                                    >
-                                        <p>{user.name}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        ))}
+                                        >
+                                            <Pfp
+                                                border={
+                                                    current
+                                                        ? 'border-black dark:border-white'
+                                                        : 'border-transparent'
+                                                }
+                                                name={
+                                                    user.name === ''
+                                                        ? 'Anonymous'
+                                                        : user.name
+                                                }
+                                                className="absolute top-0 h-4"
+                                            />
+                                        </TooltipTrigger>
+                                        <TooltipContent
+                                            side="bottom"
+                                            className="text-xs"
+                                        >
+                                            <p>{user.name}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            ))}
+                        </div>
                     </div>
                 )}
             </button>
