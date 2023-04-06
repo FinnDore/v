@@ -62,7 +62,7 @@ const Start = () => {
     if (!url.current) return null;
 
     return (
-        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center gap-4 px-12 lg:max-w-screen-lg">
+        <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center gap-6 px-12 py-6 lg:max-w-screen-lg">
             <div className="mt-auto flex flex-col sm:flex-row">
                 {url.current && (
                     <div>

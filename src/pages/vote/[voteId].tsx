@@ -5,6 +5,12 @@ import { clsx } from 'clsx';
 import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/tool-tip';
 import { useVotes } from '@/hooks/poker-hooks';
 import { useHopUpdates } from '@/hooks/use-hop-updates';
 
@@ -46,7 +52,7 @@ const Vote = () => {
     }, [votes, anonUser]);
 
     return (
-        <div className="mx-auto flex h-full w-max max-w-full flex-col place-items-center justify-center px-12 py-6 lg:max-w-screen-lg">
+        <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center justify-center px-12 py-6 lg:max-w-screen-lg">
             <animated.div className="mx-auto flex flex-wrap gap-4">
                 {voteOptions.map(vote => (
                     <VoteButton
@@ -161,24 +167,37 @@ const VoteButton = function VoteButton({
                     <div className="m-auto">{vote}</div>
                 </div>
                 {showVotes && (
-                    <div className="absolute -top-2 right-0 flex place-content-center">
+                    <div className="absolute right-0 top-0 flex place-content-center">
                         {users.map((user, i) => (
-                            <div
-                                className="animate-[floatIn_250ms_ease-out] "
-                                style={{
-                                    zIndex: i + 1,
-                                }}
-                                key={i}
-                            >
-                                <Pfp
-                                    style={{
-                                        right: `${i * 0.5}rem`,
-                                    }}
-                                    border={current ? 'border-white' : ''}
-                                    name={user === '' ? 'Anonymous' : user}
-                                    className={clsx(`absolute h-4 `, {})}
-                                />
-                            </div>
+                            <TooltipProvider delayDuration={300} key={i}>
+                                <Tooltip>
+                                    <TooltipTrigger
+                                        className="relative -top-2 aspect-square h-4 animate-[floatIn_250ms_ease-out]"
+                                        style={{
+                                            zIndex: i + 1,
+                                        }}
+                                    >
+                                        <Pfp
+                                            style={{
+                                                right: `${i * 0.5}rem`,
+                                            }}
+                                            border={
+                                                current ? 'border-white' : ''
+                                            }
+                                            name={
+                                                user === '' ? 'Anonymous' : user
+                                            }
+                                            className="h-4"
+                                        />
+                                    </TooltipTrigger>
+                                    <TooltipContent
+                                        side="bottom"
+                                        className="text-xs"
+                                    >
+                                        <p>{user}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         ))}
                     </div>
                 )}
