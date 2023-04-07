@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { clsx } from 'clsx';
 
-import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
 import {
@@ -12,66 +11,12 @@ import {
     TooltipTrigger,
 } from '@/components/tool-tip';
 import { useVotes } from '@/hooks/poker-hooks';
-import { useHopUpdates } from '@/hooks/use-hop-updates';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 const Vote = () => {
-    const anonUser = useAnonUser();
-    const { doVote, activeVote } = useVotes();
+    const { doVote, activeVote, currentVote, highestVote, votesMap } =
+        useVotes();
     const [showResults, setShowResults] = useState(false);
-
-    useHopUpdates();
-
-    const { votesMap, currentVote, highestVote } = useMemo(() => {
-        const currentVote = activeVote?.voteChoice?.find(
-            v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
-        );
-
-        if (!activeVote) {
-            return {
-                currentVote,
-                votesMap: {} as Record<
-                    string,
-                    {
-                        count: number;
-                        users: {
-                            name: string;
-                            id: string;
-                        }[];
-                    }
-                >,
-                highestVote: ['-1', 0] as const,
-            };
-        }
-
-        // Compute vote count, and users per vote choice
-        const votesMap =
-            activeVote.voteChoice.reduce(
-                (acc, v) => ({
-                    ...acc,
-                    [v.choice]: {
-                        count: (acc[v.choice]?.count ?? 0) + 1,
-                        users: [
-                            ...(acc[v.choice]?.users ?? []),
-                            v.user ?? v.anonUser,
-                        ].filter((x): x is { id: string; name: string } => !!x),
-                    },
-                }),
-                {} as Record<
-                    string,
-                    { count: number; users: { name: string; id: string }[] }
-                >
-            ) ?? {};
-
-        /// get the highest vote
-        const highestVote = Object.entries(votesMap).reduce(
-            (a, e): [string, number] =>
-                e[1].count > a[1] ? [e[0], e[1].count] : a,
-            ['-1', 0] as [string, number]
-        );
-
-        return { currentVote, votesMap, highestVote: highestVote };
-    }, [activeVote, anonUser?.id]);
 
     return (
         <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center justify-center px-12 py-6 lg:max-w-screen-lg">
@@ -91,7 +36,7 @@ const Vote = () => {
             </animated.div>
             <div className="mt-8 max-w-[85ch] whitespace-break-spaces">
                 <h1 className="mb-4 text-2xl">
-                    <b>EUI-420</b>
+                    <b>{activeVote?.title}</b>
                 </h1>
                 <p>
                     Contrary to popular belief, Lorem Ipsum is not simply random

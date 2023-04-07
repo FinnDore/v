@@ -71,7 +71,8 @@ export const anonOrUserProcedure = t.procedure
                     id: z.string().cuid(),
                     secret: z.string().cuid(),
                 })
-                .optional(),
+                .optional()
+                .nullable(),
         })
     )
     .use(async ({ ctx, input, next }) => {

@@ -59,17 +59,13 @@ export type UsersInVote = {
     name: string;
 }[];
 
-export const dispatchVoteUpdateEvent = async ({
-    pokerVote,
-}: {
-    pokerVote: Vote;
-}) => {
+export const dispatchVoteUpdateEvent = async ({ vote }: { vote: Vote }) => {
     const [, updateChannelStateError] = await to(
         hop.channels.publishMessage(
-            `poker_${pokerVote.pokerVote.poker.id}`,
+            `poker_${vote.pokerVote.poker.id}`,
             'VOTE_UPDATE',
             {
-                data: stringify(pokerVote),
+                data: stringify(vote),
             }
         )
     );
@@ -77,7 +73,7 @@ export const dispatchVoteUpdateEvent = async ({
     if (updateChannelStateError) {
         console.error(
             `Could not publish votes for poker_${
-                pokerVote.pokerVote.poker.id
+                vote.pokerVote.poker.id
             } due to error: ${updateChannelStateError.message} ${
                 updateChannelStateError.stack ?? 'no stack'
             }
@@ -86,7 +82,7 @@ export const dispatchVoteUpdateEvent = async ({
         );
     } else {
         console.log(
-            `Published votes for poker_${pokerVote.pokerVote.poker.id} to channel`
+            `Published votes for poker_${vote.pokerVote.poker.id} to channel`
         );
     }
 };

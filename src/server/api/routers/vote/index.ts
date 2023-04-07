@@ -1,4 +1,5 @@
 import { ChannelType } from '@onehop/js';
+import { createId } from '@paralleldrive/cuid2';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
@@ -88,57 +89,65 @@ export const vote = createTRPCRouter({
                 pokerVoteId: z.string().cuid(),
             })
         )
-        .mutation(async ({ input, ctx }): Promise<Vote> => {
-            const [vote, voteError] = await to(
-                prisma.pokerVoteChoice.upsert({
-                    select: selectPokerVote,
-                    where: ctx.anonSession
-                        ? {
-                              pokerVoteId_anonUserId: {
-                                  pokerVoteId: input.pokerVoteId,
+        .mutation(
+            async ({
+                input,
+                ctx,
+            }): Promise<{ eventId: string; vote: Vote }> => {
+                const [vote, voteError] = await to(
+                    prisma.pokerVoteChoice.upsert({
+                        select: selectPokerVote,
+                        where: ctx.anonSession
+                            ? {
+                                  pokerVoteId_anonUserId: {
+                                      pokerVoteId: input.pokerVoteId,
+                                      anonUserId: ctx.anonSession.id,
+                                  },
+                              }
+                            : {
+                                  pokerVoteId_userId: {
+                                      pokerVoteId: input.pokerVoteId,
+                                      userId: ctx.session.user.id,
+                                  },
+                              },
+                        update: {
+                            choice: input.choice,
+                        },
+                        create: ctx.anonSession
+                            ? {
                                   anonUserId: ctx.anonSession.id,
-                              },
-                          }
-                        : {
-                              pokerVoteId_userId: {
+                                  choice: input.choice,
                                   pokerVoteId: input.pokerVoteId,
+                              }
+                            : {
                                   userId: ctx.session.user.id,
+                                  choice: input.choice,
+                                  pokerVoteId: input.pokerVoteId,
                               },
-                          },
-                    update: {
-                        choice: input.choice,
-                    },
-                    create: ctx.anonSession
-                        ? {
-                              anonUserId: ctx.anonSession.id,
-                              choice: input.choice,
-                              pokerVoteId: input.pokerVoteId,
-                          }
-                        : {
-                              userId: ctx.session.user.id,
-                              choice: input.choice,
-                              pokerVoteId: input.pokerVoteId,
-                          },
-                })
-            );
-
-            if (voteError) {
-                console.log(
-                    `Could not upsert vote ${input.pokerVoteId} due to error: ${
-                        voteError.message
-                    } ${voteError.stack ?? 'no stack'}`
+                    })
                 );
-                throw new TRPCError({
-                    code: 'INTERNAL_SERVER_ERROR',
-                });
-            } else if (!vote) {
-                console.log('No vote found when upserting');
-                throw new TRPCError({
-                    code: 'INTERNAL_SERVER_ERROR',
-                });
-            }
 
-            await dispatchVoteUpdateEvent({ pokerVote: vote });
-            return vote;
-        }),
+                if (voteError) {
+                    console.log(
+                        `Could not upsert vote ${
+                            input.pokerVoteId
+                        } due to error: ${voteError.message} ${
+                            voteError.stack ?? 'no stack'
+                        }`
+                    );
+                    throw new TRPCError({
+                        code: 'INTERNAL_SERVER_ERROR',
+                    });
+                } else if (!vote) {
+                    console.log('No vote found when upserting');
+                    throw new TRPCError({
+                        code: 'INTERNAL_SERVER_ERROR',
+                    });
+                }
+
+                const eventId = createId();
+                await dispatchVoteUpdateEvent({ vote });
+                return { vote, eventId };
+            }
+        ),
 });
