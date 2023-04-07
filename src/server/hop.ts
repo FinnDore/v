@@ -1,4 +1,5 @@
 import { Hop, type APIAuthentication } from '@onehop/js';
+import { stringify } from 'superjson';
 
 import { to } from '@/utils/to';
 import { env } from '@/env.mjs';
@@ -11,9 +12,14 @@ export const hop = new Hop(env.HOP_TOKEN as APIAuthentication);
 export type Vote = {
     id: string;
     choice: string;
-    createdAt: string | Date;
-    updatedAt: string | Date;
-    voteId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    pokerVote: {
+        id: string;
+        poker: {
+            id: string;
+        };
+    };
     anonUser: { name: string; id: string } | null;
     user: { name: string | null; id: string } | null;
 };
@@ -35,7 +41,16 @@ export const selectPokerVote = {
     },
     createdAt: true,
     updatedAt: true,
-    voteId: true,
+    pokerVote: {
+        select: {
+            id: true,
+            poker: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    },
 };
 
 export type UsersInVote = {
@@ -44,53 +59,25 @@ export type UsersInVote = {
     name: string;
 }[];
 
-export const dispatchVoteUpdate = async ({
-    pokerId,
-    users,
-}: {
-    pokerId: string;
-    users: UsersInVote;
-}) => {
-    const [, updateChannelStateError] = await to(
-        hop.channels.publishMessage(
-            `poker_${pokerId}`,
-            ChannelEvents.USER_JOINED,
-            {
-                users,
-            }
-        )
-    );
-
-    if (updateChannelStateError) {
-        console.error(
-            `Could not publish updated users for for poker_${pokerId} due to error: ${
-                updateChannelStateError.message
-            } ${updateChannelStateError.stack ?? 'no stack'}
-            ${JSON.stringify(updateChannelStateError, null, 2)}
-            `
-        );
-    } else {
-        console.log(`Published updated users for poker_${pokerId}`);
-    }
-};
-
-export const dispatchLobbyJoinEvent = async ({
+export const dispatchVoteUpdateEvent = async ({
     pokerVote,
 }: {
     pokerVote: Vote;
 }) => {
     const [, updateChannelStateError] = await to(
         hop.channels.publishMessage(
-            `poker_${pokerVote.voteId}`,
+            `poker_${pokerVote.pokerVote.poker.id}`,
             'VOTE_UPDATE',
-            pokerVote
+            {
+                data: stringify(pokerVote),
+            }
         )
     );
 
     if (updateChannelStateError) {
         console.error(
             `Could not publish votes for poker_${
-                pokerVote.voteId
+                pokerVote.pokerVote.poker.id
             } due to error: ${updateChannelStateError.message} ${
                 updateChannelStateError.stack ?? 'no stack'
             }
@@ -98,7 +85,9 @@ export const dispatchLobbyJoinEvent = async ({
             `
         );
     } else {
-        console.log(`Published votes for poker_${pokerVote.voteId} to channel`);
+        console.log(
+            `Published votes for poker_${pokerVote.pokerVote.poker.id} to channel`
+        );
     }
 };
 export const dispatchUserJoinedEvent = async ({

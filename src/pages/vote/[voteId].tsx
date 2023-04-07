@@ -17,17 +17,36 @@ import { useHopUpdates } from '@/hooks/use-hop-updates';
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
 const Vote = () => {
     const anonUser = useAnonUser();
-    const { doVote, votes } = useVotes();
+    const { doVote, activeVote } = useVotes();
     const [showResults, setShowResults] = useState(false);
+
     useHopUpdates();
 
     const { votesMap, currentVote, highestVote } = useMemo(() => {
-        const currentVote = votes?.find(
+        const currentVote = activeVote?.voteChoice?.find(
             v => (v.user?.id ?? v.anonUser?.id) === anonUser?.id
         );
 
+        if (!activeVote) {
+            return {
+                currentVote,
+                votesMap: {} as Record<
+                    string,
+                    {
+                        count: number;
+                        users: {
+                            name: string;
+                            id: string;
+                        }[];
+                    }
+                >,
+                highestVote: ['-1', 0] as const,
+            };
+        }
+
+        // Compute vote count, and users per vote choice
         const votesMap =
-            votes?.reduce(
+            activeVote.voteChoice.reduce(
                 (acc, v) => ({
                     ...acc,
                     [v.choice]: {
@@ -52,11 +71,11 @@ const Vote = () => {
         );
 
         return { currentVote, votesMap, highestVote: highestVote };
-    }, [votes, anonUser]);
+    }, [activeVote, anonUser?.id]);
 
     return (
         <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center justify-center px-12 py-6 lg:max-w-screen-lg">
-            <animated.div className="mx-auto flex flex-wrap gap-4">
+            <animated.div className="mx-auto flex flex-wrap justify-center gap-2 md:gap-4">
                 {voteOptions.map(vote => (
                     <VoteButton
                         key={vote}
@@ -90,7 +109,7 @@ const Vote = () => {
                     ipsum dolor sit amet.., comes from a line in section
                     1.10.32.
                 </p>
-                <div className="mb-4 flex w-full gap-4">
+                <div className="my-4 flex w-full gap-4">
                     <Button
                         size={'sm'}
                         className="ms-auto"
@@ -137,7 +156,7 @@ const VoteButton = function VoteButton({
     });
 
     return (
-        <div className="mx-auto my-2 flex flex-col">
+        <div className="my-2 flex flex-col">
             <animated.div
                 className="relative mx-auto mb-1 rotate-180"
                 style={outerStyles}
@@ -145,12 +164,13 @@ const VoteButton = function VoteButton({
                 <div className="absolute top-0 z-10 h-1/3 w-full bg-gradient-to-b from-white dark:from-black"></div>
                 <animated.div
                     style={styles}
-                    className="w-8 rounded-b-md border-2 border-orange-400 border-t-transparent bg-orange-600"
+                    className="w-6 rounded-b-md border-2 border-orange-400 border-t-transparent bg-orange-600 md:w-8"
                 ></animated.div>
             </animated.div>
-            <button
+            <div
+                role="button"
                 className={clsx(
-                    'relative h-12 w-16 text-white transition-all',
+                    'relative h-9 w-12 text-white transition-all md:h-12 md:w-16',
                     {
                         'opacity-60': !current,
                     }
@@ -167,10 +187,10 @@ const VoteButton = function VoteButton({
                         }
                     )}
                 >
-                    <div className="m-auto">{vote}</div>
+                    <div className="m-auto text-xs md:text-base">{vote}</div>
                 </div>
                 {showVotes && (
-                    <div className="absolute -right-0 -top-2 h-4  w-full ">
+                    <div className="absolute -right-0 -top-2 h-4 w-full ">
                         <div className="relative">
                             {users.map((user, i) => (
                                 <TooltipProvider
@@ -211,7 +231,7 @@ const VoteButton = function VoteButton({
                         </div>
                     </div>
                 )}
-            </button>
+            </div>
         </div>
     );
 };

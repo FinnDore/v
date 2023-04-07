@@ -13,55 +13,81 @@ export const usePokerId = () => {
 export const useVotes = () => {
     const pokerId = usePokerId();
     const session = useUser();
-    const { data } = api.vote.pokerState.getVotes.useQuery(
+    const { data } = api.vote.pokerState.getPokerState.useQuery(
         { pokerId: pokerId ?? '' },
         {
             enabled: !!pokerId,
         }
     );
 
+    const currentVoteId = data?.pokerVote?.find(x => x.active)?.id;
+
     const utils = api.useContext();
     const anonUser = useAnonUser();
     const { mutate } = api.vote.vote.useMutation({
-        onMutate: ({ choice, voteId }) => {
-            void utils.vote.pokerState.getVotes.cancel({
-                pokerId: voteId,
+        onMutate: ({ choice, pokerVoteId }) => {
+            if (!pokerVoteId || !pokerId || !anonUser) return;
+            void utils.vote.pokerState.getPokerState.cancel({
+                pokerId,
             });
-            utils.vote.pokerState.getVotes.setData(
+            utils.vote.pokerState.getPokerState.setData(
                 {
-                    pokerId: voteId,
+                    pokerId,
                 },
                 old => {
                     const userId = session.user?.id;
-                    if (!userId) return old;
+                    if (!userId || !old) return old;
 
-                    const newVotes = [...(old ?? [])];
-                    const itemIndex = newVotes.findIndex(
+                    // TODO deep clone /shrug
+                    const newState = {
+                        ...old,
+                        pokerVote: [
+                            ...old.pokerVote?.map(x => ({
+                                ...x,
+                                voteChoice: [...x.voteChoice],
+                            })),
+                        ],
+                    };
+                    const newVote = newState.pokerVote?.find(
+                        x => x.id === pokerVoteId
+                    );
+
+                    if (!newVote) return old;
+
+                    const itemIndex = newVote.voteChoice.findIndex(
                         v => (v.user?.id ?? v.anonUser?.id) === userId
                     );
 
                     if (itemIndex === -1) return old;
-                    const oldItem = newVotes.splice(itemIndex, 1)[0];
+
+                    const oldItem = newVote.voteChoice.splice(itemIndex, 1)[0];
                     if (oldItem) {
-                        newVotes.push({ ...oldItem, choice });
+                        newVote.voteChoice.push({ ...oldItem, choice });
                     }
-                    return [...newVotes];
+
+                    return newState;
                 }
             );
         },
-        onError: (_err, args) => {
-            void utils.vote.pokerState.getVotes.refetch({
-                pokerId: args.voteId,
+        onError: _err => {
+            if (!pokerId) return;
+            void utils.vote.pokerState.getPokerState.refetch({
+                pokerId,
             });
         },
     });
 
     return {
         votes: data,
+        activeVote: data?.pokerVote?.find(x => x.active),
         doVote: (choice: number) => {
-            if (!pokerId || !anonUser) return;
+            if (!currentVoteId || !anonUser) return;
 
-            mutate({ choice: choice.toString(), voteId: pokerId, anonUser });
+            mutate({
+                choice: choice.toString(),
+                pokerVoteId: currentVoteId,
+                anonUser,
+            });
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             window.navigator.vibrate([10]);
         },

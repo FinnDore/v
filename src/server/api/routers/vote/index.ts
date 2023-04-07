@@ -10,7 +10,7 @@ import {
     publicProcedure,
 } from '@/server/api/trpc';
 import {
-    dispatchLobbyJoinEvent,
+    dispatchVoteUpdateEvent,
     hop,
     selectPokerVote,
     type Vote,
@@ -45,6 +45,21 @@ export const vote = createTRPCRouter({
             });
         }
 
+        const [, voteError] = await to(
+            prisma.pokerVote.create({
+                data: {
+                    pokerId: vote.id,
+                    description: 'New Vote description',
+                    title: 'New Vote',
+                    active: true,
+                },
+            })
+        );
+
+        if (voteError) {
+            console.error(`Could not create vote for ${vote.id}`);
+        }
+
         return vote;
     }),
 
@@ -70,23 +85,23 @@ export const vote = createTRPCRouter({
         .input(
             z.object({
                 choice: z.string().max(20),
-                voteId: z.string().cuid(),
+                pokerVoteId: z.string().cuid(),
             })
         )
         .mutation(async ({ input, ctx }): Promise<Vote> => {
             const [vote, voteError] = await to(
-                prisma.pokerVote.upsert({
+                prisma.pokerVoteChoice.upsert({
                     select: selectPokerVote,
                     where: ctx.anonSession
                         ? {
-                              voteId_anonUserId: {
-                                  voteId: input.voteId,
+                              pokerVoteId_anonUserId: {
+                                  pokerVoteId: input.pokerVoteId,
                                   anonUserId: ctx.anonSession.id,
                               },
                           }
                         : {
-                              voteId_userId: {
-                                  voteId: input.voteId,
+                              pokerVoteId_userId: {
+                                  pokerVoteId: input.pokerVoteId,
                                   userId: ctx.session.user.id,
                               },
                           },
@@ -97,19 +112,19 @@ export const vote = createTRPCRouter({
                         ? {
                               anonUserId: ctx.anonSession.id,
                               choice: input.choice,
-                              voteId: input.voteId,
+                              pokerVoteId: input.pokerVoteId,
                           }
                         : {
                               userId: ctx.session.user.id,
                               choice: input.choice,
-                              voteId: input.voteId,
+                              pokerVoteId: input.pokerVoteId,
                           },
                 })
             );
 
             if (voteError) {
                 console.log(
-                    `Could not upsert vote ${input.voteId} due to error: ${
+                    `Could not upsert vote ${input.pokerVoteId} due to error: ${
                         voteError.message
                     } ${voteError.stack ?? 'no stack'}`
                 );
@@ -123,7 +138,7 @@ export const vote = createTRPCRouter({
                 });
             }
 
-            await dispatchLobbyJoinEvent({ pokerVote: vote });
+            await dispatchVoteUpdateEvent({ pokerVote: vote });
             return vote;
         }),
 });

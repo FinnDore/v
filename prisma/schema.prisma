@@ -12,20 +12,53 @@ datasource db {
 }
 
 model Poker {
-  id         String      @id @default(cuid())
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  VoteChoice PokerVote[]
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  pokerVote PokerVote[]
+}
+
+model PokerVote {
+  id          String            @id @default(cuid())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  poker       Poker             @relation(fields: [pokerId], references: [id], onDelete: Cascade)
+  pokerId     String
+  voteChoice  PokerVoteChoice[]
+  title       String            @db.Text
+  description String?           @db.LongText
+  active      Boolean           @default(true)
+
+  @@index([pokerId])
+}
+
+model PokerVoteChoice {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  pokerVote   PokerVote @relation(fields: [pokerVoteId], references: [id], onDelete: Cascade)
+  pokerVoteId String
+  choice      String
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?
+  anonUser    AnonUser? @relation(fields: [anonUserId], references: [id], onDelete: Cascade)
+  anonUserId  String?
+
+  @@unique([pokerVoteId, anonUserId])
+  @@unique([pokerVoteId, userId])
+  @@index([pokerVoteId])
+  @@index([anonUserId, pokerVoteId])
+  @@index([userId, pokerVoteId])
 }
 
 model UsersInVote {
-  id     String  @id @default(cuid())
-  updatedAt DateTime @updatedAt 
-  voteId String
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id])
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+  voteId    String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
 
-  anonUser   AnonUser? @relation(fields: [anonUserId], references: [id])
+  anonUser   AnonUser? @relation(fields: [anonUserId], references: [id], onDelete: Cascade)
   anonUserId String?
 
   @@unique([voteId, anonUserId])
@@ -36,25 +69,6 @@ model UsersInVote {
   @@index([userId])
 }
 
-model PokerVote {
-  id         String    @id @default(cuid())
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  vote       Poker     @relation(fields: [voteId], references: [id])
-  voteId     String
-  choice     String
-  user       User?     @relation(fields: [userId], references: [id])
-  userId     String?
-  anonUser   AnonUser? @relation(fields: [anonUserId], references: [id])
-  anonUserId String?
-
-  @@unique([voteId, anonUserId])
-  @@unique([voteId, userId])
-  @@index([voteId])
-  @@index([anonUserId, voteId])
-  @@index([userId, voteId])
-}
-
 model AnonUser {
   id        String   @id @unique @default(cuid())
   secret    String   @default(cuid())
@@ -63,7 +77,7 @@ model AnonUser {
   updatedAt DateTime @updatedAt
   voteId    String
 
-  voteChoice PokerVote[]
+  voteChoice PokerVoteChoice[]
   userInVote UsersInVote[]
 
   @@index([voteId])
@@ -102,14 +116,14 @@ model Session {
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id            String            @id @default(cuid())
   name          String?
-  email         String?       @unique
+  email         String?           @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  voteChoice    PokerVote[]
+  voteChoice    PokerVoteChoice[]
   usrInVote     UsersInVote[]
 }
 

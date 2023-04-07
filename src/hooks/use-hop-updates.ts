@@ -1,4 +1,5 @@
 import { useChannelMessage } from '@onehop/react';
+import { parse } from 'superjson';
 
 import { api } from '@/utils/api';
 import { useUser } from '@/utils/local-user';
@@ -15,28 +16,57 @@ export const useHopUpdates = (): { channelId: string } => {
     useChannelMessage(
         channelId,
         ChannelEvents.VOTE_UPDATED,
-        (updatedVote: Vote) => {
-            const currentVote = utils.vote.pokerState.getVotes
-                .getData()
-                ?.find(v => v.id === updatedVote.id);
-            // We probably know our own vote, if we do have a current vote
+        (e: { data: string }) => {
+            const updatedVoteChoice: Vote = parse(e.data);
+            const updatedPokerVoteId = updatedVoteChoice.pokerVote.id;
+            const currentVote = utils.vote.pokerState.getPokerState
+                .getData({
+                    pokerId: pokerId ?? '',
+                })
+                ?.pokerVote?.find(x => x.id === updatedPokerVoteId)
+                ?.voteChoice?.find(v => v.id === updatedVoteChoice.id);
+
+            // We probably know our own vote, if we do have a current vote as its updated optimistically
             if (
                 currentVote &&
-                (updatedVote.anonUser?.id === user?.id ||
-                    updatedVote.user?.id === user?.id)
+                (updatedVoteChoice.anonUser?.id === user?.id ||
+                    updatedVoteChoice.user?.id === user?.id)
             )
                 return;
 
-            utils.vote.pokerState.getVotes.setData(
+            utils.vote.pokerState.getPokerState.setData(
                 { pokerId: pokerId ?? '' },
                 old => {
-                    if (!old) return [updatedVote];
+                    if (!old) return old;
+                    // TODO deep clone /shrug
+                    const newState = {
+                        ...old,
+                        pokerVote: [
+                            ...old.pokerVote?.map(x => ({
+                                ...x,
+                                voteChoice: [...x.voteChoice],
+                            })),
+                        ],
+                    };
 
-                    const index = old.findIndex(v => v.id === updatedVote.id);
-                    if (index === -1) return [...old, updatedVote];
-                    const copy = [...old];
-                    copy[index] = updatedVote;
-                    return copy;
+                    const newVote = newState.pokerVote?.find(
+                        x => x.id === updatedPokerVoteId
+                    );
+
+                    if (!newVote) return old;
+                    const itemIndex = newVote.voteChoice.findIndex(
+                        v =>
+                            (v.user?.id ?? v.anonUser?.id) ===
+                                updatedVoteChoice.user?.id ??
+                            updatedVoteChoice.anonUser?.id
+                    );
+
+                    if (itemIndex === -1) {
+                        newVote.voteChoice.push(updatedVoteChoice);
+                    } else if (newVote.voteChoice[itemIndex]) {
+                        newVote.voteChoice[itemIndex] = updatedVoteChoice;
+                    }
+                    return newState;
                 }
             );
         }
