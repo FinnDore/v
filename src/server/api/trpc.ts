@@ -87,7 +87,7 @@ export const anonOrUserProcedure = t.procedure
                       anonSession: AnonUser;
                   };
         } | null = null;
-        console.log('ctxxx', ctx);
+
         if (ctx.session?.user) {
             result = {
                 ctx: {
