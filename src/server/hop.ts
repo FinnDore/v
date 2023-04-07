@@ -21,7 +21,7 @@ export type Vote = {
         };
     };
     anonUser: { name: string; id: string } | null;
-    user: { name: string | null; id: string } | null;
+    user: { name: string | null; id: string; image: string | null } | null;
 };
 
 export const selectPokerVote = {
@@ -37,6 +37,7 @@ export const selectPokerVote = {
         select: {
             id: true,
             name: true,
+            image: true,
         },
     },
     createdAt: true,
@@ -57,6 +58,7 @@ export type UsersInVote = {
     updatedAt: number;
     id: string;
     name: string;
+    image?: string | null;
 }[];
 
 export const dispatchVoteUpdateEvent = async ({ vote }: { vote: Vote }) => {

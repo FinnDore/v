@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
 
-import { storeUser } from '@/utils/local-user';
+import { storeUser, useAnonUser, useUser } from '@/utils/local-user';
 import { api } from '../../utils/api';
 
 const Home: NextPage = () => {
@@ -12,7 +12,11 @@ const Home: NextPage = () => {
         ? router.query.voteId[0]
         : router.query.voteId;
 
-    const { mutateAsync: joinVote } = api.vote.lobby.joinVote.useMutation();
+    const anonUser = useAnonUser();
+    const { user, status } = useUser();
+
+    const { mutateAsync: joinVote, status: joinVoteStatus } =
+        api.vote.lobby.joinVote.useMutation();
 
     const { mutate: createAccount, isLoading } =
         api.vote.createAccount.useMutation({
@@ -28,25 +32,42 @@ const Home: NextPage = () => {
 
     return (
         <div className="grid h-screen w-screen place-items-center">
-            <input
-                className="border-2 border-gray-800 bg-black text-white"
-                max={20}
-                min={3}
-                value={name}
-                onChange={e => setName(e.target.value)}
-            />
-            Min name length 3
-            <button
-                onClick={() =>
-                    !isLoading &&
-                    createAccount({
-                        voteId,
-                        name,
-                    })
-                }
-            >
-                join vote
-            </button>
+            {user && (
+                <button
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClick={async () => {
+                        if (joinVoteStatus !== 'loading' || voteId) {
+                            await joinVote({ voteId, anonUser });
+                            void router.push(`/vote/${voteId}`);
+                        }
+                    }}
+                >
+                    join vote
+                </button>
+            )}
+            {!user && status !== 'loading' && (
+                <>
+                    <input
+                        className="border-2 border-gray-800 bg-black text-white"
+                        max={20}
+                        min={3}
+                        value={name}
+                        onChange={e => setName(e.target.value)}
+                    />
+                    Min name length 3
+                    <button
+                        onClick={() =>
+                            !isLoading &&
+                            createAccount({
+                                voteId,
+                                name,
+                            })
+                        }
+                    >
+                        join vote ( and create account)
+                    </button>
+                </>
+            )}
         </div>
     );
 };

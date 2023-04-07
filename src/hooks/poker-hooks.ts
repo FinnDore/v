@@ -92,14 +92,29 @@ export const useVotes = () => {
         (e: { data: string }) => {
             const updatedVoteChoice: Vote = parse(e.data);
 
+            const existingVote = utils.vote.pokerState.getPokerState
+                .getData()
+                ?.pokerVote?.find(v => v.id === updatedVoteChoice.pokerVote.id)
+                ?.voteChoice?.find(
+                    v =>
+                        v.user?.id === updatedVoteChoice.user?.id ||
+                        v.anonUser?.id === updatedVoteChoice.anonUser?.id
+                );
             const timeSinceLastUpdate = Date.now() - lastUpdated.current;
 
-            // Ignore events from ourselves x seconds after we optimistically updated
+            // Ignore events from ourselves x seconds after we optimistically updated if we have our current vote client side
             const updateGracePeriod = 2000;
             if (
+                existingVote &&
                 timeSinceLastUpdate < updateGracePeriod &&
-                updatedVoteChoice.anonUser?.id === session.user?.id
+                (updatedVoteChoice.user?.id === session.user?.id ||
+                    updatedVoteChoice.anonUser?.id === anonUser?.id)
             ) {
+                console.log(
+                    'Ignoring update from self',
+                    timeSinceLastUpdate < updateGracePeriod,
+                    timeSinceLastUpdate
+                );
                 return;
             }
 
@@ -173,12 +188,23 @@ export const useVotes = () => {
                         users: [
                             ...(acc[v.choice]?.users ?? []),
                             v.user ?? v.anonUser,
-                        ].filter((x): x is { id: string; name: string } => !!x),
+                        ].filter(
+                            (
+                                x
+                            ): x is {
+                                id: string;
+                                name: string;
+                                image: string;
+                            } => !!x
+                        ),
                     },
                 }),
                 {} as Record<
                     string,
-                    { count: number; users: { name: string; id: string }[] }
+                    {
+                        count: number;
+                        users: { name: string; id: string; image?: string }[];
+                    }
                 >
             ) ?? {};
 

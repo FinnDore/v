@@ -116,7 +116,7 @@ const Start = () => {
                         </div>
                     </div>
                 )}
-                <div className="-ml-4 flex max-h-[285px] w-full flex-col overflow-y-auto overflow-x-visible ps-4 text-center sm:ml-0 sm:w-64 sm:ps-8 sm:text-start">
+                <div className="-ml-4 flex max-h-[285px] w-full flex-col overflow-y-auto overflow-x-visible pb-4 ps-4 text-center sm:ml-0 sm:w-64 sm:ps-8 sm:text-start">
                     <div className="mb-3 text-2xl font-bold">
                         Users{' '}
                         {!!users?.length && (
@@ -133,6 +133,7 @@ const Start = () => {
                                     key={item.id}
                                 >
                                     <Pfp
+                                        image={item.image}
                                         name={item?.name ?? 'Unknown user'}
                                         className="mr-4 w-6"
                                     />

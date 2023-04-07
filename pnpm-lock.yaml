@@ -6,7 +6,7 @@ dependencies:
     version: 3.7.1(prettier@2.8.1)
   '@next-auth/prisma-adapter':
     specifier: 1.0.5
-    version: 1.0.5(@prisma/client@4.9.0)(next-auth@4.19.0)
+    version: 1.0.5(@prisma/client@4.9.0)(next-auth@4.21.1)
   '@onehop/client':
     specifier: 1.5.5
     version: 1.5.5
@@ -71,8 +71,8 @@ dependencies:
     specifier: 13.2.1
     version: 13.2.1(@babel/core@7.21.3)(react-dom@18.2.0)(react@18.2.0)
   next-auth:
-    specifier: 4.19.0
-    version: 4.19.0(next@13.2.1)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 4.21.1
+    version: 4.21.1(next@13.2.1)(react-dom@18.2.0)(react@18.2.0)
   qrcode:
     specifier: ^1.5.1
     version: 1.5.1
@@ -442,14 +442,14 @@ packages:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
 
-  /@next-auth/prisma-adapter@1.0.5(@prisma/client@4.9.0)(next-auth@4.19.0):
+  /@next-auth/prisma-adapter@1.0.5(@prisma/client@4.9.0)(next-auth@4.21.1):
     resolution: {integrity: sha512-VqMS11IxPXrPGXw6Oul6jcyS/n8GLOWzRMrPr3EMdtD6eOalM6zz05j08PcNiis8QzkfuYnCv49OvufTuaEwYQ==}
     peerDependencies:
       '@prisma/client': '>=2.26.0 || >=3'
       next-auth: ^4
     dependencies:
       '@prisma/client': 4.9.0(prisma@4.9.0)
-      next-auth: 4.19.0(next@13.2.1)(react-dom@18.2.0)(react@18.2.0)
+      next-auth: 4.21.1(next@13.2.1)(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
   /@next/env@13.2.1:
@@ -2949,8 +2949,8 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /next-auth@4.19.0(next@13.2.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-56Pc/Ni0cxfrVDAz2KeWdj+VXvABbHF1grgFR4+ktXbRmKQOiMU9uyMwhasBQkbL+pRrWujO0Ib/bwkP0oZS4g==}
+  /next-auth@4.21.1(next@13.2.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-NYkU4jAPSVxWhCblE8dDFAnKM7kOoO/QEobQ0RoEVP9Wox99A3PKHwOAsWhSg8ahJG/iKIWk2Bo1xHvsS4R39Q==}
     peerDependencies:
       next: ^12.2.5 || ^13
       nodemailer: ^6.6.5

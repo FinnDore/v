@@ -34,7 +34,6 @@ export const pokerStateRouter = createTRPCRouter({
                 })
             );
 
-            console.log('votes', votes);
             if (error) {
                 console.error("Couldn't get votes: " + error.message);
                 throw new TRPCError({

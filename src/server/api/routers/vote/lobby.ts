@@ -23,6 +23,7 @@ const usersInVoteSelect = {
         select: {
             id: true,
             name: true,
+            image: true,
         },
     },
 };
@@ -156,6 +157,7 @@ const formatUsers = (
               user: {
                   id: string;
                   name: string | null;
+                  image?: string | null;
               } | null;
           }[]
         | null

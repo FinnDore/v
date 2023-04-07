@@ -14,7 +14,11 @@ export const Nav = () => {
             </div>
             {name && (
                 <div className="text-md pointer-events-auto ml-auto mr-4 flex align-middle">
-                    <Pfp name={name} className="my-auto mr-3 ms-auto w-6" />
+                    <Pfp
+                        image={user.image}
+                        name={name}
+                        className="my-auto mr-3 ms-auto w-6"
+                    />
                     <div className="my-auto h-min">{name}</div>
                 </div>
             )}

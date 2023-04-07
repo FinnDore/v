@@ -75,6 +75,7 @@ export const useUser = ():
           user: {
               id: Session['user']['id'];
               name: Session['user']['name'];
+              image: Session['user']['image'];
           };
       }
     | {
@@ -83,7 +84,7 @@ export const useUser = ():
       }
     | {
           status: 'anon';
-          user: LocalUserStore['user'];
+          user: LocalUserStore['user'] & { image: undefined };
       }
     | {
           status: 'unauthenticated';
@@ -104,12 +105,13 @@ export const useUser = ():
             user: {
                 id: session.user.id,
                 name: session.user.name,
+                image: session.user.image,
             },
         };
     } else if (anonUser) {
         return {
             status: 'anon',
-            user: anonUser,
+            user: { ...anonUser, image: undefined },
         };
     } else {
         return {

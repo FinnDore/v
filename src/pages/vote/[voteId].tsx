@@ -84,7 +84,7 @@ const VoteButton = function VoteButton({
     doVote: (vote: number) => void;
     currentVotes: number;
     totalVotes: number;
-    users: { name: string; id: string }[];
+    users: { name: string; id: string; image?: string }[];
     showVotes: boolean;
 }) {
     const height = (currentVotes / totalVotes) * 100;
@@ -132,7 +132,9 @@ const VoteButton = function VoteButton({
                         }
                     )}
                 >
-                    <div className="m-auto text-xs md:text-base">{vote}</div>
+                    <div className="m-auto select-none text-xs md:text-base">
+                        {vote}
+                    </div>
                 </div>
                 {showVotes && (
                     <div className="absolute -right-0 -top-2 h-4 w-full ">
@@ -151,6 +153,7 @@ const VoteButton = function VoteButton({
                                             }}
                                         >
                                             <Pfp
+                                                image={user.image}
                                                 border={
                                                     current
                                                         ? 'border-black dark:border-white'
