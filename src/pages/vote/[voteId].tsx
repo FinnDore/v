@@ -181,7 +181,7 @@ const VoteButton = function VoteButton({
                                         <TooltipTrigger
                                             className="absolute aspect-square h-4 animate-[floatIn_250ms_ease-out]"
                                             style={{
-                                                zIndex: i,
+                                                zIndex: 10 + i,
                                                 right: `${i * 0.5}rem`,
                                             }}
                                         >

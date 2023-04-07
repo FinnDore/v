@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
 import { Link2Icon } from '@radix-ui/react-icons';
@@ -19,21 +19,18 @@ import { type UsersInVote } from '@/server/hop';
 
 const Start = () => {
     const pokerId = usePokerId();
-    const url = useRef<string | null>(null);
     const { channelId } = useHopUpdates();
     const utils = api.useContext();
     const router = useRouter();
 
-    useEffect(() => {
+    const url = useMemo(() => {
         if (typeof window !== undefined && pokerId) {
-            url.current = `/api/qrcode/${encodeURIComponent(
+            return `/api/qrcode/${encodeURIComponent(
                 window.location.origin + '/join/' + (pokerId ?? '')
             )}`;
         }
 
-        return () => {
-            url.current = null;
-        };
+        return null;
     }, [pokerId]);
 
     const { data: users, status: userStatus } =
@@ -59,12 +56,12 @@ const Start = () => {
 
     const noUsers = !users?.length;
     const lastUser = users?.[0]?.name;
-    if (!url.current) return null;
+    if (!url) return null;
 
     return (
         <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center gap-6 px-12 py-6 lg:max-w-screen-lg">
             <div className="mt-auto flex flex-col sm:flex-row">
-                {url.current && (
+                {url && (
                     <div>
                         <div className="relative mx-auto mb-4 aspect-square sm:mb-0 sm:w-64">
                             {lastUser && (
@@ -82,7 +79,7 @@ const Start = () => {
                             <picture>
                                 <img
                                     className=" absolute z-10 aspect-square w-full rounded-md border border-black/20 dark:border-white"
-                                    src={url.current}
+                                    src={url}
                                     alt={`QR code to join vote ${
                                         pokerId ?? ''
                                     }`}
