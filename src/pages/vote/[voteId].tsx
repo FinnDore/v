@@ -6,7 +6,7 @@ import { Button } from '@/components/button';
 import { VoteButton } from '@/components/vote/vote-button';
 import { usePokerId, usePokerState, useVotes } from '@/hooks/poker-hooks';
 
-const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, 86];
+const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Vote = () => {
     const { doVote, currentVote, highestVote, votesMap, showVotes } =
         useVotes();

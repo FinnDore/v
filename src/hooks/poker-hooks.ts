@@ -250,7 +250,7 @@ export const useVotes = () => {
         currentVote,
         highestVote,
         activeVote,
-        doVote: (choice: number) => {
+        doVote: (choice: number | string) => {
             if (!currentUsersVoteId) return;
 
             mutate({

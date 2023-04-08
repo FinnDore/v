@@ -19,8 +19,8 @@ export const VoteButton = ({
     showVotes,
 }: {
     current: boolean;
-    vote: number;
-    doVote: (vote: number) => void;
+    vote: number | string;
+    doVote: (vote: number | string) => void;
     currentVotes: number;
     totalVotes: number;
     users: { name: string; id: string; image?: string }[];
