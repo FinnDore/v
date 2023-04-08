@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { useUser } from '@/utils/local-user';
 import { Glitch } from './glitch';
 import { Pfp } from './pfp';
@@ -7,13 +9,13 @@ export const Nav = () => {
     const name = user?.name;
 
     return (
-        <nav className="pointer-events-none mx-auto flex w-full min-w-max max-w-[90ch] px-12 py-4">
-            <div className="pointer-events-auto flex text-2xl">
+        <nav className="mx-auto flex w-full min-w-max max-w-[90ch] px-12 py-4">
+            <Link className="flex text-2xl" href="/">
                 <b>V</b>
                 <Glitch text="ote" />
-            </div>
+            </Link>
             {name && (
-                <div className="text-md pointer-events-auto ml-auto mr-4 flex align-middle">
+                <div className="text-md  ml-auto mr-4 flex align-middle">
                     <Pfp
                         image={user.image}
                         name={name}

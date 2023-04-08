@@ -71,7 +71,7 @@ const Start = () => {
                                         src={`/api/gradient/${encodeURIComponent(
                                             lastUser
                                         )}`}
-                                        alt=""
+                                        alt="Blurred gradient background behind the join QR code"
                                     />
                                 </picture>
                             )}
