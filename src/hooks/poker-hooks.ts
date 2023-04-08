@@ -17,20 +17,21 @@ export const usePokerId = () => {
 
 export const usePokerState = () => {
     const pokerId = usePokerId();
-    const { data: votes } = api.vote.pokerState.getPokerState.useQuery(
+    const { data: votes, status } = api.vote.pokerState.getPokerState.useQuery(
         { pokerId: pokerId ?? '' },
         {
             enabled: !!pokerId,
         }
     );
-    return { pokerState: votes };
+    return { pokerState: votes, status };
 };
 
 export const useActiveVote = () => {
-    const { pokerState: votes } = usePokerState();
-    return useMemo(() => {
+    const { pokerState: votes, status } = usePokerState();
+    const activeVote = useMemo(() => {
         return votes?.pokerVote?.find(x => x.active);
     }, [votes]);
+    return { activeVote, status };
 };
 
 export const useVotes = () => {
@@ -41,7 +42,8 @@ export const useVotes = () => {
     const { pokerState: votes } = usePokerState();
     const session = useUser();
 
-    const activeVote = useActiveVote();
+    const { activeVote } = useActiveVote();
+
     const currentUsersVoteId = votes?.pokerVote?.find(x => x.active)?.id;
 
     const { mutate } = api.vote.vote.useMutation({

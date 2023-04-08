@@ -67,6 +67,7 @@ export const pokerStateRouter = createTRPCRouter({
                                 id: true,
                                 active: true,
                                 title: true,
+                                description: true,
                                 voteChoice: {
                                     select: selectPokerVote,
                                 },

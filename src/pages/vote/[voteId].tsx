@@ -4,7 +4,12 @@ import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { VoteButton } from '@/components/vote/vote-button';
-import { usePokerId, usePokerState, useVotes } from '@/hooks/poker-hooks';
+import {
+    useActiveVote,
+    usePokerId,
+    usePokerState,
+    useVotes,
+} from '@/hooks/poker-hooks';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Vote = () => {
@@ -37,7 +42,7 @@ export default Vote;
 const VoteDescription = () => {
     const pokerId = usePokerId();
     const { pokerState } = usePokerState();
-    const { activeVote } = useVotes();
+    const { activeVote, status } = useActiveVote();
     const anonUser = useAnonUser();
     const showResults = pokerState?.showResults;
 
@@ -67,25 +72,27 @@ const VoteDescription = () => {
         });
 
     return (
-        <div className="mt-8 max-w-[85ch] whitespace-break-spaces">
-            <h1 className="mb-4 text-2xl">
-                <b>{activeVote?.title}</b>
-            </h1>
-            <p>
-                Contrary to popular belief, Lorem Ipsum is not simply random
-                text. It has roots in a piece of classical Latin literature from
-                45 BC, making it over 2000 years old. Richard McClintock, a
-                Latin professor at Hampden-Sydney College in Virginia, looked up
-                one of the more obscure Latin words, consectetur, from a Lorem
-                Ipsum passage, and going through the cites of the word in
-                classical literature, discovered the undoubtable source. Lorem
-                Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus
-                Bonorum et Malorum (The Extremes of Good and Evil) by Cicero,
-                written in 45 BC. This book is a treatise on the theory of
-                ethics, very popular during the Renaissance. The first line of
-                Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in
-                section 1.10.32.
-            </p>
+        <div className="mx-auto mt-8 w-[clamp(90%,85ch,100%)] whitespace-break-spaces">
+            <div className="min-h-[3.50rem] md:min-h-[4rem]">
+                <h1 className="mb-2 h-7 text-base md:mb-3 md:text-2xl">
+                    <b>
+                        {activeVote?.title}
+
+                        {!activeVote?.title && status !== 'loading' && (
+                            <span className="italic opacity-70">No title</span>
+                        )}
+                    </b>
+                </h1>
+                <p className="text-sm md:text-base">
+                    {activeVote?.description}
+
+                    {!activeVote?.description && status !== 'loading' && (
+                        <span className="italic opacity-70">
+                            No description provided
+                        </span>
+                    )}
+                </p>
+            </div>
             <div className="my-4 flex w-full gap-4">
                 <Button
                     size={'sm'}
