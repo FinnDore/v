@@ -117,3 +117,29 @@ export const dispatchUserJoinedEvent = async ({
         console.log(`Published updated users for poker_${pokerId}`);
     }
 };
+
+export const dispatchPokerStateUpdateEvent = async (event: {
+    pokerId: string;
+    event: ChannelEvent;
+    data: unknown;
+}) => {
+    const [, updateChannelStateError] = await to(
+        hop.channels.publishMessage(`poker_${event.pokerId}`, event.event, {
+            data: stringify(event.data),
+        })
+    );
+
+    if (updateChannelStateError) {
+        console.error(
+            `Could not poker state update for for poker_${
+                event.pokerId
+            } due to error: ${updateChannelStateError.message} ${
+                updateChannelStateError.stack ?? 'no stack'
+            }
+            ${JSON.stringify(updateChannelStateError, null, 2)}
+            `
+        );
+    } else {
+        console.log(`Published poker state update for poker_${event.pokerId}`);
+    }
+};

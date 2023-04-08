@@ -24,7 +24,7 @@ export const VoteButton = ({
     currentVotes: number;
     totalVotes: number;
     users: { name: string; id: string; image?: string }[];
-    showVotes: boolean;
+    showVotes?: boolean;
 }) => {
     const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({

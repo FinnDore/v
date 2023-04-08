@@ -15,22 +15,34 @@ export const usePokerId = () => {
         : router.query.voteId;
 };
 
-export const useVotes = () => {
+export const usePokerState = () => {
     const pokerId = usePokerId();
-    const utils = api.useContext();
-    const anonUser = useAnonUser();
-    const lastUpdated = useRef<number>(0);
-
-    const session = useUser();
     const { data: votes } = api.vote.pokerState.getPokerState.useQuery(
         { pokerId: pokerId ?? '' },
         {
             enabled: !!pokerId,
         }
     );
+    return { pokerState: votes };
+};
 
-    const activeVote = votes?.pokerVote?.find(x => x.active);
-    const currentVoteId = votes?.pokerVote?.find(x => x.active)?.id;
+export const useActiveVote = () => {
+    const { pokerState: votes } = usePokerState();
+    return useMemo(() => {
+        return votes?.pokerVote?.find(x => x.active);
+    }, [votes]);
+};
+
+export const useVotes = () => {
+    const pokerId = usePokerId();
+    const utils = api.useContext();
+    const anonUser = useAnonUser();
+    const lastUpdated = useRef<number>(0);
+    const { pokerState: votes } = usePokerState();
+    const session = useUser();
+
+    const activeVote = useActiveVote();
+    const currentUsersVoteId = votes?.pokerVote?.find(x => x.active)?.id;
 
     const { mutate } = api.vote.vote.useMutation({
         onMutate: ({ choice, pokerVoteId }) => {
@@ -110,11 +122,6 @@ export const useVotes = () => {
                 (updatedVoteChoice.user?.id === session.user?.id ||
                     updatedVoteChoice.anonUser?.id === anonUser?.id)
             ) {
-                console.log(
-                    'Ignoring update from self',
-                    timeSinceLastUpdate < updateGracePeriod,
-                    timeSinceLastUpdate
-                );
                 return;
             }
 
@@ -150,6 +157,25 @@ export const useVotes = () => {
                     } else if (newVote.voteChoice[itemIndex]) {
                         newVote.voteChoice[itemIndex] = updatedVoteChoice;
                     }
+                    return newState;
+                }
+            );
+        }
+    );
+
+    useChannelMessage(
+        channelId,
+        ChannelEvents.TOGGLE_RESULTS,
+        (e: { data: string }) => {
+            const { showResults }: { showResults: boolean } = parse(e.data);
+            utils.vote.pokerState.getPokerState.setData(
+                { pokerId: pokerId ?? '' },
+                old => {
+                    if (!old) return old;
+                    const newState = {
+                        ...old,
+                        showResults,
+                    };
                     return newState;
                 }
             );
@@ -225,15 +251,16 @@ export const useVotes = () => {
         highestVote,
         activeVote,
         doVote: (choice: number) => {
-            if (!currentVoteId) return;
+            if (!currentUsersVoteId) return;
 
             mutate({
                 choice: choice.toString(),
-                pokerVoteId: currentVoteId,
+                pokerVoteId: currentUsersVoteId,
                 anonUser: anonUser ?? null,
             });
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             window.navigator.vibrate([20]);
         },
+        showVotes: votes?.showResults,
     };
 };

@@ -15,6 +15,7 @@ model Poker {
   id        String      @id @default(cuid())
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  showResults Boolean   @default(false)
   pokerVote PokerVote[]
 }
 
