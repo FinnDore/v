@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import clsx from 'clsx';
 
 const buttonVariants = cva(
-    'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 border border-orange-500 dark:hover:border-orange-400 dark:hover:bg-orange-500 dark:hover:text-white disabled:opacity-50 dark:focus:ring-white disabled:pointer-events-none dark:focus:ring-offset-slate-900 data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800',
+    'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 border border-orange-500 hover:border-orange-600 dark:hover:border-orange-400 dark:hover:bg-orange-500 dark:hover:text-white disabled:opacity-50 dark:focus:ring-white disabled:pointer-events-none dark:focus:ring-offset-slate-900 data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800',
     {
         variants: {
             variant: {
@@ -12,7 +12,7 @@ const buttonVariants = cva(
                 destructive:
                     'bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-600',
                 outline:
-                    'bg-transparent border border-slate-200 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100',
+                    'bg-transparent border dark:!border-white/70 !border-black/70 hover:!border-orange-600 hover:darkL!border-orange-400 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100',
                 subtle: 'bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-100',
                 ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-100 dark:hover:text-slate-100 data-[state=open]:bg-transparent dark:data-[state=open]:bg-transparent',
                 link: 'bg-transparent dark:bg-transparent underline-offset-4 hover:underline text-slate-900 dark:text-slate-100 hover:bg-transparent dark:hover:bg-transparent',

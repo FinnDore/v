@@ -6,7 +6,6 @@ import { Pfp } from './pfp';
 
 export const Nav = () => {
     const { user } = useUser();
-    const name = user?.name;
 
     return (
         <nav className="mx-auto flex w-full min-w-max max-w-[90ch] px-12 py-4">
@@ -14,14 +13,15 @@ export const Nav = () => {
                 <b>V</b>
                 <Glitch text="ote" />
             </Link>
-            {name && (
+            {user && (
                 <div className="text-md  ml-auto mr-4 flex align-middle">
                     <Pfp
                         image={user.image}
-                        name={name}
+                        name={user.name}
+                        pfpHash={user.pfpHash}
                         className="my-auto mr-3 ms-auto w-6"
                     />
-                    <div className="my-auto h-min">{name}</div>
+                    <div className="my-auto h-min">{user.name}</div>
                 </div>
             )}
         </nav>

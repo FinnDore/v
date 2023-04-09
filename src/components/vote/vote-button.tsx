@@ -23,7 +23,7 @@ export const VoteButton = ({
     doVote: (vote: number | string) => void;
     currentVotes: number;
     totalVotes: number;
-    users: { name: string; id: string; image?: string }[];
+    users: { name: string; id: string; image?: string; pfpHash?: string }[];
     showVotes?: boolean;
 }) => {
     const height = (currentVotes / totalVotes) * 100;
@@ -93,13 +93,14 @@ export const VoteButton = ({
                                         >
                                             <Pfp
                                                 image={user.image}
+                                                pfpHash={user.pfpHash}
                                                 border={
                                                     current
                                                         ? 'border-black dark:border-white'
                                                         : 'border-transparent'
                                                 }
                                                 name={
-                                                    user.name === ''
+                                                    !user.name
                                                         ? 'Anonymous'
                                                         : user.name
                                                 }

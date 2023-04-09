@@ -55,7 +55,7 @@ const Start = () => {
     );
 
     const noUsers = !users?.length;
-    const lastUser = users?.[0]?.name;
+    const lastUser = users?.[0];
     if (!url) return null;
 
     return (
@@ -67,10 +67,13 @@ const Start = () => {
                             {lastUser && (
                                 <picture>
                                     <img
-                                        className="-z-1 absolute aspect-square w-full animate-spin rounded-md opacity-50 blur-2xl"
-                                        src={`/api/gradient/${encodeURIComponent(
-                                            lastUser
-                                        )}`}
+                                        className="-z-1 absolute aspect-square w-full rounded-full opacity-50 blur-2xl duration-1000 motion-safe:animate-[spin_3s_linear_infinite]"
+                                        src={
+                                            lastUser.image ??
+                                            `/api/gradient/${encodeURIComponent(
+                                                lastUser.pfpHash ?? ''
+                                            )}`
+                                        }
                                         alt="Blurred gradient background behind the join QR code"
                                     />
                                 </picture>
@@ -134,6 +137,7 @@ const Start = () => {
                                 >
                                     <Pfp
                                         image={item.image}
+                                        pfpHash={item.pfpHash}
                                         name={item?.name ?? 'Unknown user'}
                                         className="mr-4 w-6"
                                     />
@@ -142,7 +146,7 @@ const Start = () => {
                             ))}
                         {noUsers && userStatus !== 'loading' && (
                             <div className="text-sm opacity-75">
-                                Theres no one here yet! Scan the QR code or
+                                There is no one here yet! Scan the QR code or
                                 share the join link
                             </div>
                         )}

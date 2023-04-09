@@ -74,14 +74,13 @@ model AnonUser {
   id        String   @id @unique @default(cuid())
   secret    String   @default(cuid())
   name      String
+  pfpHash   String  @default("ghd44")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  voteId    String
 
   voteChoice PokerVoteChoice[]
   userInVote UsersInVote[]
 
-  @@index([voteId])
   @@index([secret])
   @@index([id])
 }

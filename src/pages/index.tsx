@@ -1,7 +1,7 @@
 import { type PropsWithChildren } from 'react';
 import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { signIn } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 
 import { Button } from '@/components/button';
 import { api } from '../utils/api';
@@ -33,6 +33,7 @@ const Home: NextPage = () => {
                     <VoteButton>No</VoteButton>
                 </div>
             </div>
+            <button onClick={() => void signOut()}>Logout</button>
         </div>
     );
 };

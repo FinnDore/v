@@ -20,7 +20,7 @@ export type Vote = {
             id: string;
         };
     };
-    anonUser: { name: string; id: string } | null;
+    anonUser: { name: string; id: string; pfpHash: string } | null;
     user: { name: string | null; id: string; image: string | null } | null;
 };
 
@@ -31,6 +31,7 @@ export const selectPokerVote = {
         select: {
             id: true,
             name: true,
+            pfpHash: true,
         },
     },
     user: {
@@ -59,6 +60,7 @@ export type UsersInVote = {
     id: string;
     name: string;
     image?: string | null;
+    pfpHash?: string | null;
 }[];
 
 export const dispatchVoteUpdateEvent = async ({ vote }: { vote: Vote }) => {

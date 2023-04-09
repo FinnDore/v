@@ -222,7 +222,8 @@ export const useVotes = () => {
                             ): x is {
                                 id: string;
                                 name: string;
-                                image: string;
+                                image?: string;
+                                pfpHash?: string;
                             } => !!x
                         ),
                     },
@@ -231,7 +232,12 @@ export const useVotes = () => {
                     string,
                     {
                         count: number;
-                        users: { name: string; id: string; image?: string }[];
+                        users: {
+                            name: string;
+                            id: string;
+                            image?: string;
+                            pfpHash?: string;
+                        }[];
                     }
                 >
             ) ?? {};

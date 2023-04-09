@@ -1,4 +1,4 @@
-import { useEffect, useRef, version } from 'react';
+import { useMemo, useRef, version } from 'react';
 import { type AnonUser } from '@prisma/client';
 import { type Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
@@ -10,6 +10,7 @@ const LocalUserStoreSchema = z.object({
         id: z.string(),
         name: z.string(),
         secret: z.string().cuid(),
+        pfpHash: z.string(),
     }),
 });
 
@@ -17,7 +18,7 @@ type LocalUserStore = z.infer<typeof LocalUserStoreSchema>;
 
 export function useAnonUser() {
     const user = useRef<LocalUserStore['user'] | null>();
-    useEffect(() => {
+    useMemo(() => {
         const cleanup = () => {
             user.current = null;
         };
@@ -33,7 +34,7 @@ export function useAnonUser() {
 
 export function storeUser(user: AnonUser) {
     const existingUsersParseResult = LocalUserStoreSchema.safeParse(
-        JSON.parse(localStorage.getItem('users') ?? 'null')
+        JSON.parse(localStorage.getItem('users') || 'null')
     );
     if (!existingUsersParseResult.success) {
         console.error(
@@ -48,6 +49,7 @@ export function storeUser(user: AnonUser) {
                   id: user.id,
                   name: user.name,
                   secret: user.secret,
+                  pfpHash: user.pfpHash,
               },
               version,
           };
@@ -57,7 +59,7 @@ export function storeUser(user: AnonUser) {
 
 function getLocalUserStore() {
     const existingUsersParseResult = LocalUserStoreSchema.safeParse(
-        JSON.parse(localStorage.getItem('user') ?? 'null')
+        JSON.parse(localStorage.getItem('user') || 'null')
     );
     if (!existingUsersParseResult.success) {
         console.error(
@@ -76,6 +78,7 @@ export const useUser = ():
               id: Session['user']['id'];
               name: Session['user']['name'];
               image: Session['user']['image'];
+              pfpHash: undefined;
           };
       }
     | {
@@ -84,7 +87,10 @@ export const useUser = ():
       }
     | {
           status: 'anon';
-          user: LocalUserStore['user'] & { image: undefined };
+          user: LocalUserStore['user'] & {
+              image: undefined;
+              pfpHash: string;
+          };
       }
     | {
           status: 'unauthenticated';
@@ -106,6 +112,7 @@ export const useUser = ():
                 id: session.user.id,
                 name: session.user.name,
                 image: session.user.image,
+                pfpHash: undefined,
             },
         };
     } else if (anonUser) {

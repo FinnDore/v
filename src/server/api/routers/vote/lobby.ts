@@ -17,6 +17,7 @@ const usersInVoteSelect = {
         select: {
             id: true,
             name: true,
+            pfpHash: true,
         },
     },
     user: {

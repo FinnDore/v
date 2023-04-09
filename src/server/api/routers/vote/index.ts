@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { to } from '@/utils/to';
 import {
     anonOrUserProcedure,
-    anonProcedure,
     createTRPCRouter,
     publicProcedure,
 } from '@/server/api/trpc';
@@ -64,18 +63,18 @@ export const vote = createTRPCRouter({
         return vote;
     }),
 
-    createAccount: anonProcedure
+    createAccount: publicProcedure
         .input(
             z.object({
-                voteId: z.string().cuid(),
-                name: z.string().max(20).min(3),
+                name: z.string().trim().max(25).min(1),
+                pfpHash: z.string().trim().min(1).max(30),
             })
         )
         .mutation(async ({ input }) => {
             const anonUser = await prisma.anonUser.create({
                 data: {
-                    voteId: input.voteId,
                     name: input.name,
+                    pfpHash: input.pfpHash,
                 },
             });
 
