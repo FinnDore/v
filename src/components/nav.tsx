@@ -17,7 +17,7 @@ export const Nav = () => {
                 <div className="text-md  ml-auto mr-4 flex align-middle">
                     <Pfp
                         image={user.image}
-                        name={user.name}
+                        name={user.name ?? undefined}
                         pfpHash={user.pfpHash}
                         className="my-auto mr-3 ms-auto w-6"
                     />
