@@ -35,10 +35,10 @@ const Home: NextPage = () => {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const joinVoteAndRedirect = useCallback(async () => {
-        if (!voteId) return;
-        await joinVote({ voteId, anonUser: undefined });
+        if (!voteId || joinVoteStatus === 'loading') return;
+        await joinVote({ voteId, anonUser: anonUser });
         void router.push(`/vote/${voteId}`);
-    }, [joinVote, router, voteId]);
+    }, [anonUser, joinVote, joinVoteStatus, router, voteId]);
 
     const { mutate: createAccount } = api.vote.createAccount.useMutation({
         onSuccess: async user => {
@@ -120,11 +120,8 @@ const Home: NextPage = () => {
                 <div className="flex w-48 flex-col">
                     <Button
                         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                        onClick={async () => {
-                            if (joinVoteStatus !== 'loading' || voteId) {
-                                await joinVote({ voteId, anonUser });
-                                void router.push(`/vote/${voteId}`);
-                            }
+                        onClick={() => {
+                            void joinVoteAndRedirect();
                         }}
                     >
                         join vote as {user.name}

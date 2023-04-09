@@ -1,4 +1,4 @@
-import { useMemo, useRef, version } from 'react';
+import { useEffect, useMemo, useState, version } from 'react';
 import { type AnonUser } from '@prisma/client';
 import { type Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
@@ -17,19 +17,35 @@ const LocalUserStoreSchema = z.object({
 type LocalUserStore = z.infer<typeof LocalUserStoreSchema>;
 
 export function useAnonUser() {
-    const user = useRef<LocalUserStore['user'] | null>();
+    const [user, setUser] = useState<LocalUserStore['user'] | null>();
     useMemo(() => {
         const cleanup = () => {
-            user.current = null;
+            setUser(null);
         };
         if (typeof window === 'undefined') return cleanup;
         const localUserStore = getLocalUserStore();
 
-        user.current = localUserStore?.user ?? null;
+        setUser(localUserStore?.user ?? null);
         return cleanup;
     }, []);
 
-    return user.current;
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const reloadUser = (e: StorageEvent) => {
+            if (e.key === 'user') {
+                console.log('Reloading user');
+                const localUserStore = getLocalUserStore();
+                setUser(localUserStore?.user ?? null);
+            }
+        };
+
+        window.addEventListener('storage', reloadUser);
+        return () => {
+            window.removeEventListener('storage', reloadUser);
+        };
+    }, []);
+
+    return user;
 }
 
 export function storeUser(user: AnonUser) {
@@ -43,7 +59,15 @@ export function storeUser(user: AnonUser) {
         );
     }
     const existingUser = existingUsersParseResult.success
-        ? existingUsersParseResult.data
+        ? {
+              ...existingUsersParseResult.data,
+              user: {
+                  id: user.id,
+                  name: user.name,
+                  secret: user.secret,
+                  pfpHash: user.pfpHash,
+              },
+          }
         : {
               user: {
                   id: user.id,
@@ -55,6 +79,9 @@ export function storeUser(user: AnonUser) {
           };
 
     localStorage.setItem('user', JSON.stringify(existingUser));
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new StorageEvent('storage', { key: 'user' }));
+    }
 }
 
 function getLocalUserStore() {
