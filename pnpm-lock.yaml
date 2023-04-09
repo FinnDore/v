@@ -1,5 +1,10 @@
 lockfileVersion: '6.0'
 
+patchedDependencies:
+  '@onehop/client@1.5.5':
+    hash: am325uufw6okpucl5nyzghrzau
+    path: patches/@onehop__client@1.5.5.patch
+
 dependencies:
   '@ianvs/prettier-plugin-sort-imports':
     specifier: 3.7.1
@@ -12,7 +17,7 @@ dependencies:
     version: 13.3.0
   '@onehop/client':
     specifier: 1.5.5
-    version: 1.5.5
+    version: 1.5.5(patch_hash=am325uufw6okpucl5nyzghrzau)
   '@onehop/js':
     specifier: 1.30.0
     version: 1.30.0
@@ -622,7 +627,7 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@onehop/client@1.5.5:
+  /@onehop/client@1.5.5(patch_hash=am325uufw6okpucl5nyzghrzau):
     resolution: {integrity: sha512-wKlTuvs0TfX70LxOM2HWkhraMbHjY5kshrlKZv48gncw2hLfmQ1r1Cv1kD7erDJ0kPW/Hri4yXCgKGGedJu50Q==}
     dependencies:
       '@onehop/js': 1.30.0
@@ -633,6 +638,7 @@ packages:
       - encoding
       - utf-8-validate
     dev: false
+    patched: true
 
   /@onehop/js@1.30.0:
     resolution: {integrity: sha512-81LELReARRLKodSFQ7bF8jLNQ7WrGrfQenIkVfHmuTBsLM25P17Bm0tOVdQDjZEN3E2jdeLaWsvhTasQOq9v2w==}
@@ -665,7 +671,7 @@ packages:
     peerDependencies:
       react: '*'
     dependencies:
-      '@onehop/client': 1.5.5
+      '@onehop/client': 1.5.5(patch_hash=am325uufw6okpucl5nyzghrzau)
       '@onehop/js': 1.30.0
       '@onehop/leap-edge-js': 1.0.11
       react: 18.2.0

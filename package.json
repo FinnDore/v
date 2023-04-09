@@ -7,7 +7,7 @@
         "dev": "next dev",
         "postinstall": "prisma generate",
         "lint": "next lint",
-        "analyze": "NODE_ENV=production ANALYZE=1 next build",
+        "analyze": "ANALYZE=1 NODE_ENV=production next build",
         "start": "next start",
         "format": "prettier --write .",
         "format:lint": "prettier --check ."
@@ -67,5 +67,10 @@
     },
     "ct3aMetadata": {
         "initVersion": "7.7.0"
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "@onehop/client@1.5.5": "patches/@onehop__client@1.5.5.patch"
+        }
     }
 }

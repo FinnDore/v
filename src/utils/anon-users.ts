@@ -1,4 +1,4 @@
-import { AnonUser } from '@prisma/client';
+import { type AnonUser } from '@prisma/client';
 
 import { prisma } from '@/server/db';
 import { to } from './to';
