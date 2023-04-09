@@ -40,7 +40,7 @@ export const VoteButton = ({
     });
 
     return (
-        <div className="my-2 flex flex-col">
+        <div className="my-2 flex select-none flex-col">
             <animated.div
                 className="relative mx-auto mb-1 rotate-180"
                 style={outerStyles}
