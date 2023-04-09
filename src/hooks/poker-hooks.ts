@@ -107,7 +107,9 @@ export const useVotes = () => {
             const updatedVoteChoice: Vote = parse(e.data);
 
             const existingVote = utils.vote.pokerState.getPokerState
-                .getData()
+                .getData({
+                    pokerId: pokerId ?? '',
+                })
                 ?.pokerVote?.find(v => v.id === updatedVoteChoice.pokerVote.id)
                 ?.voteChoice?.find(
                     v =>
