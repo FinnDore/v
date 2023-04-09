@@ -6,9 +6,9 @@ import ColorHash from 'color-hash';
 const colorHash = new ColorHash({ saturation: 1 });
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-export const stringToColour = (s: string): string => colorHash.hex(s);
+const stringToColour = (s: string): string => colorHash.hex(s);
 
-export const generateColours = (s: string): [string, string] => {
+const generateColours = (s: string): [string, string] => {
     const s1 = s.substring(0, s.length / 2);
     const s2 = s.substring(s.length / 2);
     const c1 = stringToColour(s1);
@@ -17,7 +17,7 @@ export const generateColours = (s: string): [string, string] => {
     return [c1, c2];
 };
 
-export const generateSVG = (s: string, size = 256): string => {
+const generateSVG = (s: string, size = 256): string => {
     const [c1, c2] = generateColours(s);
 
     const svg = `
