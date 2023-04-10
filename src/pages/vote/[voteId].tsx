@@ -108,7 +108,8 @@ const VoteDescription = () => {
             </div>
             <div className="my-4 flex w-full gap-2">
                 <div className="my-auto ms-auto text-xs opacity-70">
-                    {currentIndex ?? 0} / {pokerState?.pokerVote?.length ?? 0}
+                    {(currentIndex ?? 0) + 1} /{' '}
+                    {pokerState?.pokerVote?.length ?? 0}
                 </div>
                 <TooltipProvider>
                     <Tooltip>

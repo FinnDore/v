@@ -63,7 +63,7 @@ const CreatePoker = () => {
                         </Button>
                         <Label>Vote Name</Label>
                         <Input
-                            className="mb-4 w-44"
+                            className="mb-4 !w-44"
                             maxLength={15}
                             min="1"
                             value={vote.title}
