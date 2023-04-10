@@ -84,6 +84,8 @@ const VoteDescription = () => {
             },
         });
 
+    if (!activeVote) return null;
+
     return (
         <div className="mx-auto mt-8 w-[clamp(90%,85ch,100%)] whitespace-break-spaces">
             <div className="min-h-[3.50rem] md:min-h-[4rem]">
