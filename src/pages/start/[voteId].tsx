@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { GetServerSidePropsContext, PageConfig } from 'next';
 import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
 import { Link2Icon } from '@radix-ui/react-icons';
@@ -167,3 +168,17 @@ const Start = () => {
 };
 
 export default Start;
+
+export const getServerSideProps = (
+    ctx: GetServerSidePropsContext<{ voteId: string }>
+) => ({
+    props: {
+        voteId: Array.isArray(ctx.query.voteId)
+            ? ctx.query.voteId[0]
+            : ctx.query.voteId,
+    },
+});
+
+export const config: PageConfig = {
+    // runtime: 'experimental-edge',
+};
