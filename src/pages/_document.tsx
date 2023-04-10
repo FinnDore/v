@@ -8,7 +8,7 @@ export default function Document() {
                 color: 'white',
             }}
         >
-            <title>Finn</title>
+            <title>Vote</title>
             <Head>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
