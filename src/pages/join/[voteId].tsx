@@ -47,7 +47,7 @@ const Home: NextPage = () => {
         },
     });
 
-    if (!voteId) return <div>no voteId</div>;
+    if (!voteId) return null;
 
     return (
         <div className="grid h-screen w-screen place-items-center">
