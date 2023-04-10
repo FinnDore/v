@@ -1,9 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import {
-    GetServerSidePropsContext,
-    type NextPage,
-    type PageConfig,
-} from 'next';
+import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { GitHubLogoIcon, ShuffleIcon } from '@radix-ui/react-icons';
 import { signIn } from 'next-auth/react';
@@ -159,17 +155,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
-export const getServerSideProps = (
-    ctx: GetServerSidePropsContext<{ voteId: string }>
-) => ({
-    props: {
-        voteId: Array.isArray(ctx.query.voteId)
-            ? ctx.query.voteId[0]
-            : ctx.query.voteId,
-    },
-});
-
-export const config: PageConfig = {
-    // runtime: 'experimental-edge',
-};

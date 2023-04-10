@@ -1,4 +1,3 @@
-import { type GetServerSidePropsContext, type PageConfig } from 'next';
 import {
     DoubleArrowLeftIcon,
     DoubleArrowRightIcon,
@@ -23,7 +22,6 @@ import {
 } from '@/hooks/poker-hooks';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
-
 const Vote = () => {
     const { doVote, currentVote, highestVote, votesMap, showVotes } =
         useVotes();
@@ -181,18 +179,4 @@ const VoteDescription = () => {
             </div>
         </div>
     );
-};
-
-export const getServerSideProps = (
-    ctx: GetServerSidePropsContext<{ voteId: string }>
-) => ({
-    props: {
-        voteId: Array.isArray(ctx.query.voteId)
-            ? ctx.query.voteId[0]
-            : ctx.query.voteId,
-    },
-});
-
-export const config: PageConfig = {
-    // runtime: 'experimental-edge',
 };
