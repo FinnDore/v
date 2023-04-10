@@ -29,6 +29,14 @@
     }
 }
 
+.btn-shadow {
+    box-shadow: 0px 3.3px 2.2px rgba(0, 0, 0, 0.066),
+        0px 8px 5.3px rgba(0, 0, 0, 0.08), 0px 15.2px 10px rgba(0, 0, 0, 0.084),
+        0px 27px 17.9px rgba(0, 0, 0, 0.082),
+        0px 50.6px 33.4px rgba(0, 0, 0, 0.077),
+        0px 121px 80px rgba(0, 0, 0, 0.07);
+}
+
 @keyframes clipPathKeyframes {
     0% {
         -webkit-clip-path: polygon(

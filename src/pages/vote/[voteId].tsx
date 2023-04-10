@@ -17,7 +17,7 @@ const Vote = () => {
         useVotes();
 
     return (
-        <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center justify-center px-12 py-6 lg:max-w-screen-lg">
+        <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center justify-center px-6 py-6 sm:px-12 lg:max-w-screen-lg">
             <animated.div className="mx-auto flex flex-wrap justify-center gap-2 md:gap-4">
                 {voteOptions.map(vote => (
                     <VoteButton

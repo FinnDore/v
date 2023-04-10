@@ -8,7 +8,7 @@ export const Nav = () => {
     const { user } = useUser();
 
     return (
-        <nav className="mx-auto flex w-full min-w-max max-w-[90ch] px-12 py-4">
+        <nav className="mx-auto flex w-full min-w-max max-w-[90ch] px-6 py-4 sm:px-12">
             <Link className="flex text-2xl" href="/">
                 <b>V</b>
                 <Glitch text="ote" />

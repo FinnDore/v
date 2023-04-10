@@ -54,7 +54,7 @@ export const VoteButton = ({
             <div
                 role="button"
                 className={clsx(
-                    'relative h-9 w-12 text-white transition-all md:h-12 md:w-16',
+                    'btn-shadow  relative h-9 w-12 text-white transition-all dark:shadow-none md:h-12 md:w-16',
                     {
                         'opacity-60': !current,
                     }
