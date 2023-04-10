@@ -1,8 +1,18 @@
+import {
+    DoubleArrowLeftIcon,
+    DoubleArrowRightIcon,
+} from '@radix-ui/react-icons';
+import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { animated } from '@react-spring/web';
 
 import { api } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+} from '@/components/tool-tip';
 import { VoteButton } from '@/components/vote/vote-button';
 import {
     useActiveVote,
@@ -41,10 +51,13 @@ export default Vote;
 
 const VoteDescription = () => {
     const pokerId = usePokerId();
-    const { pokerState } = usePokerState();
+    const { pokerState, nextVote, prevVote, currentIndex } = usePokerState();
     const { activeVote, status } = useActiveVote();
     const anonUser = useAnonUser();
     const showResults = pokerState?.showResults;
+
+    const { mutate: progressVote } =
+        api.vote.pokerState.toggleResultsAndProgress.useMutation({});
 
     const utils = api.useContext();
 
@@ -74,7 +87,7 @@ const VoteDescription = () => {
     return (
         <div className="mx-auto mt-8 w-[clamp(90%,85ch,100%)] whitespace-break-spaces">
             <div className="min-h-[3.50rem] md:min-h-[4rem]">
-                <h1 className="mb-2 h-7 text-base md:mb-3 md:text-2xl">
+                <h1 className="mb-2 h-7 max-w-full text-base md:mb-3 md:text-2xl">
                     <b>
                         {activeVote?.title}
 
@@ -83,7 +96,7 @@ const VoteDescription = () => {
                         )}
                     </b>
                 </h1>
-                <p className="text-sm md:text-base">
+                <p className="max-h-56 max-w-full overflow-auto break-words text-sm md:text-base">
                     {activeVote?.description}
 
                     {!activeVote?.description && status !== 'loading' && (
@@ -93,10 +106,63 @@ const VoteDescription = () => {
                     )}
                 </p>
             </div>
-            <div className="my-4 flex w-full gap-4">
+            <div className="my-4 flex w-full gap-2">
+                <div className="my-auto ms-auto text-xs opacity-70">
+                    {currentIndex ?? 0} / {pokerState?.pokerVote?.length ?? 0}
+                </div>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="sm"
+                                className="ms-1 aspect-square"
+                                variant="outline"
+                                disabled={!prevVote}
+                                onClick={() => {
+                                    if (!prevVote) return;
+                                    progressVote({
+                                        pokerId: pokerId ?? '',
+                                        progressTo: prevVote.id,
+                                        anonUser,
+                                    });
+                                }}
+                            >
+                                <DoubleArrowLeftIcon />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                            Previous vote
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="ms-0 aspect-square"
+                                disabled={!nextVote}
+                                onClick={() => {
+                                    if (!nextVote) return;
+                                    progressVote({
+                                        pokerId: pokerId ?? '',
+                                        progressTo: nextVote.id,
+                                        anonUser,
+                                    });
+                                }}
+                            >
+                                <DoubleArrowRightIcon />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">Next vote</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
                 <Button
-                    size={'sm'}
-                    className="ms-auto"
+                    size="sm"
+                    variant="outline"
+                    className="ms-2 w-28"
                     onClick={() => {
                         toggleResults({
                             pokerId: pokerId ?? '',

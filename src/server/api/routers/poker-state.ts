@@ -30,7 +30,6 @@ export const pokerStateRouter = createTRPCRouter({
                     },
                 })
             );
-            console.log('votes', votes);
 
             if (error) {
                 console.error("Couldn't get votes: " + error.message);
@@ -48,6 +47,61 @@ export const pokerStateRouter = createTRPCRouter({
                 pokerId: input.pokerId,
                 event: ChannelEvents.TOGGLE_RESULTS,
                 data: { showResults: input.showResults },
+            });
+        }),
+
+    toggleResultsAndProgress: anonOrUserProcedure
+        .input(
+            z.object({
+                pokerId: z.string().cuid(),
+                progressTo: z.string().cuid(),
+            })
+        )
+        .mutation(async ({ input }) => {
+            const [votes, error] = await to(
+                prisma.poker.update({
+                    where: {
+                        id: input.pokerId,
+                    },
+                    data: {
+                        showResults: false,
+                        pokerVote: {
+                            updateMany: {
+                                where: {
+                                    active: true,
+                                },
+                                data: {
+                                    active: false,
+                                },
+                            },
+                            update: {
+                                where: {
+                                    id: input.progressTo,
+                                },
+                                data: {
+                                    active: true,
+                                },
+                            },
+                        },
+                    },
+                })
+            );
+
+            if (error) {
+                console.error("Couldn't get votes: " + error.message);
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            } else if (!votes) {
+                throw new TRPCError({
+                    code: 'NOT_FOUND',
+                });
+            }
+
+            await dispatchPokerStateUpdateEvent({
+                pokerId: input.pokerId,
+                event: ChannelEvents.CHANGE_VOTE,
+                data: { currentVote: input.progressTo },
             });
         }),
 

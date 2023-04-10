@@ -22,46 +22,53 @@ export const vote = createTRPCRouter({
     pokerState: pokerStateRouter,
     lobby: lobbyRouter,
 
-    createPoker: publicProcedure.mutation(async ({}) => {
-        const vote = await prisma.poker.create({
-            data: {},
-        });
-        const [, createChannelError] = await to(
-            hop.channels.create(ChannelType.UNPROTECTED, `poker_${vote.id}`)
-        );
-
-        if (createChannelError) {
-            console.error(
-                `Could not create channel poker_${
-                    vote.id
-                } ( attempting to publish anyway ): ${
-                    createChannelError.message ?? 'no error message'
-                } ${createChannelError.stack ?? 'no stack'}`
-            );
-            console.log(JSON.stringify(createChannelError));
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-            });
-        }
-
-        const [, voteError] = await to(
-            prisma.pokerVote.create({
-                data: {
-                    pokerId: vote.id,
-                    title: 'New Vote',
-                    description:
-                        'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32.',
-                    active: true,
-                },
+    createPoker: publicProcedure
+        .input(
+            z.object({
+                votes: z
+                    .array(
+                        z.object({
+                            title: z.string().trim().max(20),
+                            description: z.string().trim().max(2000),
+                        })
+                    )
+                    .max(15),
             })
-        );
+        )
+        .mutation(async ({ input }) => {
+            const vote = await prisma.poker.create({
+                data: {
+                    pokerVote: {
+                        createMany: {
+                            data: input.votes.map((vote, i) => ({
+                                title: vote.title,
+                                description: vote.description,
+                                active: i === 0,
+                            })),
+                        },
+                    },
+                },
+            });
+            const [, createChannelError] = await to(
+                hop.channels.create(ChannelType.UNPROTECTED, `poker_${vote.id}`)
+            );
 
-        if (voteError) {
-            console.error(`Could not create vote for ${vote.id}`);
-        }
+            if (createChannelError) {
+                console.error(
+                    `Could not create channel poker_${
+                        vote.id
+                    } ( attempting to publish anyway ): ${
+                        createChannelError.message ?? 'no error message'
+                    } ${createChannelError.stack ?? 'no stack'}`
+                );
+                console.log(JSON.stringify(createChannelError));
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            }
 
-        return vote;
-    }),
+            return vote;
+        }),
 
     createAccount: publicProcedure
         .input(

@@ -23,7 +23,18 @@ export const usePokerState = () => {
             enabled: !!pokerId,
         }
     );
-    return { pokerState: votes, status };
+
+    const nextVote = useMemo(() => {
+        if (!votes) return { nextVote: null, prevVote: null };
+        const activeVoteIndex = votes.pokerVote.findIndex(x => x.active);
+        return {
+            prevVote: votes.pokerVote?.[activeVoteIndex - 1] ?? null,
+            nextVote: votes.pokerVote?.[activeVoteIndex + 1] ?? null,
+            currentIndex: activeVoteIndex,
+        };
+    }, [votes]);
+
+    return { pokerState: votes, status, ...nextVote };
 };
 
 export const useActiveVote = () => {
@@ -162,6 +173,34 @@ export const useVotes = () => {
                         newVote.voteChoice[itemIndex] = updatedVoteChoice;
                     }
                     return newState;
+                }
+            );
+        }
+    );
+
+    useChannelMessage(
+        channelId,
+        ChannelEvents.CHANGE_VOTE,
+        (e: { data: string }) => {
+            const event: { currentVote: string } = parse(e.data);
+
+            utils.vote.pokerState.getPokerState.setData(
+                {
+                    pokerId: pokerId ?? '',
+                },
+                old => {
+                    if (!old) return old;
+                    return {
+                        ...old,
+                        showResults: false,
+                        pokerVote: [
+                            ...old.pokerVote?.map(x => ({
+                                ...x,
+                                active: x.id === event.currentVote,
+                                voteChoice: [...x.voteChoice],
+                            })),
+                        ],
+                    };
                 }
             );
         }
