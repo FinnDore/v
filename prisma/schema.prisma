@@ -19,7 +19,7 @@ model Poker {
   createdByAnonUser   AnonUser?   @relation(fields: [createdByAnonUserId], references: [id], onDelete: Cascade)
   createdByAnonUserId String?
   createdByUser       User?       @relation(fields: [createdByuserId], references: [id], onDelete: Cascade)
-  createdByuserId         String? @map("createdById")
+  createdByuserId         String?
   pokerVote           PokerVote[]
 
   @@index([createdByuserId])
