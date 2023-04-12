@@ -19,12 +19,24 @@ export const pokerStateRouter = createTRPCRouter({
                 showResults: z.boolean(),
             })
         )
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx }) => {
+            const where = ctx.session
+                ? {
+                      id_createdByUserId: {
+                          createdByUserId: ctx.session.user.id,
+                          id: input.pokerId,
+                      },
+                  }
+                : {
+                      id_createdByAnonUserId: {
+                          createdByAnonUserId: ctx.anonSession.id,
+                          id: input.pokerId,
+                      },
+                  };
+
             const [votes, error] = await to(
                 prisma.poker.update({
-                    where: {
-                        id: input.pokerId,
-                    },
+                    where,
                     data: {
                         showResults: input.showResults,
                     },
@@ -57,12 +69,23 @@ export const pokerStateRouter = createTRPCRouter({
                 progressTo: z.string().cuid(),
             })
         )
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx }) => {
+            const where = ctx.session
+                ? {
+                      id_createdByUserId: {
+                          createdByUserId: ctx.session.user.id,
+                          id: input.pokerId,
+                      },
+                  }
+                : {
+                      id_createdByAnonUserId: {
+                          createdByAnonUserId: ctx.anonSession.id,
+                          id: input.pokerId,
+                      },
+                  };
             const [votes, error] = await to(
                 prisma.poker.update({
-                    where: {
-                        id: input.pokerId,
-                    },
+                    where,
                     data: {
                         showResults: false,
                         pokerVote: {
@@ -116,6 +139,20 @@ export const pokerStateRouter = createTRPCRouter({
                 prisma.poker.findFirst({
                     select: {
                         showResults: true,
+                        createdByAnonUser: {
+                            select: {
+                                id: true,
+                                name: true,
+                                pfpHash: true,
+                            },
+                        },
+                        createdByUser: {
+                            select: {
+                                id: true,
+                                name: true,
+                                image: true,
+                            },
+                        },
                         pokerVote: {
                             select: {
                                 id: true,

@@ -1,12 +1,15 @@
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
+import { atom, useAtom } from 'jotai';
 import { parse } from 'superjson';
 
 import { api } from '@/utils/api';
 import { useAnonUser, useUser } from '@/utils/local-user';
 import { ChannelEvents } from '@/server/channel-events';
 import { type Vote } from '@/server/hop';
+
+const currentVoteIdAtom = atom<string | null>(null);
 
 export const usePokerId = () => {
     const router = useRouter();
@@ -17,32 +20,55 @@ export const usePokerId = () => {
 
 export const usePokerState = () => {
     const pokerId = usePokerId();
-    const { data: votes, status } = api.vote.pokerState.getPokerState.useQuery(
-        { pokerId: pokerId ?? '' },
-        {
-            enabled: !!pokerId,
-        }
+    const [currentVoteId, setActiveVoteId] = useAtom(currentVoteIdAtom);
+    const { data: pokerState, status } =
+        api.vote.pokerState.getPokerState.useQuery(
+            { pokerId: pokerId ?? '' },
+            {
+                enabled: !!pokerId,
+            }
+        );
+
+    const session = useUser();
+    const isHost = useMemo(
+        () =>
+            pokerState?.createdByUser?.id === session.user?.id ||
+            pokerState?.createdByAnonUser?.id === session?.user?.id,
+        [
+            pokerState?.createdByAnonUser?.id,
+            pokerState?.createdByUser?.id,
+            session.user?.id,
+        ]
     );
 
+    const activeVote = useMemo(() => {
+        if (currentVoteId && !isHost) {
+            return pokerState?.pokerVote?.find(x => x.id === currentVoteId);
+        } else {
+            return pokerState?.pokerVote?.find(x => x.active);
+        }
+    }, [currentVoteId, isHost, pokerState?.pokerVote]);
+
     const nextVote = useMemo(() => {
-        if (!votes) return { nextVote: null, prevVote: null };
-        const activeVoteIndex = votes.pokerVote.findIndex(x => x.active);
+        if (!pokerState) return { nextVote: null, prevVote: null };
+        const activeVoteIndex = pokerState.pokerVote.findIndex(
+            x => activeVote?.id === x.id
+        );
         return {
-            prevVote: votes.pokerVote?.[activeVoteIndex - 1] ?? null,
-            nextVote: votes.pokerVote?.[activeVoteIndex + 1] ?? null,
+            prevVote: pokerState.pokerVote?.[activeVoteIndex - 1] ?? null,
+            nextVote: pokerState.pokerVote?.[activeVoteIndex + 1] ?? null,
             currentIndex: activeVoteIndex,
         };
-    }, [votes]);
+    }, [activeVote?.id, pokerState]);
 
-    return { pokerState: votes, status, ...nextVote };
-};
-
-export const useActiveVote = () => {
-    const { pokerState: votes, status } = usePokerState();
-    const activeVote = useMemo(() => {
-        return votes?.pokerVote?.find(x => x.active);
-    }, [votes]);
-    return { activeVote, status };
+    return {
+        pokerState: pokerState,
+        status,
+        activeVote,
+        setActiveVoteId,
+        isHost,
+        ...nextVote,
+    };
 };
 
 export const useVotes = () => {
@@ -50,13 +76,9 @@ export const useVotes = () => {
     const utils = api.useContext();
     const anonUser = useAnonUser();
     const lastUpdated = useRef<number>(0);
-    const { pokerState: votes } = usePokerState();
     const session = useUser();
 
-    const { activeVote } = useActiveVote();
-
-    const currentUsersVoteId = votes?.pokerVote?.find(x => x.active)?.id;
-
+    const { pokerState, activeVote } = usePokerState();
     const { mutate } = api.vote.vote.useMutation({
         onMutate: ({ choice, pokerVoteId }) => {
             if (!pokerVoteId || !pokerId) return;
@@ -294,22 +316,133 @@ export const useVotes = () => {
     }, [activeVote, session?.user?.id]);
 
     return {
-        votes: votes,
+        votes: pokerState,
         votesMap,
         currentVote,
         highestVote,
         activeVote,
         doVote: (choice: number | string) => {
-            if (!currentUsersVoteId) return;
+            if (!activeVote?.id) return;
 
             mutate({
                 choice: choice.toString(),
-                pokerVoteId: currentUsersVoteId,
+                pokerVoteId: activeVote.id,
+
                 anonUser: anonUser ?? null,
             });
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             window.navigator.vibrate([20]);
         },
-        showVotes: votes?.showResults,
+        showVotes: pokerState?.showResults && activeVote?.active,
+    };
+};
+
+export const useVoteControls = () => {
+    const {
+        activeVote,
+        currentIndex,
+        nextVote,
+        pokerState,
+        prevVote,
+        setActiveVoteId,
+        status,
+        isHost,
+    } = usePokerState();
+    const pokerId = usePokerId();
+    const utils = api.useContext();
+    const anonUser = useAnonUser();
+
+    const toggleResultsMutation = api.vote.pokerState.toggleResults.useMutation(
+        {
+            onMutate() {
+                utils.vote.pokerState.getPokerState.setData(
+                    {
+                        pokerId: pokerId ?? '',
+                    },
+                    old => {
+                        if (!old) return old;
+                        return {
+                            ...old,
+                            showResults: !old?.showResults,
+                        };
+                    }
+                );
+            },
+            onError() {
+                void utils.vote.pokerState.getPokerState.invalidate({
+                    pokerId: pokerId ?? '',
+                });
+            },
+        }
+    );
+    const toggleResults = useCallback(() => {
+        if (!pokerId) return;
+        toggleResultsMutation.mutate({
+            pokerId: pokerId,
+            anonUser,
+            showResults: !pokerState?.showResults,
+        });
+    }, [anonUser, pokerId, pokerState?.showResults, toggleResultsMutation]);
+
+    const progressVoteMutation =
+        api.vote.pokerState.toggleResultsAndProgress.useMutation({});
+
+    const progressVote = useCallback(
+        (prev = false) => {
+            if (!isHost) {
+                const currentlyShownVoteId = pokerState?.pokerVote.find(
+                    x => x.active
+                )?.id;
+                if (!prev && nextVote) {
+                    setActiveVoteId(nextVote.id);
+                    if (nextVote.id === currentlyShownVoteId) {
+                        setActiveVoteId(null);
+                    }
+                } else if (prev && prevVote) {
+                    setActiveVoteId(prevVote.id);
+                    if (prevVote.id === currentlyShownVoteId) {
+                        setActiveVoteId(null);
+                    }
+                }
+            } else {
+                if (prev && prevVote && pokerId) {
+                    progressVoteMutation.mutate({
+                        pokerId: pokerId,
+                        progressTo: prevVote.id,
+                        anonUser,
+                    });
+                } else if (!prev && nextVote && pokerId) {
+                    progressVoteMutation.mutate({
+                        pokerId: pokerId,
+                        progressTo: nextVote.id,
+                        anonUser,
+                    });
+                }
+            }
+        },
+        [
+            anonUser,
+            isHost,
+            nextVote,
+            pokerId,
+            pokerState?.pokerVote,
+            prevVote,
+            progressVoteMutation,
+            setActiveVoteId,
+        ]
+    );
+
+    return {
+        progressVote,
+        showResults: pokerState?.showResults && activeVote?.active,
+        currentIndex,
+        toggleResults,
+        voteCount: pokerState?.pokerVote?.length ?? 0,
+        activeVote,
+        status,
+        isEnd: !nextVote,
+        isStart: !prevVote,
+        isHost,
+        followHost: () => setActiveVoteId(null),
     };
 };

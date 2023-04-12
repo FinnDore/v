@@ -51,7 +51,7 @@ export const VoteButton = ({
                     className="w-6 rounded-b-md border-2 border-orange-400 border-t-transparent bg-orange-600 md:w-8"
                 ></animated.div>
             </animated.div>
-            <div
+            <button
                 role="button"
                 className={clsx(
                     'btn-shadow  relative h-9 w-12 text-white transition-all dark:shadow-none md:h-12 md:w-16',
@@ -119,7 +119,7 @@ export const VoteButton = ({
                         </div>
                     </div>
                 )}
-            </div>
+            </button>
         </div>
     );
 };

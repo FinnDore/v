@@ -12,11 +12,21 @@ datasource db {
 }
 
 model Poker {
-  id        String      @id @default(cuid())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  showResults Boolean   @default(false)
-  pokerVote PokerVote[]
+  id                  String      @id @default(cuid())
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  showResults         Boolean     @default(false)
+  createdByAnonUser   AnonUser?   @relation(fields: [createdByAnonUserId], references: [id], onDelete: Cascade)
+  createdByAnonUserId String?
+  createdByUser       User?       @relation(fields: [createdByuserId], references: [id], onDelete: Cascade)
+  createdByuserId         String? @map("createdById")
+  pokerVote           PokerVote[]
+
+  @@index([createdByuserId])
+  @@index([createdByAnonUserId])
+
+  @@unique([id, createdByuserId])
+  @@unique([id, createdByAnonUserId])
 }
 
 model PokerVote {
@@ -74,12 +84,13 @@ model AnonUser {
   id        String   @id @unique @default(cuid())
   secret    String   @default(cuid())
   name      String
-  pfpHash   String  @default("ghd44")
+  pfpHash   String   @default("ghd44")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   voteChoice PokerVoteChoice[]
   userInVote UsersInVote[]
+  Poker      Poker[]
 
   @@index([secret])
   @@index([id])
@@ -87,20 +98,20 @@ model AnonUser {
 
 // Necessary for Next auth
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
+  expires_at               Int?
   refresh_token_expires_in Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -126,6 +137,7 @@ model User {
   sessions      Session[]
   voteChoice    PokerVoteChoice[]
   usrInVote     UsersInVote[]
+  Poker         Poker[]
 }
 
 model VerificationToken {

@@ -1,12 +1,11 @@
 import {
     DoubleArrowLeftIcon,
     DoubleArrowRightIcon,
+    EyeOpenIcon,
 } from '@radix-ui/react-icons';
 import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { animated } from '@react-spring/web';
 
-import { api } from '@/utils/api';
-import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import {
     Tooltip,
@@ -14,12 +13,7 @@ import {
     TooltipProvider,
 } from '@/components/tool-tip';
 import { VoteButton } from '@/components/vote/vote-button';
-import {
-    useActiveVote,
-    usePokerId,
-    usePokerState,
-    useVotes,
-} from '@/hooks/poker-hooks';
+import { useVoteControls, useVotes } from '@/hooks/poker-hooks';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Vote = () => {
@@ -50,39 +44,19 @@ const Vote = () => {
 export default Vote;
 
 const VoteDescription = () => {
-    const pokerId = usePokerId();
-    const { pokerState, nextVote, prevVote, currentIndex } = usePokerState();
-    const { activeVote, status } = useActiveVote();
-    const anonUser = useAnonUser();
-    const showResults = pokerState?.showResults;
-
-    const { mutate: progressVote } =
-        api.vote.pokerState.toggleResultsAndProgress.useMutation({});
-
-    const utils = api.useContext();
-
-    const { mutate: toggleResults } =
-        api.vote.pokerState.toggleResults.useMutation({
-            onMutate() {
-                utils.vote.pokerState.getPokerState.setData(
-                    {
-                        pokerId: pokerId ?? '',
-                    },
-                    old => {
-                        if (!old) return old;
-                        return {
-                            ...old,
-                            showResults: !old?.showResults,
-                        };
-                    }
-                );
-            },
-            onError() {
-                void utils.vote.pokerState.getPokerState.invalidate({
-                    pokerId: pokerId ?? '',
-                });
-            },
-        });
+    const {
+        status,
+        activeVote,
+        currentIndex,
+        showResults,
+        voteCount,
+        progressVote,
+        isStart,
+        isEnd,
+        toggleResults,
+        isHost,
+        followHost,
+    } = useVoteControls();
 
     if (!activeVote) return null;
 
@@ -108,10 +82,28 @@ const VoteDescription = () => {
                     )}
                 </p>
             </div>
-            <div className="my-4 flex w-full gap-2">
-                <div className="my-auto ms-auto text-xs opacity-70">
-                    {(currentIndex ?? 0) + 1} /{' '}
-                    {pokerState?.pokerVote?.length ?? 0}
+            <div className="my-4 flex w-full justify-end gap-2">
+                {!isHost && !activeVote.active && (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    size="sm"
+                                    className="fade-in ms-1 aspect-square"
+                                    variant="outline"
+                                    onClick={() => followHost()}
+                                >
+                                    <EyeOpenIcon />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                                Spectate host
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
+                <div className="my-auto ms-1 text-xs opacity-70">
+                    {(currentIndex ?? 0) + 1} / {voteCount}
                 </div>
                 <TooltipProvider>
                     <Tooltip>
@@ -120,15 +112,8 @@ const VoteDescription = () => {
                                 size="sm"
                                 className="ms-1 aspect-square"
                                 variant="outline"
-                                disabled={!prevVote}
-                                onClick={() => {
-                                    if (!prevVote) return;
-                                    progressVote({
-                                        pokerId: pokerId ?? '',
-                                        progressTo: prevVote.id,
-                                        anonUser,
-                                    });
-                                }}
+                                disabled={isStart}
+                                onClick={() => progressVote(true)}
                             >
                                 <DoubleArrowLeftIcon />
                             </Button>
@@ -146,15 +131,8 @@ const VoteDescription = () => {
                                 size="sm"
                                 variant="outline"
                                 className="ms-0 aspect-square"
-                                disabled={!nextVote}
-                                onClick={() => {
-                                    if (!nextVote) return;
-                                    progressVote({
-                                        pokerId: pokerId ?? '',
-                                        progressTo: nextVote.id,
-                                        anonUser,
-                                    });
-                                }}
+                                disabled={isEnd}
+                                onClick={() => progressVote(false)}
                             >
                                 <DoubleArrowRightIcon />
                             </Button>
@@ -162,20 +140,16 @@ const VoteDescription = () => {
                         <TooltipContent side="bottom">Next vote</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
-                <Button
-                    size="sm"
-                    variant="outline"
-                    className="ms-2 w-28"
-                    onClick={() => {
-                        toggleResults({
-                            pokerId: pokerId ?? '',
-                            showResults: !showResults,
-                            anonUser,
-                        });
-                    }}
-                >
-                    {showResults ? 'Hide Results' : 'Show Results'}
-                </Button>
+                {isHost && (
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="ms-2 w-28"
+                        onClick={() => toggleResults()}
+                    >
+                        {showResults ? 'Hide Results' : 'Show Results'}
+                    </Button>
+                )}
             </div>
         </div>
     );

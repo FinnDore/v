@@ -22,7 +22,7 @@ export const vote = createTRPCRouter({
     pokerState: pokerStateRouter,
     lobby: lobbyRouter,
 
-    createPoker: publicProcedure
+    createPoker: anonOrUserProcedure
         .input(
             z.object({
                 votes: z
@@ -35,9 +35,17 @@ export const vote = createTRPCRouter({
                     .max(15),
             })
         )
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx }) => {
+            const createdBy = ctx.session
+                ? {
+                      createdByUserId: ctx.session.user.id,
+                  }
+                : {
+                      createdByAnonUserId: ctx.anonSession.id,
+                  };
             const vote = await prisma.poker.create({
                 data: {
+                    ...createdBy,
                     pokerVote: {
                         createMany: {
                             data: input.votes.map((vote, i) => ({

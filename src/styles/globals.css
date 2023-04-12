@@ -28,6 +28,9 @@
         opacity: 1;
     }
 }
+.fade-in {
+    animation: fadeIn 0.25s ease-in;
+}
 
 .btn-shadow {
     box-shadow: 0px 3.3px 2.2px rgba(0, 0, 0, 0.066),

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Cross1Icon, PlusIcon } from '@radix-ui/react-icons';
 
 import { api } from '@/utils/api';
+import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Label } from '@/components/label';
@@ -21,6 +22,7 @@ const CreatePoker = () => {
             description: '',
         },
     ]);
+    const anonUser = useAnonUser();
 
     const router = useRouter();
     const { mutate: createVote } = api.vote.createPoker.useMutation({
@@ -42,6 +44,7 @@ const CreatePoker = () => {
                     e.preventDefault();
                     createVote({
                         votes,
+                        anonUser,
                     });
                 }}
             >
