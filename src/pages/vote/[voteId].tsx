@@ -102,8 +102,8 @@ const VoteDescription = () => {
                         </Tooltip>
                     </TooltipProvider>
                 )}
-                <div className="my-auto ms-1 text-xs opacity-70">
-                    {(currentIndex ?? 0) + 1} / {voteCount}
+                <div className="my-auto ms-1 font-mono text-xs opacity-70">
+                    {(currentIndex ?? 0) + 1}/{voteCount}
                 </div>
                 <TooltipProvider>
                     <Tooltip>
