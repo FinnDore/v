@@ -18,15 +18,14 @@ model Poker {
   showResults         Boolean     @default(false)
   createdByAnonUser   AnonUser?   @relation(fields: [createdByAnonUserId], references: [id], onDelete: Cascade)
   createdByAnonUserId String?
-  createdByUser       User?       @relation(fields: [createdByuserId], references: [id], onDelete: Cascade)
-  createdByuserId         String?
+  createdByUser       User?       @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  createdByUserId     String?
   pokerVote           PokerVote[]
 
-  @@index([createdByuserId])
-  @@index([createdByAnonUserId])
-
-  @@unique([id, createdByuserId])
+  @@unique([id, createdByUserId])
   @@unique([id, createdByAnonUserId])
+  @@index([createdByUserId])
+  @@index([createdByAnonUserId])
 }
 
 model PokerVote {
