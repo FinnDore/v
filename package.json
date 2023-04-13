@@ -10,7 +10,10 @@
         "analyze": "ANALYZE=1 NODE_ENV=production next build",
         "start": "next start",
         "format": "prettier --write .",
-        "format:lint": "prettier --check ."
+        "format:lint": "prettier --check .",
+        "prisma:generate": "prisma generate",
+        "prisma:studio": "prisma studio",
+        "prisma:db:push": "prisma db push"
     },
     "packageManager": "pnpm@8.1.0",
     "dependencies": {

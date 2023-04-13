@@ -13,6 +13,7 @@ datasource db {
 
 model Poker {
   id                  String      @id @default(cuid())
+  title               String?      @db.Text
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
   showResults         Boolean     @default(false)
@@ -21,6 +22,7 @@ model Poker {
   createdByUser       User?       @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
   createdByUserId     String?
   pokerVote           PokerVote[]
+  userInVote          UsersInVote[]
 
   @@unique([id, createdByUserId])
   @@unique([id, createdByAnonUserId])
@@ -65,6 +67,7 @@ model UsersInVote {
   id        String   @id @default(cuid())
   updatedAt DateTime @updatedAt
   voteId    String
+  poker     Poker @relation(fields: [voteId], references: [id], onDelete: Cascade)
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
 

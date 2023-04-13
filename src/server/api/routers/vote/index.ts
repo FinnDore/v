@@ -25,6 +25,7 @@ export const vote = createTRPCRouter({
     createPoker: anonOrUserProcedure
         .input(
             z.object({
+                title: z.string().trim().max(20),
                 votes: z
                     .array(
                         z.object({
@@ -36,27 +37,34 @@ export const vote = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
-            const createdBy = ctx.session
-                ? {
-                      createdByUserId: ctx.session.user.id,
-                  }
-                : {
-                      createdByAnonUserId: ctx.anonSession.id,
-                  };
-            const vote = await prisma.poker.create({
-                data: {
-                    ...createdBy,
-                    pokerVote: {
-                        createMany: {
-                            data: input.votes.map((vote, i) => ({
-                                title: vote.title,
-                                description: vote.description,
-                                active: i === 0,
-                            })),
+            const [vote, createVoteError] = await to(
+                prisma.poker.create({
+                    data: {
+                        title: input.title,
+                        createdByUserId: ctx?.session?.user?.id ?? null,
+                        createdByAnonUserId: ctx?.anonSession?.id ?? null,
+                        pokerVote: {
+                            createMany: {
+                                data: input.votes.map((vote, i) => ({
+                                    title: vote.title,
+                                    description: vote.description,
+                                    active: i === 0,
+                                })),
+                            },
                         },
                     },
-                },
-            });
+                })
+            );
+
+            if (createVoteError) {
+                console.error(
+                    `Could not create vote ${createVoteError.message})`
+                );
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            }
+
             const [, createChannelError] = await to(
                 hop.channels.create(ChannelType.UNPROTECTED, `poker_${vote.id}`)
             );

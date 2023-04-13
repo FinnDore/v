@@ -16,6 +16,7 @@ type CreateVoteItem = {
 
 const CreatePoker = () => {
     const formRef = useRef<HTMLFormElement>(null);
+    const [title, setTitle] = useState('');
     const [votes, setVotes] = useState<CreateVoteItem[]>([
         {
             title: '',
@@ -43,11 +44,23 @@ const CreatePoker = () => {
                 onSubmit={e => {
                     e.preventDefault();
                     createVote({
+                        title,
                         votes,
                         anonUser,
                     });
                 }}
             >
+                <fieldset className="relative flex flex-col">
+                    <Label>Poker Session Name</Label>
+                    <Input
+                        placeholder="Sprint 2 - phase 9"
+                        className="mb-4"
+                        maxLength={20}
+                        min="1"
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                    />
+                </fieldset>
                 {votes.map((vote, i) => (
                     <fieldset className="relative mb-4 flex flex-col" key={i}>
                         <Button
@@ -66,6 +79,7 @@ const CreatePoker = () => {
                         </Button>
                         <Label>Vote Name</Label>
                         <Input
+                            placeholder="EFS-60"
                             className="mb-4 !w-44"
                             maxLength={15}
                             min="1"
@@ -82,6 +96,7 @@ const CreatePoker = () => {
                         />
                         <Label>Vote Description</Label>
                         <Textarea
+                            placeholder="A Very cool description for a very cool story"
                             minLength={1}
                             className="!h-32"
                             value={vote.description}

@@ -13,6 +13,26 @@ export const meRouter = createTRPCRouter({
                     createdByAnonUserId: ctx?.anonSession?.id ?? null,
                 },
                 select: {
+                    userInVote: {
+                        select: {
+                            id: true,
+                            anonUser: {
+                                select: {
+                                    id: true,
+                                    pfpHash: true,
+                                    name: true,
+                                },
+                            },
+                            user: {
+                                select: {
+                                    id: true,
+                                    image: true,
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                    title: true,
                     updatedAt: true,
                     id: true,
                     pokerVote: {
