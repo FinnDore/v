@@ -17,8 +17,9 @@ import { useVoteControls, useVotes } from '@/hooks/poker-hooks';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Vote = () => {
-    const { doVote, currentVote, highestVote, votesMap, showVotes } =
+    const { doVote, currentVote, highestVote, votesMap, showVotes, status } =
         useVotes();
+    if (status === 'loading') return null;
 
     return (
         <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center justify-center px-6 py-6 sm:px-12 lg:max-w-screen-lg">

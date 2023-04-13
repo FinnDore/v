@@ -78,7 +78,7 @@ export const useVotes = () => {
     const lastUpdated = useRef<number>(0);
     const session = useUser();
 
-    const { pokerState, activeVote } = usePokerState();
+    const { pokerState, activeVote, status } = usePokerState();
     const { mutate } = api.vote.vote.useMutation({
         onMutate: ({ choice, pokerVoteId }) => {
             if (!pokerVoteId || !pokerId) return;
@@ -334,6 +334,7 @@ export const useVotes = () => {
             window.navigator.vibrate([20]);
         },
         showVotes: pokerState?.showResults && activeVote?.active,
+        status,
     };
 };
 
