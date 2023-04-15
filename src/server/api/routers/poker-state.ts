@@ -138,6 +138,7 @@ export const pokerStateRouter = createTRPCRouter({
             const [votes, error] = await to(
                 prisma.poker.findFirst({
                     select: {
+                        title: true,
                         showResults: true,
                         createdByAnonUser: {
                             select: {

@@ -62,7 +62,7 @@ export const usePokerState = () => {
     }, [activeVote?.id, pokerState]);
 
     return {
-        pokerState: pokerState,
+        pokerState,
         status,
         activeVote,
         setActiveVoteId,
@@ -316,7 +316,7 @@ export const useVotes = () => {
     }, [activeVote, session?.user?.id]);
 
     return {
-        votes: pokerState,
+        pokerState,
         votesMap,
         currentVote,
         highestVote,

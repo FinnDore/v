@@ -7,6 +7,7 @@ import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { animated } from '@react-spring/web';
 
 import { Button } from '@/components/button';
+import { Pfp } from '@/components/pfp';
 import {
     Tooltip,
     TooltipContent,
@@ -17,27 +18,57 @@ import { useVoteControls, useVotes } from '@/hooks/poker-hooks';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Vote = () => {
-    const { doVote, currentVote, highestVote, votesMap, showVotes, status } =
-        useVotes();
+    const {
+        doVote,
+        currentVote,
+        highestVote,
+        votesMap,
+        showVotes,
+        status,
+        pokerState,
+    } = useVotes();
     if (status === 'loading') return null;
+    const createdByUser =
+        pokerState?.createdByUser ?? pokerState?.createdByAnonUser;
 
     return (
-        <div className="mx-auto my-auto flex h-max w-max max-w-full flex-col place-items-center justify-center px-6 py-6 sm:px-12 lg:max-w-screen-lg">
-            <animated.div className="mx-auto flex flex-wrap justify-center gap-2 md:gap-4">
-                {voteOptions.map(vote => (
-                    <VoteButton
-                        key={vote}
-                        vote={vote}
-                        showVotes={showVotes}
-                        users={votesMap[vote.toString()]?.users ?? []}
-                        currentVotes={votesMap[vote.toString()]?.count ?? 0}
-                        totalVotes={highestVote[1]}
-                        doVote={doVote}
-                        current={currentVote?.choice === vote.toString()}
-                    />
-                ))}
-            </animated.div>
-            <VoteDescription />
+        <div className="mx-auto flex h-full w-max max-w-full flex-col px-6 py-6 sm:px-12 lg:max-w-screen-lg">
+            {pokerState && (
+                <div className="flex">
+                    {pokerState?.title && (
+                        <h1 className="text-2xl font-bold">
+                            {pokerState.title}
+                        </h1>
+                    )}
+                    <h2 className="ms-auto flex gap-2">
+                        <span className="opacity-70">hosted by</span>
+                        <b>{createdByUser?.name ?? 'Unknown user'}</b>
+                        <Pfp
+                            className="aspect-square h-6"
+                            image={pokerState.createdByUser?.image}
+                            pfpHash={pokerState.createdByAnonUser?.pfpHash}
+                            name={createdByUser?.name ?? 'Unknown user'}
+                        />
+                    </h2>
+                </div>
+            )}
+            <div className="m-auto">
+                <animated.div className="mx-auto mt-auto flex flex-wrap justify-center gap-2 md:gap-4">
+                    {voteOptions.map(vote => (
+                        <VoteButton
+                            key={vote}
+                            vote={vote}
+                            showVotes={showVotes}
+                            users={votesMap[vote.toString()]?.users ?? []}
+                            currentVotes={votesMap[vote.toString()]?.count ?? 0}
+                            totalVotes={highestVote[1]}
+                            doVote={doVote}
+                            current={currentVote?.choice === vote.toString()}
+                        />
+                    ))}
+                </animated.div>
+                <VoteDescription />
+            </div>
         </div>
     );
 };

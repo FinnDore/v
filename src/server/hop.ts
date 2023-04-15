@@ -9,60 +9,6 @@ export type ChannelEvent = typeof ChannelEvents[keyof typeof ChannelEvents];
 
 export const hop = new Hop(env.HOP_TOKEN as APIAuthentication);
 
-export type Vote = {
-    id: string;
-    choice: string;
-    createdAt: Date;
-    updatedAt: Date;
-    pokerVote: {
-        id: string;
-        poker: {
-            id: string;
-        };
-    };
-    anonUser: { name: string; id: string; pfpHash: string } | null;
-    user: { name: string | null; id: string; image: string | null } | null;
-};
-
-export const selectPokerVote = {
-    id: true,
-    choice: true,
-    anonUser: {
-        select: {
-            id: true,
-            name: true,
-            pfpHash: true,
-        },
-    },
-    user: {
-        select: {
-            id: true,
-            name: true,
-            image: true,
-        },
-    },
-    createdAt: true,
-    updatedAt: true,
-    pokerVote: {
-        select: {
-            id: true,
-            poker: {
-                select: {
-                    id: true,
-                },
-            },
-        },
-    },
-};
-
-export type UsersInVote = {
-    updatedAt: number;
-    id: string;
-    name: string;
-    image?: string | null;
-    pfpHash?: string | null;
-}[];
-
 export const dispatchVoteUpdateEvent = async ({ vote }: { vote: Vote }) => {
     const [, updateChannelStateError] = await to(
         hop.channels.publishMessage(
@@ -145,3 +91,57 @@ export const dispatchPokerStateUpdateEvent = async (event: {
         console.log(`Published poker state update for poker_${event.pokerId}`);
     }
 };
+
+export type Vote = {
+    id: string;
+    choice: string;
+    createdAt: Date;
+    updatedAt: Date;
+    pokerVote: {
+        id: string;
+        poker: {
+            id: string;
+        };
+    };
+    anonUser: { name: string; id: string; pfpHash: string } | null;
+    user: { name: string | null; id: string; image: string | null } | null;
+};
+
+export const selectPokerVote = {
+    id: true,
+    choice: true,
+    anonUser: {
+        select: {
+            id: true,
+            name: true,
+            pfpHash: true,
+        },
+    },
+    user: {
+        select: {
+            id: true,
+            name: true,
+            image: true,
+        },
+    },
+    createdAt: true,
+    updatedAt: true,
+    pokerVote: {
+        select: {
+            id: true,
+            poker: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    },
+};
+
+export type UsersInVote = {
+    updatedAt: number;
+    id: string;
+    name: string;
+    image?: string | null;
+    pfpHash?: string | null;
+}[];

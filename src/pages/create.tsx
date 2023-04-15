@@ -58,7 +58,7 @@ const CreatePoker = () => {
                         maxLength={20}
                         min="1"
                         value={title}
-                        onChange={e => setTitle(e.target.value)}
+                        onChange={e => setTitle(() => e.target.value)}
                     />
                 </fieldset>
                 {votes.map((vote, i) => (
