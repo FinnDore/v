@@ -3,10 +3,11 @@ import { useRouter } from 'next/router';
 import { Cross1Icon, PlusIcon } from '@radix-ui/react-icons';
 
 import { api } from '@/utils/api';
-import { useAnonUser } from '@/utils/local-user';
+import { useAnonUser, useUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Label } from '@/components/label';
+import { SignIn } from '@/components/sign-in';
 import { Textarea } from '@/components/text-area';
 
 type CreateVoteItem = {
@@ -24,7 +25,7 @@ const CreatePoker = () => {
         },
     ]);
     const anonUser = useAnonUser();
-
+    const { status } = useUser();
     const router = useRouter();
     const { mutate: createVote } = api.vote.createPoker.useMutation({
         async onSuccess(returnVote) {
@@ -33,7 +34,13 @@ const CreatePoker = () => {
             });
         },
     });
-
+    if (status === 'unauthenticated') {
+        return (
+            <div className="m-auto">
+                <SignIn />
+            </div>
+        );
+    }
     return (
         <div className="mx-auto flex h-max w-[clamp(100%,95ch,100vw)] max-w-[90ch] flex-col gap-6  px-6 py-6 sm:px-12 lg:max-w-screen-lg">
             <h1 className="text-xl sm:text-2xl">Create Poker Session</h1>
