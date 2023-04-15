@@ -22,6 +22,8 @@ const server = z.object({
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
     HOP_TOKEN: z.string(),
+    UPSTASH_REDIS_REST_URL: z.string().url(),
+    UPSTASH_REDIS_REST_TOKEN: z.string(),
 });
 
 /**
@@ -48,6 +50,8 @@ const processEnv = {
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     HOP_TOKEN: process.env.HOP_TOKEN,
     NEXT_PUBLIC_HOP_PROJECT_ID: process.env.NEXT_PUBLIC_HOP_PROJECT_ID,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
