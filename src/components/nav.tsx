@@ -8,13 +8,13 @@ export const Nav = () => {
     const { user } = useUser();
 
     return (
-        <nav className="mx-auto flex w-full min-w-max max-w-[90ch] px-6 py-4 sm:px-12">
+        <nav className="mx-auto flex w-full min-w-max px-6 py-4 sm:px-12 lg:max-w-screen-lg">
             <Link className="flex text-2xl" href="/">
                 <b>V</b>
                 <Glitch text="ote" />
             </Link>
             {user && (
-                <div className="text-md  ml-auto mr-4 flex align-middle">
+                <div className="text-md ml-auto flex align-middle">
                     <Pfp
                         image={user.image}
                         name={user.name ?? undefined}
