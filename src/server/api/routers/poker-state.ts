@@ -16,6 +16,7 @@ export const pokerStateRouter = createTRPCRouter({
         .input(
             z.object({
                 pokerId: z.string().cuid(),
+                voteId: z.string().cuid(),
                 showResults: z.boolean(),
             })
         )
@@ -38,7 +39,16 @@ export const pokerStateRouter = createTRPCRouter({
                 prisma.poker.update({
                     where,
                     data: {
-                        showResults: input.showResults,
+                        pokerVote: {
+                            update: {
+                                where: {
+                                    id: input.voteId,
+                                },
+                                data: {
+                                    showResults: input.showResults,
+                                },
+                            },
+                        },
                     },
                 })
             );
@@ -58,11 +68,11 @@ export const pokerStateRouter = createTRPCRouter({
             await dispatchPokerStateUpdateEvent({
                 pokerId: input.pokerId,
                 event: ChannelEvents.TOGGLE_RESULTS,
-                data: { showResults: input.showResults },
+                data: { voteId: input.voteId, showResults: input.showResults },
             });
         }),
 
-    toggleResultsAndProgress: anonOrUserProcedure
+    toggleProgressVote: anonOrUserProcedure
         .input(
             z.object({
                 pokerId: z.string().cuid(),
@@ -87,7 +97,6 @@ export const pokerStateRouter = createTRPCRouter({
                 prisma.poker.update({
                     where,
                     data: {
-                        showResults: false,
                         pokerVote: {
                             updateMany: {
                                 where: {
@@ -139,7 +148,6 @@ export const pokerStateRouter = createTRPCRouter({
                 prisma.poker.findFirst({
                     select: {
                         title: true,
-                        showResults: true,
                         createdByAnonUser: {
                             select: {
                                 id: true,
@@ -158,6 +166,7 @@ export const pokerStateRouter = createTRPCRouter({
                             select: {
                                 id: true,
                                 active: true,
+                                showResults: true,
                                 title: true,
                                 description: true,
                                 voteChoice: {

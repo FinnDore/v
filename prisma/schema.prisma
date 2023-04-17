@@ -16,7 +16,6 @@ model Poker {
   title               String?      @db.Text
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
-  showResults         Boolean     @default(false)
   createdByAnonUser   AnonUser?   @relation(fields: [createdByAnonUserId], references: [id], onDelete: Cascade)
   createdByAnonUserId String?
   createdByUser       User?       @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
@@ -40,6 +39,7 @@ model PokerVote {
   title       String            @db.Text
   description String?           @db.LongText
   active      Boolean           @default(true)
+  showResults Boolean           @default(false)
 
   @@index([pokerId])
 }

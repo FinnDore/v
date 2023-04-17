@@ -32,8 +32,9 @@ export const usePokerState = () => {
     const session = useUser();
     const isHost = useMemo(
         () =>
-            pokerState?.createdByUser?.id === session.user?.id ||
-            pokerState?.createdByAnonUser?.id === session?.user?.id,
+            session?.user?.id &&
+            (pokerState?.createdByUser?.id === session.user?.id ||
+                pokerState?.createdByAnonUser?.id === session?.user?.id),
         [
             pokerState?.createdByAnonUser?.id,
             pokerState?.createdByUser?.id,
@@ -214,7 +215,6 @@ export const useVotes = () => {
                     if (!old) return old;
                     return {
                         ...old,
-                        showResults: false,
                         pokerVote: [
                             ...old.pokerVote?.map(x => ({
                                 ...x,
@@ -232,16 +232,31 @@ export const useVotes = () => {
         channelId,
         ChannelEvents.TOGGLE_RESULTS,
         (e: { data: string }) => {
-            const { showResults }: { showResults: boolean } = parse(e.data);
+            const {
+                showResults,
+                voteId,
+            }: { showResults: boolean; voteId: string } = parse(e.data);
+
             utils.vote.pokerState.getPokerState.setData(
                 { pokerId: pokerId ?? '' },
                 old => {
                     if (!old) return old;
-                    const newState = {
+                    const newPokerVotes = [...(old?.pokerVote ?? [])];
+                    const updatedVoteIndex = newPokerVotes.findIndex(
+                        x => x.id === voteId
+                    );
+                    const updatedVote = newPokerVotes[updatedVoteIndex];
+                    if (updatedVote) {
+                        newPokerVotes[updatedVoteIndex] = {
+                            ...updatedVote,
+                            showResults: showResults,
+                        };
+                    }
+
+                    return {
                         ...old,
-                        showResults,
+                        pokerVote: newPokerVotes,
                     };
-                    return newState;
                 }
             );
         }
@@ -327,13 +342,12 @@ export const useVotes = () => {
             mutate({
                 choice: choice.toString(),
                 pokerVoteId: activeVote.id,
-
                 anonUser: anonUser ?? null,
             });
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             window.navigator.vibrate([20]);
         },
-        showVotes: pokerState?.showResults && activeVote?.active,
+        showVotes: activeVote?.showResults,
         status,
     };
 };
@@ -355,38 +369,89 @@ export const useVoteControls = () => {
 
     const toggleResultsMutation = api.vote.pokerState.toggleResults.useMutation(
         {
-            onMutate() {
+            onMutate(data) {
                 utils.vote.pokerState.getPokerState.setData(
                     {
-                        pokerId: pokerId ?? '',
+                        pokerId: data.pokerId,
                     },
                     old => {
                         if (!old) return old;
+                        const newPokerVotes = [...(old?.pokerVote ?? [])];
+                        const updatedVoteIndex = newPokerVotes.findIndex(
+                            x => x.id === data.voteId
+                        );
+                        const updatedVote = newPokerVotes[updatedVoteIndex];
+                        if (updatedVote) {
+                            newPokerVotes[updatedVoteIndex] = {
+                                ...updatedVote,
+                                showResults: data.showResults,
+                            };
+                        }
+
                         return {
                             ...old,
-                            showResults: !old?.showResults,
+                            pokerVote: newPokerVotes,
                         };
                     }
                 );
             },
-            onError() {
+            onError(_data, ctx) {
                 void utils.vote.pokerState.getPokerState.invalidate({
-                    pokerId: pokerId ?? '',
+                    pokerId: ctx.pokerId,
                 });
             },
         }
     );
     const toggleResults = useCallback(() => {
-        if (!pokerId) return;
+        if (!pokerId || !activeVote) return;
         toggleResultsMutation.mutate({
             pokerId: pokerId,
+            voteId: activeVote?.id,
             anonUser,
-            showResults: !pokerState?.showResults,
+            showResults: !activeVote.showResults,
         });
-    }, [anonUser, pokerId, pokerState?.showResults, toggleResultsMutation]);
+    }, [activeVote, anonUser, pokerId, toggleResultsMutation]);
 
     const progressVoteMutation =
-        api.vote.pokerState.toggleResultsAndProgress.useMutation({});
+        api.vote.pokerState.toggleProgressVote.useMutation({
+            onMutate(data) {
+                utils.vote.pokerState.getPokerState.setData(
+                    {
+                        pokerId: data.pokerId,
+                    },
+                    old => {
+                        if (!old) return old;
+                        const newPokerVotes = [
+                            ...(old?.pokerVote ?? []).map(x => ({
+                                ...x,
+                                active: false,
+                            })),
+                        ];
+
+                        const updatedVoteIndex = newPokerVotes.findIndex(
+                            x => x.id === data.progressTo
+                        );
+                        const updatedVote = newPokerVotes[updatedVoteIndex];
+                        if (updatedVote) {
+                            newPokerVotes[updatedVoteIndex] = {
+                                ...updatedVote,
+                                active: true,
+                            };
+                        }
+
+                        return {
+                            ...old,
+                            pokerVote: newPokerVotes,
+                        };
+                    }
+                );
+            },
+            onError(_data, ctx) {
+                void utils.vote.pokerState.getPokerState.invalidate({
+                    pokerId: ctx.pokerId,
+                });
+            },
+        });
 
     const progressVote = useCallback(
         (prev = false) => {
@@ -435,7 +500,7 @@ export const useVoteControls = () => {
 
     return {
         progressVote,
-        showResults: pokerState?.showResults && activeVote?.active,
+        showResults: activeVote?.showResults,
         currentIndex,
         toggleResults,
         voteCount: pokerState?.pokerVote?.length ?? 0,
