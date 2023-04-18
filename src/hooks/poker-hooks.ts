@@ -5,6 +5,7 @@ import { atom, useAtom } from 'jotai';
 import { parse } from 'superjson';
 
 import { api } from '@/utils/api';
+import { cloneArray, updateArrayItem } from '@/utils/helpers';
 import { useAnonUser, useUser } from '@/utils/local-user';
 import { ChannelEvents } from '@/server/channel-events';
 import { type Vote } from '@/server/hop';
@@ -76,7 +77,7 @@ export const useVotes = () => {
     const pokerId = usePokerId();
     const utils = api.useContext();
     const anonUser = useAnonUser();
-    const lastUpdated = useRef<number>(0);
+    const voteLastUpdated = useRef<number>(0);
     const session = useUser();
 
     const { pokerState, activeVote, status } = usePokerState();
@@ -93,7 +94,7 @@ export const useVotes = () => {
                 old => {
                     const userId = session.user?.id;
                     if (!userId || !old) return old;
-                    lastUpdated.current = Date.now();
+                    voteLastUpdated.current = Date.now();
                     // TODO deep clone /shrug
                     const newState = {
                         ...old,
@@ -139,10 +140,10 @@ export const useVotes = () => {
         ChannelEvents.VOTE_UPDATED,
         (e: { data: string }) => {
             const updatedVoteChoice: Vote = parse(e.data);
-
+            if (!pokerId) return;
             const existingVote = utils.vote.pokerState.getPokerState
                 .getData({
-                    pokerId: pokerId ?? '',
+                    pokerId,
                 })
                 ?.pokerVote?.find(v => v.id === updatedVoteChoice.pokerVote.id)
                 ?.voteChoice?.find(
@@ -150,7 +151,7 @@ export const useVotes = () => {
                         v.user?.id === updatedVoteChoice.user?.id ||
                         v.anonUser?.id === updatedVoteChoice.anonUser?.id
                 );
-            const timeSinceLastUpdate = Date.now() - lastUpdated.current;
+            const timeSinceLastUpdate = Date.now() - voteLastUpdated.current;
 
             // Ignore events from ourselves x seconds after we optimistically updated if we have our current vote client side
             const updateGracePeriod = 2000;
@@ -164,21 +165,21 @@ export const useVotes = () => {
             }
 
             utils.vote.pokerState.getPokerState.setData(
-                { pokerId: pokerId ?? '' },
+                { pokerId: pokerId },
                 old => {
                     if (!old) return old;
                     // TODO deep clone /shrug
                     const newState = {
                         ...old,
                         pokerVote: [
-                            ...old.pokerVote?.map(x => ({
+                            ...old.pokerVote.map(x => ({
                                 ...x,
                                 voteChoice: [...x.voteChoice],
                             })),
                         ],
                     };
 
-                    const newVote = newState.pokerVote?.find(
+                    const newVote = newState.pokerVote.find(
                         x => x.id === updatedVoteChoice.pokerVote.id
                     );
 
@@ -206,10 +207,10 @@ export const useVotes = () => {
         ChannelEvents.CHANGE_VOTE,
         (e: { data: string }) => {
             const event: { currentVote: string } = parse(e.data);
-
+            if (!pokerId) return;
             utils.vote.pokerState.getPokerState.setData(
                 {
-                    pokerId: pokerId ?? '',
+                    pokerId,
                 },
                 old => {
                     if (!old) return old;
@@ -219,7 +220,6 @@ export const useVotes = () => {
                             ...old.pokerVote?.map(x => ({
                                 ...x,
                                 active: x.id === event.currentVote,
-                                voteChoice: [...x.voteChoice],
                             })),
                         ],
                     };
@@ -236,29 +236,18 @@ export const useVotes = () => {
                 showResults,
                 voteId,
             }: { showResults: boolean; voteId: string } = parse(e.data);
-
-            utils.vote.pokerState.getPokerState.setData(
-                { pokerId: pokerId ?? '' },
-                old => {
-                    if (!old) return old;
-                    const newPokerVotes = [...(old?.pokerVote ?? [])];
-                    const updatedVoteIndex = newPokerVotes.findIndex(
-                        x => x.id === voteId
-                    );
-                    const updatedVote = newPokerVotes[updatedVoteIndex];
-                    if (updatedVote) {
-                        newPokerVotes[updatedVoteIndex] = {
-                            ...updatedVote,
-                            showResults: showResults,
-                        };
-                    }
-
-                    return {
-                        ...old,
-                        pokerVote: newPokerVotes,
-                    };
-                }
-            );
+            if (!pokerId) return;
+            utils.vote.pokerState.getPokerState.setData({ pokerId }, old => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    pokerVote: updateArrayItem(
+                        cloneArray(old.pokerVote),
+                        x => x.id === voteId,
+                        x => ({ ...x, showResults })
+                    ),
+                };
+            });
         }
     );
 
@@ -285,49 +274,48 @@ export const useVotes = () => {
         }
 
         // Compute vote count, and users per vote choice
-        const votesMap =
-            activeVote.voteChoice.reduce(
-                (acc, v) => ({
-                    ...acc,
-                    [v.choice]: {
-                        count: (acc[v.choice]?.count ?? 0) + 1,
-                        users: [
-                            ...(acc[v.choice]?.users ?? []),
-                            v.user ?? v.anonUser,
-                        ].filter(
-                            (
-                                x
-                            ): x is {
-                                id: string;
-                                name: string;
-                                image?: string;
-                                pfpHash?: string;
-                            } => !!x
-                        ),
-                    },
-                }),
-                {} as Record<
-                    string,
-                    {
-                        count: number;
-                        users: {
-                            name: string;
+        const votesMap = activeVote.voteChoice.reduce(
+            (acc, v) => ({
+                ...acc,
+                [v.choice]: {
+                    count: (acc[v.choice]?.count ?? 0) + 1,
+                    users: [
+                        ...(acc[v.choice]?.users ?? []),
+                        v.user ?? v.anonUser,
+                    ].filter(
+                        (
+                            x
+                        ): x is {
                             id: string;
+                            name: string;
                             image?: string;
                             pfpHash?: string;
-                        }[];
-                    }
-                >
-            ) ?? {};
+                        } => !!x
+                    ),
+                },
+            }),
+            {} as Record<
+                string,
+                {
+                    count: number;
+                    users: {
+                        name: string;
+                        id: string;
+                        image?: string;
+                        pfpHash?: string;
+                    }[];
+                }
+            >
+        );
 
-        /// get the highest vote
+        // get the highest vote
         const highestVote = Object.entries(votesMap).reduce(
             (a, e): [string, number] =>
                 e[1].count > a[1] ? [e[0], e[1].count] : a,
             ['-1', 0] as [string, number]
         );
 
-        return { currentVote, votesMap, highestVote: highestVote };
+        return { currentVote, votesMap, highestVote };
     }, [activeVote, session?.user?.id]);
 
     return {
@@ -342,7 +330,7 @@ export const useVotes = () => {
             mutate({
                 choice: choice.toString(),
                 pokerVoteId: activeVote.id,
-                anonUser: anonUser ?? null,
+                anonUser,
             });
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             window.navigator.vibrate([20]);
@@ -376,21 +364,16 @@ export const useVoteControls = () => {
                     },
                     old => {
                         if (!old) return old;
-                        const newPokerVotes = [...(old?.pokerVote ?? [])];
-                        const updatedVoteIndex = newPokerVotes.findIndex(
-                            x => x.id === data.voteId
-                        );
-                        const updatedVote = newPokerVotes[updatedVoteIndex];
-                        if (updatedVote) {
-                            newPokerVotes[updatedVoteIndex] = {
-                                ...updatedVote,
-                                showResults: data.showResults,
-                            };
-                        }
-
                         return {
                             ...old,
-                            pokerVote: newPokerVotes,
+                            pokerVote: updateArrayItem(
+                                cloneArray(old.pokerVote),
+                                x => x.id === data.voteId,
+                                x => ({
+                                    ...x,
+                                    showResults: data.showResults,
+                                })
+                            ),
                         };
                     }
                 );
@@ -421,27 +404,12 @@ export const useVoteControls = () => {
                     },
                     old => {
                         if (!old) return old;
-                        const newPokerVotes = [
-                            ...(old?.pokerVote ?? []).map(x => ({
-                                ...x,
-                                active: false,
-                            })),
-                        ];
-
-                        const updatedVoteIndex = newPokerVotes.findIndex(
-                            x => x.id === data.progressTo
-                        );
-                        const updatedVote = newPokerVotes[updatedVoteIndex];
-                        if (updatedVote) {
-                            newPokerVotes[updatedVoteIndex] = {
-                                ...updatedVote,
-                                active: true,
-                            };
-                        }
-
                         return {
                             ...old,
-                            pokerVote: newPokerVotes,
+                            pokerVote: old.pokerVote.map(x => ({
+                                ...x,
+                                active: x.id === data.progressTo,
+                            })),
                         };
                     }
                 );
