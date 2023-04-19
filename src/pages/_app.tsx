@@ -27,6 +27,18 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <SessionProvider session={session}>
             <Nav />
             <Component {...pageProps} />
+            <footer className="mt-auto w-full pb-4 text-center">
+                Made with ❤️ by{' '}
+                <a
+                    href="https://github.com/FinnDore"
+                    aria-label="Link to Finns Github"
+                    className="underline"
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    Finn
+                </a>
+            </footer>
             <ReactQueryDevtools initialIsOpen={false} />
             <Analytics />
         </SessionProvider>
