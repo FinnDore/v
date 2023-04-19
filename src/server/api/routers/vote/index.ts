@@ -131,17 +131,12 @@ export const vote = createTRPCRouter({
                     update: {
                         choice: input.choice,
                     },
-                    create: ctx.anonSession
-                        ? {
-                              anonUserId: ctx.anonSession.id,
-                              choice: input.choice,
-                              pokerVoteId: input.pokerVoteId,
-                          }
-                        : {
-                              userId: ctx.session.user.id,
-                              choice: input.choice,
-                              pokerVoteId: input.pokerVoteId,
-                          },
+                    create: {
+                        anonUserId: ctx.anonSession?.id ?? null,
+                        userId: ctx.session?.user.id ?? null,
+                        choice: input.choice,
+                        pokerVoteId: input.pokerVoteId,
+                    },
                 })
             );
 

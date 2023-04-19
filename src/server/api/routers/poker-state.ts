@@ -21,23 +21,22 @@ export const pokerStateRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
-            const where = ctx.session
-                ? {
-                      id_createdByUserId: {
-                          createdByUserId: ctx.session.user.id,
-                          id: input.pokerId,
-                      },
-                  }
-                : {
-                      id_createdByAnonUserId: {
-                          createdByAnonUserId: ctx.anonSession.id,
-                          id: input.pokerId,
-                      },
-                  };
-
             const [votes, error] = await to(
                 prisma.poker.update({
-                    where,
+                    where: {
+                        id_createdByUserId: ctx.session
+                            ? {
+                                  createdByUserId: ctx.session.user.id,
+                                  id: input.pokerId,
+                              }
+                            : undefined,
+                        id_createdByAnonUserId: ctx.anonSession
+                            ? {
+                                  createdByAnonUserId: ctx.anonSession.id,
+                                  id: input.pokerId,
+                              }
+                            : undefined,
+                    },
                     data: {
                         pokerVote: {
                             update: {
@@ -80,22 +79,22 @@ export const pokerStateRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
-            const where = ctx.session
-                ? {
-                      id_createdByUserId: {
-                          createdByUserId: ctx.session.user.id,
-                          id: input.pokerId,
-                      },
-                  }
-                : {
-                      id_createdByAnonUserId: {
-                          createdByAnonUserId: ctx.anonSession.id,
-                          id: input.pokerId,
-                      },
-                  };
             const [votes, error] = await to(
                 prisma.poker.update({
-                    where,
+                    where: {
+                        id_createdByUserId: ctx.session
+                            ? {
+                                  createdByUserId: ctx.session.user.id,
+                                  id: input.pokerId,
+                              }
+                            : undefined,
+                        id_createdByAnonUserId: ctx.anonSession
+                            ? {
+                                  createdByAnonUserId: ctx.anonSession.id,
+                                  id: input.pokerId,
+                              }
+                            : undefined,
+                    },
                     data: {
                         pokerVote: {
                             updateMany: {
