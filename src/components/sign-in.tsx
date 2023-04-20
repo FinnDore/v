@@ -1,15 +1,15 @@
 import { useRef, useState } from 'react';
 import { GitHubLogoIcon, ShuffleIcon } from '@radix-ui/react-icons';
+import { signIn } from 'next-auth/react';
+
+import { api } from '@/utils/api';
+import { storeUser } from '@/utils/local-user';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from '@radix-ui/react-tooltip';
-import { signIn } from 'next-auth/react';
-
-import { api } from '@/utils/api';
-import { storeUser } from '@/utils/local-user';
+} from '@/components/tool-tip';
 import { Button } from './button';
 import { Input } from './input';
 import { Pfp } from './pfp';
