@@ -34,10 +34,10 @@ const Me = () => {
                         </div>
                         {vote.userInVote.length > 0 && (
                             <div className="relative flex w-min flex-row-reverse pr-[14px]">
-                                {vote.userInVote.map((userInVote, i) => (
+                                {vote.userInVote.map((user, i) => (
                                     <TooltipProvider
                                         delayDuration={300}
-                                        key={userInVote.id}
+                                        key={user.id}
                                     >
                                         <Tooltip>
                                             <TooltipTrigger
@@ -57,21 +57,18 @@ const Me = () => {
                                                         zIndex: i,
                                                     }}
                                                     name={
-                                                        userInVote.user?.name ??
-                                                        userInVote.anonUser
-                                                            ?.name
+                                                        user.user?.name ??
+                                                        user.anonUser?.name
                                                     }
                                                     pfpHash={
-                                                        userInVote.anonUser
-                                                            ?.pfpHash
+                                                        user.anonUser?.pfpHash
                                                     }
-                                                    image={
-                                                        userInVote.user?.image
-                                                    }
+                                                    image={user.user?.image}
                                                 />
                                             </TooltipTrigger>
                                             <TooltipContent side="bottom">
-                                                {userInVote.user?.name ??
+                                                {user.user?.name ??
+                                                    user.anonUser?.name ??
                                                     'Anonymous User'}
                                             </TooltipContent>
                                         </Tooltip>
