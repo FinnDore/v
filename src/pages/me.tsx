@@ -97,7 +97,7 @@ const VoteItem = ({
             href={`/vote/${vote.id}`}
             key={vote.id}
             className={clsx(
-                '[&>.delete]:touch-none:w-6 relative flex w-full rounded-md border border-black/50 px-6 py-4 transition-all hover:scale-105 hover:border-black dark:border-white/50  hover:dark:border-white',
+                'relative flex w-full rounded-md border border-black/50 px-6 py-4 transition-all hover:border-black dark:border-white/50 dark:hover:border-white',
                 {
                     'opacity-75 [&>*]:pointer-events-none':
                         deletingVote === vote.id,
