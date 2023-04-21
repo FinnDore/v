@@ -42,7 +42,7 @@ const Me = () => {
     const status = useThrottle(myVotesQuery.status, 1000, 'success');
 
     return (
-        <div className=" mx-auto flex h-max w-[95ch] max-w-full flex-col place-items-center justify-center px-6 pb-8 sm:px-12 lg:max-w-screen-lg">
+        <div className="mx-auto flex h-max w-full flex-col place-items-center justify-center px-6 pb-8 sm:px-12 lg:max-w-screen-lg">
             <div className="flex w-full justify-between">
                 <h1 className="mb-3 text-2xl">My Votes</h1>
             </div>
