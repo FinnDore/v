@@ -94,7 +94,6 @@ export const useVotes = () => {
                 old => {
                     const userId = session.user?.id;
                     if (!userId || !old) return old;
-                    voteLastUpdated.current = Date.now();
                     // TODO deep clone /shrug
                     const newState = {
                         ...old,
@@ -117,6 +116,7 @@ export const useVotes = () => {
 
                     if (itemIndex === -1) return old;
 
+                    voteLastUpdated.current = Date.now();
                     const oldItem = newVote.voteChoice.splice(itemIndex, 1)[0];
                     if (oldItem) {
                         newVote.voteChoice.push({ ...oldItem, choice });
