@@ -32,7 +32,7 @@ const Vote = () => {
         pokerState?.createdByUser ?? pokerState?.createdByAnonUser;
 
     return (
-        <div className="mx-auto flex h-full w-max max-w-full flex-col px-6 py-6 sm:px-12 lg:max-w-screen-lg">
+        <div className="mx-auto flex h-full w-max max-w-full flex-col px-6 pb-6 sm:px-12 lg:max-w-screen-lg">
             {pokerState && (
                 <div className="flex">
                     {pokerState?.title && (

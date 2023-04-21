@@ -86,6 +86,60 @@ export const vote = createTRPCRouter({
             return vote;
         }),
 
+    deletePokerSession: anonOrUserProcedure
+        .input(
+            z.object({
+                pokerId: z.string().cuid(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            const [vote, deleteVoteError] = await to(
+                prisma.poker.delete({
+                    where: {
+                        id_createdByUserId: ctx.session
+                            ? {
+                                  createdByUserId: ctx.session.user.id,
+                                  id: input.pokerId,
+                              }
+                            : undefined,
+                        id_createdByAnonUserId: ctx.anonSession
+                            ? {
+                                  createdByAnonUserId: ctx.anonSession.id,
+                                  id: input.pokerId,
+                              }
+                            : undefined,
+                    },
+                })
+            );
+
+            if (deleteVoteError) {
+                console.error(
+                    `Could not delete vote ${deleteVoteError.message})`
+                );
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            }
+
+            const [, deleteChannelError] = await to(
+                hop.channels.delete(`poker_${vote.id}`)
+            );
+
+            if (deleteChannelError) {
+                console.error(
+                    `Could not delete channel poker_${vote.id}: ${
+                        deleteChannelError.message ?? 'no error message'
+                    } ${deleteChannelError.stack ?? 'no stack'}`
+                );
+                console.log(JSON.stringify(deleteChannelError));
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            }
+
+            return vote;
+        }),
+
     createAccount: publicProcedure
         .input(
             z.object({

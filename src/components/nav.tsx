@@ -11,15 +11,21 @@ export const Nav = () => {
     const { user, status } = useUser();
 
     return (
-        <nav className="mx-auto flex w-full min-w-max px-6 py-4 sm:px-12 lg:max-w-screen-lg">
+        <nav className="mx-auto flex h-[70px] w-full min-w-max px-6 py-4 sm:px-12 lg:max-w-screen-lg">
             <Link className="flex text-2xl" href="/">
                 <b>V</b>
                 <Glitch text="ote" />
             </Link>
             {user && (
                 <>
-                    <Link href="/me" className="me-6 ms-auto">
-                        <button className="rounded-md border border-transparent px-3 py-2 transition-colors hover:border-black/50 dark:hover:border-white/50 dark:hover:bg-white/10">
+                    <Link href="/create" className="me-2 ms-auto">
+                        <button className="rounded-md border border-transparent px-3 py-2 text-sm transition-colors hover:border-black/50 dark:hover:border-white/50 dark:hover:bg-white/10">
+                            Create Vote
+                        </button>
+                    </Link>
+
+                    <Link href="/me" className="me-6">
+                        <button className="rounded-md border border-transparent px-3 py-2 text-sm transition-colors hover:border-black/50 dark:hover:border-white/50 dark:hover:bg-white/10">
                             My Votes
                         </button>
                     </Link>
