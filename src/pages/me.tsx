@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { TrashIcon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
 
-import { RouterOutputs, api } from '@/utils/api';
+import { api, type RouterOutputs } from '@/utils/api';
 import { useAnonUser } from '@/utils/local-user';
 import { Pfp } from '@/components/pfp';
 import {
