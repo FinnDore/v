@@ -33,7 +33,6 @@ export function useAnonUser() {
         if (typeof window === 'undefined') return;
         const reloadUser = (e: StorageEvent) => {
             if (e.key === 'user') {
-                console.log('Reloading user');
                 const localUserStore = getLocalUserStore();
                 setUser(localUserStore?.user ?? null);
             }
@@ -52,12 +51,7 @@ export function storeUser(user: AnonUser) {
     const existingUsersParseResult = LocalUserStoreSchema.safeParse(
         JSON.parse(localStorage.getItem('users') || 'null')
     );
-    if (!existingUsersParseResult.success) {
-        console.error(
-            'Failed to parse existing users, resting users store',
-            existingUsersParseResult.error
-        );
-    }
+
     const existingUser = existingUsersParseResult.success
         ? {
               ...existingUsersParseResult.data,
