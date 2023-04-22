@@ -57,7 +57,7 @@ const Me = () => {
                         <div className="flex h-[58px] w-full animate-pulse justify-center rounded-md border border-black/25 bg-black/10 dark:border-white/25 dark:bg-white/10"></div>
                         <div className="flex h-[58px] w-full animate-pulse justify-center rounded-md border border-black/25 bg-black/10 dark:border-white/25 dark:bg-white/10"></div>
                         <div className="flex h-[58px] w-full animate-pulse justify-center rounded-md border border-black/25 bg-black/10 dark:border-white/25 dark:bg-white/10"></div>
-                        <div className="absolute h-full w-full bg-gradient-to-t from-white/80 to-transparent dark:from-black/80"></div>
+                        <div className="absolute h-full w-full bg-gradient-to-t from-white to-white/40 dark:from-black dark:to-black/40"></div>
                     </div>
                 )}
 
@@ -127,7 +127,7 @@ const VoteItem = ({
                                     }}
                                 >
                                     <Pfp
-                                        className={clsx('mr-[-14px] w-6', {})}
+                                        className="mr-[-14px] w-6"
                                         style={{
                                             zIndex: i,
                                         }}
