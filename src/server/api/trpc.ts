@@ -6,6 +6,7 @@ import superjson from 'superjson';
 import { z } from 'zod';
 
 import { AnonHelper } from '@/utils/anon-users';
+import { rateLimitTrpcProc, type RateLimitPrefix } from '@/utils/rate-limit';
 import { getServerAuthSession } from '@/server/auth';
 
 type CreateContextOptions = {
@@ -144,4 +145,31 @@ export const anonOrUserProcedure = t.procedure
         } else {
             throw new TRPCError({ code: 'UNAUTHORIZED' });
         }
+    });
+
+export const rateLimitedAnonOrUserProcedure = (
+    rateLimitPrefix: RateLimitPrefix,
+    byIp?: boolean
+) =>
+    anonOrUserProcedure.use(async ({ ctx, next }) => {
+        await rateLimitTrpcProc({
+            prefix: rateLimitPrefix,
+            ip: ctx.ip,
+            anonSession: ctx.anonSession,
+            userSession: ctx.session,
+            byIp: !!byIp,
+        });
+        return next();
+    });
+
+export const rateLimitedTrpcProc = (rateLimitPrefix: RateLimitPrefix) =>
+    publicProcedure.use(async ({ ctx, next }) => {
+        await rateLimitTrpcProc({
+            prefix: rateLimitPrefix,
+            ip: ctx.ip,
+            anonSession: null,
+            userSession: null,
+            byIp: true,
+        });
+        return next();
     });

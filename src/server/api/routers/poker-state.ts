@@ -1,18 +1,21 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
+import { RateLimitPrefix } from '@/utils/rate-limit';
 import { to } from '@/utils/to';
 import { ChannelEvents } from '@/server/channel-events';
 import { prisma } from '@/server/db';
 import { dispatchPokerStateUpdateEvent, selectPokerVote } from '@/server/hop';
 import {
-    anonOrUserProcedure,
     createTRPCRouter,
     publicProcedure,
+    rateLimitedAnonOrUserProcedure,
 } from '../trpc';
 
 export const pokerStateRouter = createTRPCRouter({
-    toggleResults: anonOrUserProcedure
+    toggleResults: rateLimitedAnonOrUserProcedure(
+        RateLimitPrefix.progressVoteOrToggleResults
+    )
         .input(
             z.object({
                 pokerId: z.string().cuid(),
@@ -71,7 +74,9 @@ export const pokerStateRouter = createTRPCRouter({
             });
         }),
 
-    toggleProgressVote: anonOrUserProcedure
+    progressVote: rateLimitedAnonOrUserProcedure(
+        RateLimitPrefix.progressVoteOrToggleResults
+    )
         .input(
             z.object({
                 pokerId: z.string().cuid(),

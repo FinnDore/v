@@ -395,31 +395,30 @@ export const useVoteControls = () => {
         });
     }, [activeVote, anonUser, pokerId, toggleResultsMutation]);
 
-    const progressVoteMutation =
-        api.vote.pokerState.toggleProgressVote.useMutation({
-            onMutate(data) {
-                utils.vote.pokerState.getPokerState.setData(
-                    {
-                        pokerId: data.pokerId,
-                    },
-                    old => {
-                        if (!old) return old;
-                        return {
-                            ...old,
-                            pokerVote: old.pokerVote.map(x => ({
-                                ...x,
-                                active: x.id === data.progressTo,
-                            })),
-                        };
-                    }
-                );
-            },
-            onError(_data, ctx) {
-                void utils.vote.pokerState.getPokerState.invalidate({
-                    pokerId: ctx.pokerId,
-                });
-            },
-        });
+    const progressVoteMutation = api.vote.pokerState.progressVote.useMutation({
+        onMutate(data) {
+            utils.vote.pokerState.getPokerState.setData(
+                {
+                    pokerId: data.pokerId,
+                },
+                old => {
+                    if (!old) return old;
+                    return {
+                        ...old,
+                        pokerVote: old.pokerVote.map(x => ({
+                            ...x,
+                            active: x.id === data.progressTo,
+                        })),
+                    };
+                }
+            );
+        },
+        onError(_data, ctx) {
+            void utils.vote.pokerState.getPokerState.invalidate({
+                pokerId: ctx.pokerId,
+            });
+        },
+    });
 
     const progressVote = useCallback(
         (prev = false) => {

@@ -1,15 +1,14 @@
 import { ChannelType } from '@onehop/js';
 import { TRPCError } from '@trpc/server';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
 import { z } from 'zod';
 
+import { RateLimitPrefix } from '@/utils/rate-limit';
 import { to } from '@/utils/to';
-import { env } from '@/env.mjs';
 import {
     anonOrUserProcedure,
     createTRPCRouter,
-    publicProcedure,
+    rateLimitedAnonOrUserProcedure,
+    rateLimitedTrpcProc,
 } from '@/server/api/trpc';
 import {
     dispatchVoteUpdateEvent,
@@ -21,24 +20,12 @@ import { prisma } from '../../../db';
 import { pokerStateRouter } from '../poker-state';
 import { lobbyRouter } from './lobby';
 
-const createAnonAccountRateLimit = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.tokenBucket(20, '1h', 20),
-    ephemeralCache: new Map(),
-    analytics: true,
-});
-
-const createPokerRateLimit = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(20, '1h'),
-    ephemeralCache: new Map(),
-    analytics: true,
-});
-
 export const vote = createTRPCRouter({
     pokerState: pokerStateRouter,
     lobby: lobbyRouter,
-    createPoker: anonOrUserProcedure
+    createPoker: rateLimitedAnonOrUserProcedure(
+        RateLimitPrefix.createAnonAccount
+    )
         .input(
             z.object({
                 title: z.string().trim().max(20),
@@ -53,39 +40,6 @@ export const vote = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
-            if (env.PROD) {
-                const userId = ctx.session?.user?.id ?? ctx.anonSession?.id;
-
-                const { success, limit, reset, remaining } =
-                    await createPokerRateLimit.limit(
-                        `ratelimit_create_poker${userId ?? ctx.ip}}`
-                    );
-
-                if (!success) {
-                    console.warn(
-                        `Rate limited poker creation attempt from ${
-                            userId ?? ctx.ip
-                        } (limit: ${limit}, reset: ${reset}, remaining: ${remaining}, user: ${
-                            ctx.session?.user?.id ??
-                            ctx.anonSession?.id ??
-                            'No UserId'
-                        }) name: ${
-                            ctx.session?.user?.name ??
-                            ctx.anonSession?.name ??
-                            'No Name'
-                        } ${
-                            !userId
-                                ? 'Fell back to IP rate limiting as no userId was given'
-                                : ''
-                        }`
-                    );
-                    throw new TRPCError({
-                        code: 'TOO_MANY_REQUESTS',
-                        message: `You are being rate limited. Try again in ${reset} seconds.`,
-                    });
-                }
-            }
-
             // Max of 50 sessions per user and 3 sessions per anon user
             const maxPokerSessions = ctx.session ? 50 : 3;
             const [voteCount, voteCountError] = await to(
@@ -213,31 +167,14 @@ export const vote = createTRPCRouter({
             return vote;
         }),
 
-    createAccount: publicProcedure
+    createAccount: rateLimitedTrpcProc(RateLimitPrefix.createAnonAccount)
         .input(
             z.object({
                 name: z.string().trim().max(25).min(1),
                 pfpHash: z.string().trim().min(1).max(30),
             })
         )
-        .mutation(async ({ input, ctx }) => {
-            if (env.PROD) {
-                const { success, limit, reset, remaining } =
-                    await createAnonAccountRateLimit.limit(
-                        `ratelimit_anon_acc_create_${ctx.ip}`
-                    );
-
-                if (!success) {
-                    console.warn(
-                        `Rate limited anon account creation attempt from ${ctx.ip} (limit: ${limit}, reset: ${reset}, remaining: ${remaining}, attempted name: ${input.name})`
-                    );
-                    throw new TRPCError({
-                        code: 'TOO_MANY_REQUESTS',
-                        message: `You are being rate limited. Try again in ${reset} seconds.`,
-                    });
-                }
-            }
-
+        .mutation(async ({ input }) => {
             const anonUser = await prisma.anonUser.create({
                 data: {
                     name: input.name,
@@ -248,7 +185,7 @@ export const vote = createTRPCRouter({
             return anonUser;
         }),
 
-    vote: anonOrUserProcedure
+    vote: rateLimitedAnonOrUserProcedure(RateLimitPrefix.vote)
         .input(
             z.object({
                 choice: z.string().max(20),

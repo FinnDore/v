@@ -1,11 +1,12 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
+import { RateLimitPrefix } from '@/utils/rate-limit';
 import { to } from '@/utils/to';
 import {
-    anonOrUserProcedure,
     createTRPCRouter,
     publicProcedure,
+    rateLimitedAnonOrUserProcedure,
 } from '@/server/api/trpc';
 import { ChannelEvents } from '@/server/channel-events';
 import { prisma } from '@/server/db';
@@ -30,7 +31,7 @@ const usersInVoteSelect = {
 };
 
 export const lobbyRouter = createTRPCRouter({
-    joinVote: anonOrUserProcedure
+    joinVote: rateLimitedAnonOrUserProcedure(RateLimitPrefix.joinVote)
         .input(
             z.object({
                 voteId: z.string().cuid(),
