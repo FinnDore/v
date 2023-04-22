@@ -1,8 +1,11 @@
 import { ChannelType } from '@onehop/js';
 import { TRPCError } from '@trpc/server';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 import { z } from 'zod';
 
 import { to } from '@/utils/to';
+import { env } from '@/env.mjs';
 import {
     anonOrUserProcedure,
     createTRPCRouter,
@@ -18,10 +21,23 @@ import { prisma } from '../../../db';
 import { pokerStateRouter } from '../poker-state';
 import { lobbyRouter } from './lobby';
 
+const createAnonAccountRateLimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.tokenBucket(20, '1h', 20),
+    ephemeralCache: new Map(),
+    analytics: true,
+});
+
+const createPokerRateLimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(20, '1h'),
+    ephemeralCache: new Map(),
+    analytics: true,
+});
+
 export const vote = createTRPCRouter({
     pokerState: pokerStateRouter,
     lobby: lobbyRouter,
-
     createPoker: anonOrUserProcedure
         .input(
             z.object({
@@ -37,6 +53,64 @@ export const vote = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
+            if (env.PROD) {
+                const userId = ctx.session?.user?.id ?? ctx.anonSession?.id;
+
+                const { success, limit, reset, remaining } =
+                    await createPokerRateLimit.limit(
+                        `ratelimit_create_poker${userId ?? ctx.ip}}`
+                    );
+
+                if (!success) {
+                    console.warn(
+                        `Rate limited poker creation attempt from ${
+                            userId ?? ctx.ip
+                        } (limit: ${limit}, reset: ${reset}, remaining: ${remaining}, user: ${
+                            ctx.session?.user?.id ??
+                            ctx.anonSession?.id ??
+                            'No UserId'
+                        }) name: ${
+                            ctx.session?.user?.name ??
+                            ctx.anonSession?.name ??
+                            'No Name'
+                        } ${
+                            !userId
+                                ? 'Fell back to IP rate limiting as no userId was given'
+                                : ''
+                        }`
+                    );
+                    throw new TRPCError({
+                        code: 'TOO_MANY_REQUESTS',
+                        message: `You are being rate limited. Try again in ${reset} seconds.`,
+                    });
+                }
+            }
+
+            // Max of 50 sessions per user and 3 sessions per anon user
+            const maxPokerSessions = ctx.session ? 50 : 3;
+            const [voteCount, voteCountError] = await to(
+                prisma.poker.count({
+                    where: {
+                        createdByUserId: ctx.session?.user?.id ?? null,
+                        createdByAnonUserId: ctx.anonSession?.id ?? null,
+                    },
+                })
+            );
+
+            if (voteCountError) {
+                console.error(
+                    `Could not count votes ${voteCountError.message})`
+                );
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            } else if (voteCount >= maxPokerSessions) {
+                throw new TRPCError({
+                    code: 'FORBIDDEN',
+                    message: `You have reached the maximum number of poker sessions (${maxPokerSessions})`,
+                });
+            }
+
             const [vote, createVoteError] = await to(
                 prisma.poker.create({
                     data: {
@@ -71,13 +145,12 @@ export const vote = createTRPCRouter({
 
             if (createChannelError) {
                 console.error(
-                    `Could not create channel poker_${
-                        vote.id
-                    } ( attempting to publish anyway ): ${
+                    `Could not create channel poker_${vote.id} error: ${
                         createChannelError.message ?? 'no error message'
-                    } ${createChannelError.stack ?? 'no stack'}`
+                    } ${
+                        createChannelError.stack ?? 'no stack'
+                    } \n ${JSON.stringify(createChannelError)}`
                 );
-                console.log(JSON.stringify(createChannelError));
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',
                 });
@@ -147,7 +220,24 @@ export const vote = createTRPCRouter({
                 pfpHash: z.string().trim().min(1).max(30),
             })
         )
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx }) => {
+            if (env.PROD) {
+                const { success, limit, reset, remaining } =
+                    await createAnonAccountRateLimit.limit(
+                        `ratelimit_anon_acc_create_${ctx.ip}`
+                    );
+
+                if (!success) {
+                    console.warn(
+                        `Rate limited anon account creation attempt from ${ctx.ip} (limit: ${limit}, reset: ${reset}, remaining: ${remaining}, attempted name: ${input.name})`
+                    );
+                    throw new TRPCError({
+                        code: 'TOO_MANY_REQUESTS',
+                        message: `You are being rate limited. Try again in ${reset} seconds.`,
+                    });
+                }
+            }
+
             const anonUser = await prisma.anonUser.create({
                 data: {
                     name: input.name,

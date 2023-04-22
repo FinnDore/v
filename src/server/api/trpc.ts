@@ -10,11 +10,13 @@ import { getServerAuthSession } from '@/server/auth';
 
 type CreateContextOptions = {
     session: Session | null;
+    ip: string;
 };
 
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
     return {
         session: opts.session,
+        ip: opts.ip,
     };
 };
 
@@ -23,9 +25,15 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
     // Get the session from the server using the getServerSession wrapper function
     const session = await getServerAuthSession({ req, res });
+    const xForwardedFor = req.headers['x-forwarded-for'];
+
+    const requestIp = Array.isArray(xForwardedFor)
+        ? xForwardedFor[0]
+        : xForwardedFor;
 
     return createInnerTRPCContext({
         session,
+        ip: requestIp ?? '127.0.0.1',
     });
 };
 

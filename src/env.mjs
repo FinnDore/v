@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
+const NodeEnv = z.enum(['development', 'test', 'production']);
 /**
  * Specify your server-side environment variables schema here. This way you can ensure the app isn't
  * built with invalid env vars.
  */
 const server = z.object({
     DATABASE_URL: z.string().url(),
-    NODE_ENV: z.enum(['development', 'test', 'production']),
+    NODE_ENV: NodeEnv,
     NEXTAUTH_SECRET:
         process.env.NODE_ENV === 'production'
             ? z.string().min(1)
@@ -24,6 +25,9 @@ const server = z.object({
     HOP_TOKEN: z.string(),
     UPSTASH_REDIS_REST_URL: z.string().url(),
     UPSTASH_REDIS_REST_TOKEN: z.string(),
+    PROD: NodeEnv.pipe(
+        z.preprocess(() => process.env.NODE_ENV === 'production', z.boolean())
+    ),
 });
 
 /**
@@ -52,6 +56,8 @@ const processEnv = {
     NEXT_PUBLIC_HOP_PROJECT_ID: process.env.NEXT_PUBLIC_HOP_PROJECT_ID,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+    PROD: process.env.NODE_ENV,
+
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
