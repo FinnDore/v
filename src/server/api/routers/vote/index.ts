@@ -37,6 +37,7 @@ export const vote = createTRPCRouter({
                         })
                     )
                     .max(15),
+                private: z.boolean(),
             })
         )
         .mutation(async ({ input, ctx }) => {
@@ -71,6 +72,7 @@ export const vote = createTRPCRouter({
                         title: input.title,
                         createdByUserId: ctx?.session?.user?.id ?? null,
                         createdByAnonUserId: ctx?.anonSession?.id ?? null,
+                        private: input.private,
                         pokerVote: {
                             createMany: {
                                 data: input.votes.map((vote, i) => ({

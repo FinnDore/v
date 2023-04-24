@@ -21,14 +21,23 @@ export const usePokerId = () => {
 
 export const usePokerState = () => {
     const pokerId = usePokerId();
+    const anonUser = useAnonUser();
+    // const [isWhiteListed, setIsWhiteListed] = useState<boolean>(true);
     const [currentVoteId, setActiveVoteId] = useAtom(currentVoteIdAtom);
-    const { data: pokerState, status } =
-        api.vote.pokerState.getPokerState.useQuery(
-            { pokerId: pokerId ?? '' },
-            {
-                enabled: !!pokerId,
-            }
-        );
+
+    const {
+        data: pokerState,
+        status,
+        error,
+    } = api.vote.pokerState.getPokerState.useQuery(
+        { pokerId: pokerId ?? '', anonUser },
+        {
+            enabled: !!pokerId,
+            retry: false,
+        }
+    );
+
+    const isWhiteListed = error?.data?.code === 'UNAUTHORIZED' ? false : true;
 
     const session = useUser();
     const isHost = useMemo(
@@ -69,6 +78,7 @@ export const usePokerState = () => {
         activeVote,
         setActiveVoteId,
         isHost,
+        isWhiteListed,
         ...nextVote,
     };
 };
@@ -80,16 +90,18 @@ export const useVotes = () => {
     const voteLastUpdated = useRef<number>(0);
     const session = useUser();
 
-    const { pokerState, activeVote, status } = usePokerState();
+    const { pokerState, activeVote, status, isWhiteListed } = usePokerState();
     const { mutate } = api.vote.vote.useMutation({
         onMutate: ({ choice, pokerVoteId }) => {
             if (!pokerVoteId || !pokerId) return;
             void utils.vote.pokerState.getPokerState.cancel({
                 pokerId,
+                anonUser,
             });
             utils.vote.pokerState.getPokerState.setData(
                 {
                     pokerId,
+                    anonUser,
                 },
                 old => {
                     const userId = session.user?.id;
@@ -126,10 +138,11 @@ export const useVotes = () => {
                 }
             );
         },
-        onError: _err => {
+        onError: (_err, ctx) => {
             if (!pokerId) return;
             void utils.vote.pokerState.getPokerState.refetch({
-                pokerId,
+                pokerId: ctx.pokerVoteId,
+                anonUser: ctx.anonUser,
             });
         },
     });
@@ -144,6 +157,7 @@ export const useVotes = () => {
             const existingVote = utils.vote.pokerState.getPokerState
                 .getData({
                     pokerId,
+                    anonUser,
                 })
                 ?.pokerVote?.find(v => v.id === updatedVoteChoice.pokerVote.id)
                 ?.voteChoice?.find(
@@ -165,7 +179,7 @@ export const useVotes = () => {
             }
 
             utils.vote.pokerState.getPokerState.setData(
-                { pokerId: pokerId },
+                { pokerId, anonUser },
                 old => {
                     if (!old) return old;
                     // TODO deep clone /shrug
@@ -211,6 +225,7 @@ export const useVotes = () => {
             utils.vote.pokerState.getPokerState.setData(
                 {
                     pokerId,
+                    anonUser,
                 },
                 old => {
                     if (!old) return old;
@@ -237,17 +252,20 @@ export const useVotes = () => {
                 voteId,
             }: { showResults: boolean; voteId: string } = parse(e.data);
             if (!pokerId) return;
-            utils.vote.pokerState.getPokerState.setData({ pokerId }, old => {
-                if (!old) return old;
-                return {
-                    ...old,
-                    pokerVote: updateArrayItem(
-                        cloneArray(old.pokerVote),
-                        x => x.id === voteId,
-                        x => ({ ...x, showResults })
-                    ),
-                };
-            });
+            utils.vote.pokerState.getPokerState.setData(
+                { pokerId, anonUser },
+                old => {
+                    if (!old) return old;
+                    return {
+                        ...old,
+                        pokerVote: updateArrayItem(
+                            cloneArray(old.pokerVote),
+                            x => x.id === voteId,
+                            x => ({ ...x, showResults })
+                        ),
+                    };
+                }
+            );
         }
     );
 
@@ -337,6 +355,7 @@ export const useVotes = () => {
         },
         showVotes: activeVote?.showResults,
         status,
+        isWhiteListed,
     };
 };
 
@@ -361,6 +380,7 @@ export const useVoteControls = () => {
                 utils.vote.pokerState.getPokerState.setData(
                     {
                         pokerId: data.pokerId,
+                        anonUser: data.anonUser,
                     },
                     old => {
                         if (!old) return old;
@@ -378,9 +398,10 @@ export const useVoteControls = () => {
                     }
                 );
             },
-            onError(_data, ctx) {
+            onError(_err, ctx) {
                 void utils.vote.pokerState.getPokerState.invalidate({
                     pokerId: ctx.pokerId,
+                    anonUser: ctx.anonUser,
                 });
             },
         }
@@ -400,6 +421,7 @@ export const useVoteControls = () => {
             utils.vote.pokerState.getPokerState.setData(
                 {
                     pokerId: data.pokerId,
+                    anonUser: data.anonUser,
                 },
                 old => {
                     if (!old) return old;
@@ -413,9 +435,10 @@ export const useVoteControls = () => {
                 }
             );
         },
-        onError(_data, ctx) {
+        onError(_err, ctx) {
             void utils.vote.pokerState.getPokerState.invalidate({
                 pokerId: ctx.pokerId,
+                anonUser: ctx.anonUser,
             });
         },
     });

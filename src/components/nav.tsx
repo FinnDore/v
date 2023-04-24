@@ -43,7 +43,7 @@ export const Nav = () => {
                     onClick={() => void router.push(`/login`)}
                     className="ms-auto flex rounded-md border border-transparent px-3 py-2 transition-colors hover:border-black/50 dark:hover:border-white/50 dark:hover:bg-white/10 dark:hover:text-white"
                 >
-                    <EnterIcon className="my-auto mr-2" />
+                    <EnterIcon className="mr-2 mt-auto" />
                     Login
                 </button>
             )}

@@ -83,9 +83,7 @@ export const dispatchPokerStateUpdateEvent = async (event: {
                 event.pokerId
             } due to error: ${updateChannelStateError.message} ${
                 updateChannelStateError.stack ?? 'no stack'
-            }
-            ${JSON.stringify(updateChannelStateError, null, 2)}
-            `
+            } ${JSON.stringify(updateChannelStateError, null, 2)}`
         );
     } else {
         console.log(`Published poker state update for poker_${event.pokerId}`);
@@ -144,4 +142,5 @@ export type UsersInVote = {
     name: string;
     image?: string | null;
     pfpHash?: string | null;
+    whiteListed: boolean;
 }[];

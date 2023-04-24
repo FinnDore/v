@@ -26,6 +26,7 @@ const Vote = () => {
         showVotes,
         status,
         pokerState,
+        isWhiteListed,
     } = useVotes();
     if (status === 'loading') return null;
     const createdByUser =
@@ -33,42 +34,57 @@ const Vote = () => {
 
     return (
         <div className="mx-auto flex h-full w-max max-w-full flex-col px-6 pb-6 sm:px-12 lg:max-w-screen-lg">
-            {pokerState && (
-                <div className="flex">
-                    {pokerState?.title && (
-                        <h1 className="text-2xl font-bold">
-                            {pokerState.title}
-                        </h1>
-                    )}
-                    <h2 className="ms-auto flex gap-2">
-                        <span className="opacity-70">hosted by</span>
-                        <b>{createdByUser?.name ?? 'Unknown user'}</b>
-                        <Pfp
-                            className="aspect-square h-6"
-                            image={pokerState.createdByUser?.image}
-                            pfpHash={pokerState.createdByAnonUser?.pfpHash}
-                            name={createdByUser?.name ?? 'Unknown user'}
-                        />
-                    </h2>
+            {!isWhiteListed && (
+                <div className="flex h-full">
+                    <span className="m-auto opacity-70">
+                        This poker session is private the host must add you
+                    </span>
                 </div>
             )}
-            <div className="m-auto">
-                <animated.div className="mx-auto mt-auto flex flex-wrap justify-center gap-2 md:gap-4">
-                    {voteOptions.map(vote => (
-                        <VoteButton
-                            key={vote}
-                            vote={vote}
-                            showVotes={showVotes}
-                            users={votesMap[vote.toString()]?.users ?? []}
-                            currentVotes={votesMap[vote.toString()]?.count ?? 0}
-                            totalVotes={highestVote[1]}
-                            doVote={doVote}
-                            current={currentVote?.choice === vote.toString()}
-                        />
-                    ))}
-                </animated.div>
-                <VoteDescription />
-            </div>
+            {pokerState && isWhiteListed && (
+                <>
+                    <div className="flex">
+                        {pokerState?.title && (
+                            <h1 className="text-2xl font-bold">
+                                {pokerState.title}
+                            </h1>
+                        )}
+                        <h2 className="ms-auto flex gap-2">
+                            <span className="opacity-70">hosted by</span>
+                            <b>{createdByUser?.name ?? 'Unknown user'}</b>
+                            <Pfp
+                                className="aspect-square h-6"
+                                image={pokerState.createdByUser?.image}
+                                pfpHash={pokerState.createdByAnonUser?.pfpHash}
+                                name={createdByUser?.name ?? 'Unknown user'}
+                            />
+                        </h2>
+                    </div>
+                    <div className="m-auto">
+                        <animated.div className="mx-auto mt-auto flex flex-wrap justify-center gap-2 md:gap-4">
+                            {voteOptions.map(vote => (
+                                <VoteButton
+                                    key={vote}
+                                    vote={vote}
+                                    showVotes={showVotes}
+                                    users={
+                                        votesMap[vote.toString()]?.users ?? []
+                                    }
+                                    currentVotes={
+                                        votesMap[vote.toString()]?.count ?? 0
+                                    }
+                                    totalVotes={highestVote[1]}
+                                    doVote={doVote}
+                                    current={
+                                        currentVote?.choice === vote.toString()
+                                    }
+                                />
+                            ))}
+                        </animated.div>
+                        <VoteDescription />
+                    </div>
+                </>
+            )}
         </div>
     );
 };

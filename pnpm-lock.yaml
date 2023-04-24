@@ -19,8 +19,8 @@ dependencies:
     specifier: 1.5.5
     version: 1.5.5(patch_hash=am325uufw6okpucl5nyzghrzau)
   '@onehop/js':
-    specifier: 1.30.0
-    version: 1.30.0
+    specifier: 1.31.1
+    version: 1.31.1
   '@onehop/react':
     specifier: 1.5.5
     version: 1.5.5(react@18.2.0)
@@ -30,6 +30,9 @@ dependencies:
   '@prisma/client':
     specifier: 4.13.0
     version: 4.13.0(prisma@4.13.0)
+  '@radix-ui/react-checkbox':
+    specifier: ^1.0.3
+    version: 1.0.3(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-dropdown-menu':
     specifier: ^2.0.4
     version: 2.0.4(@types/react@18.0.28)(react-dom@18.2.0)(react@18.2.0)
@@ -645,7 +648,7 @@ packages:
   /@onehop/client@1.5.5(patch_hash=am325uufw6okpucl5nyzghrzau):
     resolution: {integrity: sha512-wKlTuvs0TfX70LxOM2HWkhraMbHjY5kshrlKZv48gncw2hLfmQ1r1Cv1kD7erDJ0kPW/Hri4yXCgKGGedJu50Q==}
     dependencies:
-      '@onehop/js': 1.30.0
+      '@onehop/js': 1.31.1
       '@onehop/leap-edge-js': 1.0.11
       hls.js: 1.3.5
     transitivePeerDependencies:
@@ -655,8 +658,8 @@ packages:
     dev: false
     patched: true
 
-  /@onehop/js@1.30.0:
-    resolution: {integrity: sha512-81LELReARRLKodSFQ7bF8jLNQ7WrGrfQenIkVfHmuTBsLM25P17Bm0tOVdQDjZEN3E2jdeLaWsvhTasQOq9v2w==}
+  /@onehop/js@1.31.1:
+    resolution: {integrity: sha512-Y9IQ60NM2DYbNHVsoxmuEUyvGPIK8KB7EyqdiOdSaKldeOJ5nHdCvZ1ai879Jvj/yWhlxJ8m5Mo30DPlVxRiAQ==}
     dependencies:
       '@onehop/json-methods': 1.2.0
       cross-fetch: 3.1.5
@@ -687,7 +690,7 @@ packages:
       react: '*'
     dependencies:
       '@onehop/client': 1.5.5(patch_hash=am325uufw6okpucl5nyzghrzau)
-      '@onehop/js': 1.30.0
+      '@onehop/js': 1.31.1
       '@onehop/leap-edge-js': 1.0.11
       react: 18.2.0
     transitivePeerDependencies:
@@ -758,6 +761,25 @@ packages:
     dependencies:
       '@babel/runtime': 7.21.0
       '@radix-ui/react-primitive': 1.0.2(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@radix-ui/react-checkbox@1.0.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-55B8/vKzTuzxllH5sGJO4zaBf9gYpJuJRRzaOKm+0oAefRnMvbf+Kgww7IOANVN0w3z7agFJgtnXaZl8Uj95AA==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    dependencies:
+      '@babel/runtime': 7.21.0
+      '@radix-ui/primitive': 1.0.0
+      '@radix-ui/react-compose-refs': 1.0.0(react@18.2.0)
+      '@radix-ui/react-context': 1.0.0(react@18.2.0)
+      '@radix-ui/react-presence': 1.0.0(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-primitive': 1.0.2(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-use-controllable-state': 1.0.0(react@18.2.0)
+      '@radix-ui/react-use-previous': 1.0.0(react@18.2.0)
+      '@radix-ui/react-use-size': 1.0.0(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
