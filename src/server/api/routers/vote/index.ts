@@ -28,7 +28,7 @@ export const vote = createTRPCRouter({
     )
         .input(
             z.object({
-                title: z.string().trim().max(30),
+                title: z.string().trim().max(15),
                 votes: z
                     .array(
                         z.object({
@@ -36,7 +36,7 @@ export const vote = createTRPCRouter({
                             description: z.string().trim().max(2000),
                         })
                     )
-                    .max(15),
+                    .max(30),
             })
         )
         .mutation(async ({ input, ctx }) => {
