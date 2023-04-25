@@ -28,7 +28,7 @@ export const vote = createTRPCRouter({
     )
         .input(
             z.object({
-                title: z.string().trim().max(20),
+                title: z.string().trim().max(30),
                 votes: z
                     .array(
                         z.object({

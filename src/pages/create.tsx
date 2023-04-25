@@ -132,7 +132,7 @@ const CreatePoker = () => {
                             },
                         ]);
                     }}
-                    disabled={votes.length >= 15}
+                    disabled={votes.length >= 30}
                 >
                     Add another vote <PlusIcon className="ml-1" />
                 </Button>
