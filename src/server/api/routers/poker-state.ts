@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
+import { AnonHelper, anonUserSchema } from '@/utils/anon-users';
 import { RateLimitPrefix } from '@/utils/rate-limit';
 import { to } from '@/utils/to';
 import { ChannelEvents } from '@/server/channel-events';
@@ -145,13 +146,15 @@ export const pokerStateRouter = createTRPCRouter({
         .input(
             z.object({
                 pokerId: z.string().cuid(),
+                anonUser: anonUserSchema,
             })
         )
-        .query(async ({ input }) => {
+        .query(async ({ input, ctx }) => {
             const [votes, error] = await to(
                 prisma.poker.findFirst({
                     select: {
                         title: true,
+                        private: true,
                         createdByAnonUser: {
                             select: {
                                 id: true,
@@ -178,6 +181,20 @@ export const pokerStateRouter = createTRPCRouter({
                                 },
                             },
                         },
+                        userInVote: {
+                            select: {
+                                id: true,
+                                whiteListed: true,
+                                anonUserId: true,
+                                userId: true,
+                            },
+                            where: {
+                                userId: ctx.session?.user.id ?? null,
+                                anonUserId: ctx.session?.user.id
+                                    ? null
+                                    : input.anonUser?.id ?? null,
+                            },
+                        },
                     },
                     where: {
                         id: input.pokerId,
@@ -197,6 +214,56 @@ export const pokerStateRouter = createTRPCRouter({
                 });
             }
 
+            if (votes.private) {
+                if (!ctx.session && !input.anonUser) {
+                    throw new TRPCError({
+                        code: 'UNAUTHORIZED',
+                    });
+                }
+
+                let userId = ctx.session?.user.id;
+                if (input.anonUser && !userId) {
+                    const [anonUser, anonUserError] =
+                        await AnonHelper.getAnonUserByIdAndSecret({
+                            userId: input.anonUser.id,
+                            secret: input.anonUser.secret,
+                        });
+
+                    if (anonUserError) {
+                        console.log(
+                            `Couldn't get anon user when : ${anonUserError.message}`
+                        );
+                        throw new TRPCError({
+                            code: 'INTERNAL_SERVER_ERROR',
+                        });
+                    }
+
+                    userId = anonUser?.id;
+                }
+
+                if (!userId) {
+                    throw new TRPCError({
+                        code: 'UNAUTHORIZED',
+                    });
+                }
+
+                const userInVote = votes.userInVote.find(
+                    x =>
+                        (userId === x.anonUserId || userId === x.userId) &&
+                        x.whiteListed
+                );
+
+                const isOwner =
+                    votes.createdByUser?.id === userId ||
+                    votes.createdByAnonUser?.id === userId;
+
+                console.log(votes.private, !userInVote, !isOwner);
+                if (votes.private && !userInVote && !isOwner) {
+                    throw new TRPCError({
+                        code: 'UNAUTHORIZED',
+                    });
+                }
+            }
             const returnVotes = votes.pokerVote.map(x => ({
                 ...x,
                 voteChoice: x.voteChoice.sort(

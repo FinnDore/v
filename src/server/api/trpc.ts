@@ -5,9 +5,11 @@ import { type Session } from 'next-auth';
 import superjson from 'superjson';
 import { z } from 'zod';
 
-import { AnonHelper } from '@/utils/anon-users';
+import { AnonHelper, anonUserSchema } from '@/utils/anon-users';
 import { rateLimitTrpcProc, type RateLimitPrefix } from '@/utils/rate-limit';
+import { to } from '@/utils/to';
 import { getServerAuthSession } from '@/server/auth';
+import { prisma } from '../db';
 
 type CreateContextOptions = {
     session: Session | null;
@@ -75,13 +77,7 @@ export const anonProcedure = t.procedure.use(async ({ ctx, next }) => {
 export const anonOrUserProcedure = t.procedure
     .input(
         z.object({
-            anonUser: z
-                .object({
-                    id: z.string().cuid(),
-                    secret: z.string().cuid(),
-                })
-                .optional()
-                .nullable(),
+            anonUser: anonUserSchema,
         })
     )
     .use(async ({ ctx, input, next }) => {
@@ -172,4 +168,46 @@ export const rateLimitedTrpcProc = (rateLimitPrefix: RateLimitPrefix) =>
             byIp: true,
         });
         return next();
+    });
+
+export const pokerOwnerProcedure = anonOrUserProcedure
+    .input(
+        z.object({
+            pokerId: z.string().cuid(),
+        })
+    )
+    .use(async ({ input, ctx, next }) => {
+        const [pokerSession, getPokerSessionError] = await to(
+            prisma.poker.findFirst({
+                where: {
+                    id: input.pokerId,
+                    createdByAnonUserId: ctx.anonSession?.id ?? null,
+                    createdByUserId: ctx.session?.user?.id ?? null,
+                },
+            })
+        );
+
+        console.log({
+            id: input.pokerId,
+            createdByAnonUserId: ctx.anonSession?.id ?? null,
+            createdByUserId: ctx.session?.user?.id ?? null,
+        });
+        if (getPokerSessionError) {
+            console.error(
+                `pokerOwnerProcedure: Could not find poker session to verify ownership: ${
+                    getPokerSessionError.message
+                } ${getPokerSessionError.stack ?? 'no stack'}`
+            );
+            throw new TRPCError({
+                code: 'INTERNAL_SERVER_ERROR',
+            });
+        } else if (!pokerSession) {
+            throw new TRPCError({
+                code: 'UNAUTHORIZED',
+            });
+        }
+
+        return next({
+            ctx: { ...ctx, pokerId: pokerSession.id },
+        });
     });

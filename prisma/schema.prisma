@@ -21,6 +21,7 @@ model Poker {
   createdByAnonUserId String?
   createdByUser       User?       @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
   createdByUserId     String?
+  private             Boolean     @default(true)
   pokerVote           PokerVote[]
   userInVote          UsersInVote[]
 
@@ -71,6 +72,7 @@ model UsersInVote {
   poker     Poker @relation(fields: [voteId], references: [id], onDelete: Cascade)
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
+  whiteListed Boolean @default(false)
 
   anonUser   AnonUser? @relation(fields: [anonUserId], references: [id], onDelete: Cascade)
   anonUserId String?

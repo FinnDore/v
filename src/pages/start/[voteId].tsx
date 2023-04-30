@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useChannelMessage } from '@onehop/react';
-import { Link2Icon } from '@radix-ui/react-icons';
+import { CheckIcon, Cross2Icon, Link2Icon } from '@radix-ui/react-icons';
 
 import { api } from '@/utils/api';
+import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
 import {
@@ -142,6 +143,7 @@ const Start = () => {
                                         className="mr-4 w-6"
                                     />
                                     <span>{item?.name ?? 'Unknown user'}</span>
+                                    <WhiteListOrKick user={item} />
                                 </li>
                             ))}
                         {noUsers && userStatus !== 'loading' && (
@@ -167,3 +169,64 @@ const Start = () => {
 };
 
 export default Start;
+
+const WhiteListOrKick = ({ user }: { user: UsersInVote[number] }) => {
+    const anonUser = useAnonUser();
+    const pokerId = usePokerId();
+    const utils = api.useContext();
+
+    const kickOrWhitelistMutation =
+        api.vote.lobby.kickOrWhitelistUser.useMutation({
+            onSettled() {
+                void utils.vote.lobby.listUsersInVote.invalidate({
+                    voteId: pokerId ?? '',
+                });
+            },
+        });
+
+    const kickOrWhiteList = useCallback(
+        (kick: boolean) =>
+            void kickOrWhitelistMutation.mutate({
+                pokerId: pokerId ?? '',
+                userId: user.pfpHash ? undefined : user.id,
+                anonUserId: user.pfpHash ? user.id : undefined,
+                kick,
+                anonUser,
+            }),
+        [kickOrWhitelistMutation, pokerId, user, anonUser]
+    );
+
+    if (user.whiteListed) {
+        return (
+            <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            className="my-auto ms-auto h-max w-max rounded-sm px-[2px] py-[2px] text-rose-500"
+                            onClick={() => kickOrWhiteList(true)}
+                        >
+                            <Cross2Icon />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Kick user</TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+        );
+    }
+
+    return (
+        <TooltipProvider delayDuration={300}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button
+                        onClick={() => kickOrWhiteList(false)}
+                        className="my-auto ms-auto h-max  w-max rounded-sm px-[2px] py-[2px] text-green-500"
+                    >
+                        <CheckIcon className="ms-auto" />
+                    </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">whitelist user</TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    );
+};

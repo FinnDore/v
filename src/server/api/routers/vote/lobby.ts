@@ -5,6 +5,7 @@ import { RateLimitPrefix } from '@/utils/rate-limit';
 import { to } from '@/utils/to';
 import {
     createTRPCRouter,
+    pokerOwnerProcedure,
     publicProcedure,
     rateLimitedAnonOrUserProcedure,
 } from '@/server/api/trpc';
@@ -28,6 +29,7 @@ const usersInVoteSelect = {
             image: true,
         },
     },
+    whiteListed: true,
 };
 
 export const lobbyRouter = createTRPCRouter({
@@ -146,6 +148,105 @@ export const lobbyRouter = createTRPCRouter({
                 }))
             );
         }),
+
+    kickOrWhitelistUser: pokerOwnerProcedure
+        .input(
+            z.object({
+                anonUserId: z.string().optional(),
+                userId: z.string().optional(),
+                kick: z.boolean(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            if (input.kick) {
+                const [kickedUser, kickError] = await to(
+                    prisma.$transaction([
+                        prisma.usersInVote.delete({
+                            where: {
+                                voteId_userId: input.userId
+                                    ? {
+                                          userId: input.userId,
+                                          voteId: ctx.pokerId,
+                                      }
+                                    : undefined,
+                                voteId_anonUserId: input.anonUserId
+                                    ? {
+                                          anonUserId: input.anonUserId,
+                                          voteId: ctx.pokerId,
+                                      }
+                                    : undefined,
+                            },
+                        }),
+                        prisma.pokerVoteChoice.deleteMany({
+                            where: {
+                                userId: input.userId,
+                                pokerVote: {
+                                    pokerId: ctx.pokerId,
+                                },
+                            },
+                        }),
+                    ])
+                );
+
+                if (kickError) {
+                    console.error(
+                        `Could not kick user from vote due to error: ${
+                            kickError.message
+                        } ${kickError.stack ?? 'no stack'}`
+                    );
+
+                    throw new TRPCError({
+                        code: 'INTERNAL_SERVER_ERROR',
+                    });
+                }
+
+                if (!kickedUser) {
+                    throw new TRPCError({
+                        code: 'NOT_FOUND',
+                    });
+                }
+            } else {
+                const [updatedUserInVote, updateError] = await to(
+                    prisma.usersInVote.update({
+                        where: {
+                            voteId_userId: input.userId
+                                ? {
+                                      userId: input.userId,
+                                      voteId: ctx.pokerId,
+                                  }
+                                : undefined,
+                            voteId_anonUserId: input.anonUserId
+                                ? {
+                                      anonUserId: input.anonUserId,
+                                      voteId: ctx.pokerId,
+                                  }
+                                : undefined,
+                        },
+                        data: {
+                            whiteListed: true,
+                        },
+                    })
+                );
+
+                if (updateError) {
+                    console.error(
+                        `Could not whitelist user in vote due to error: ${
+                            updateError.message
+                        } ${updateError.stack ?? 'no stack'}`
+                    );
+
+                    throw new TRPCError({
+                        code: 'INTERNAL_SERVER_ERROR',
+                    });
+                }
+
+                if (!updatedUserInVote) {
+                    throw new TRPCError({
+                        code: 'NOT_FOUND',
+                    });
+                }
+            }
+        }),
 });
 
 const formatUsers = (
@@ -161,14 +262,23 @@ const formatUsers = (
                   name: string | null;
                   image?: string | null;
               } | null;
+              whiteListed: boolean;
           }[]
         | null
 ): UsersInVote =>
     users
         ?.map(u =>
             u.user
-                ? { ...u.user, updatedAt: u.updatedAt }
-                : { ...u.anonUser, updatedAt: u.updatedAt }
+                ? {
+                      ...u.user,
+                      updatedAt: u.updatedAt,
+                      whiteListed: u.whiteListed,
+                  }
+                : {
+                      ...u.anonUser,
+                      updatedAt: u.updatedAt,
+                      whiteListed: u.whiteListed,
+                  }
         )
         .filter((x): x is UsersInVote[number] => x !== null && x.name !== null)
         .sort((a, b) => b.updatedAt - a.updatedAt) ?? [];

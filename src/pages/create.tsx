@@ -5,6 +5,7 @@ import { Cross1Icon, PlusIcon } from '@radix-ui/react-icons';
 import { api } from '@/utils/api';
 import { useAnonUser, useUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
+import { Checkbox } from '@/components/checkbox';
 import { Input } from '@/components/input';
 import { Label } from '@/components/label';
 import { SignIn } from '@/components/sign-in';
@@ -24,10 +25,11 @@ const CreatePoker = () => {
             description: '',
         },
     ]);
+    const [privateVote, setPrivate] = useState(false);
     const anonUser = useAnonUser();
     const { status } = useUser();
     const router = useRouter();
-    const { mutate: createVote } = api.vote.createPoker.useMutation({
+    const { mutate: createVote } = api.vote.createPokerSession.useMutation({
         async onSuccess(returnVote) {
             await router.push('/start/[voteId]', `/start/${returnVote.id}`, {
                 shallow: true,
@@ -54,6 +56,7 @@ const CreatePoker = () => {
                         title,
                         votes,
                         anonUser,
+                        private: privateVote,
                     });
                 }}
             >
@@ -61,12 +64,20 @@ const CreatePoker = () => {
                     <Label>Poker Session Name</Label>
                     <Input
                         placeholder="Sprint 2 - phase 9"
-                        className="mb-4"
+                        className="mb-2"
                         maxLength={20}
                         min="1"
                         value={title}
                         onChange={e => setTitle(() => e.target.value)}
                     />
+                </fieldset>
+
+                <fieldset className="relative flex gap-2">
+                    <Label>Private</Label>
+                    <Checkbox
+                        checked={privateVote}
+                        onClick={() => setPrivate(x => !x)}
+                    ></Checkbox>
                 </fieldset>
                 {votes.map((vote, i) => (
                     <fieldset className="relative mb-4 flex flex-col" key={i}>
