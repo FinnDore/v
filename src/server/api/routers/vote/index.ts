@@ -20,7 +20,9 @@ import { prisma } from '../../../db';
 import { pokerStateRouter } from '../poker-state';
 import { lobbyRouter } from './lobby';
 
-const createPokerSession = rateLimitedAnonOrUserProcedure()
+const createPokerSession = rateLimitedAnonOrUserProcedure(
+    RateLimitPrefix.createPoker
+)
     .input(
         z.object({
             title: z.string().trim().max(20),
