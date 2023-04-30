@@ -29,7 +29,7 @@ const CreatePoker = () => {
     const anonUser = useAnonUser();
     const { status } = useUser();
     const router = useRouter();
-    const { mutate: createVote } = api.vote.createPoker.useMutation({
+    const { mutate: createVote } = api.vote.createPokerSession.useMutation({
         async onSuccess(returnVote) {
             await router.push('/start/[voteId]', `/start/${returnVote.id}`, {
                 shallow: true,
@@ -143,7 +143,7 @@ const CreatePoker = () => {
                             },
                         ]);
                     }}
-                    disabled={votes.length >= 15}
+                    disabled={votes.length >= 30}
                 >
                     Add another vote <PlusIcon className="ml-1" />
                 </Button>
