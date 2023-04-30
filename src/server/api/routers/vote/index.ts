@@ -21,7 +21,7 @@ import { pokerStateRouter } from '../poker-state';
 import { lobbyRouter } from './lobby';
 
 const createPokerSession = rateLimitedAnonOrUserProcedure(
-    RateLimitPrefix.createAnonAccount
+
 )
     .input(
         z.object({
@@ -94,8 +94,7 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
 
         if (createChannelError) {
             console.error(
-                `Could not create channel poker_${vote.id} error: ${
-                    createChannelError.message ?? 'no error message'
+                `Could not create channel poker_${vote.id} error: ${createChannelError.message ?? 'no error message'
                 } ${createChannelError.stack ?? 'no stack'} \n ${JSON.stringify(
                     createChannelError
                 )}`
@@ -120,15 +119,15 @@ const deletePokerSession = anonOrUserProcedure
                 where: {
                     id_createdByUserId: ctx.session
                         ? {
-                              createdByUserId: ctx.session.user.id,
-                              id: input.pokerId,
-                          }
+                            createdByUserId: ctx.session.user.id,
+                            id: input.pokerId,
+                        }
                         : undefined,
                     id_createdByAnonUserId: ctx.anonSession
                         ? {
-                              createdByAnonUserId: ctx.anonSession.id,
-                              id: input.pokerId,
-                          }
+                            createdByAnonUserId: ctx.anonSession.id,
+                            id: input.pokerId,
+                        }
                         : undefined,
                 },
             })
@@ -147,8 +146,7 @@ const deletePokerSession = anonOrUserProcedure
 
         if (deleteChannelError) {
             console.error(
-                `Could not delete channel poker_${vote.id}: ${
-                    deleteChannelError.message ?? 'no error message'
+                `Could not delete channel poker_${vote.id}: ${deleteChannelError.message ?? 'no error message'
                 } ${deleteChannelError.stack ?? 'no stack'}`
             );
             console.log(JSON.stringify(deleteChannelError));
@@ -173,17 +171,17 @@ const castVote = rateLimitedAnonOrUserProcedure(RateLimitPrefix.vote)
                 select: selectPokerVote,
                 where: ctx.anonSession
                     ? {
-                          pokerVoteId_anonUserId: {
-                              pokerVoteId: input.pokerVoteId,
-                              anonUserId: ctx.anonSession.id,
-                          },
-                      }
+                        pokerVoteId_anonUserId: {
+                            pokerVoteId: input.pokerVoteId,
+                            anonUserId: ctx.anonSession.id,
+                        },
+                    }
                     : {
-                          pokerVoteId_userId: {
-                              pokerVoteId: input.pokerVoteId,
-                              userId: ctx.session.user.id,
-                          },
-                      },
+                        pokerVoteId_userId: {
+                            pokerVoteId: input.pokerVoteId,
+                            userId: ctx.session.user.id,
+                        },
+                    },
                 update: {
                     choice: input.choice,
                 },
@@ -198,8 +196,7 @@ const castVote = rateLimitedAnonOrUserProcedure(RateLimitPrefix.vote)
 
         if (voteError) {
             console.log(
-                `Could not upsert vote ${input.pokerVoteId} due to error: ${
-                    voteError.message
+                `Could not upsert vote ${input.pokerVoteId} due to error: ${voteError.message
                 } ${voteError.stack ?? 'no stack'}`
             );
             throw new TRPCError({
