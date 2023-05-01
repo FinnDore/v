@@ -25,17 +25,19 @@ const CreatePoker = () => {
             description: '',
         },
     ]);
+
     const [privateVote, setPrivate] = useState(false);
     const anonUser = useAnonUser();
     const { status } = useUser();
     const router = useRouter();
-    const { mutate: createVote } = api.vote.createPokerSession.useMutation({
+    const createVoteMutation = api.vote.createPokerSession.useMutation({
         async onSuccess(returnVote) {
             await router.push('/start/[voteId]', `/start/${returnVote.id}`, {
                 shallow: true,
             });
         },
     });
+
     if (status === 'unauthenticated') {
         return (
             <div className="m-auto">
@@ -52,7 +54,7 @@ const CreatePoker = () => {
                 ref={formRef}
                 onSubmit={e => {
                     e.preventDefault();
-                    createVote({
+                    createVoteMutation.mutate({
                         title,
                         votes,
                         anonUser,
