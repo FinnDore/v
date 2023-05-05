@@ -8,6 +8,7 @@ import { animated } from '@react-spring/web';
 
 import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
+import { Separator } from '@/components/seperator';
 import {
     Tooltip,
     TooltipContent,
@@ -104,6 +105,7 @@ const VoteDescription = () => {
         toggleResults,
         isHost,
         followHost,
+        averages,
     } = useVoteControls();
 
     if (!activeVote) return null;
@@ -130,74 +132,105 @@ const VoteDescription = () => {
                     )}
                 </p>
             </div>
-            <div className="my-4 flex w-full justify-end gap-2">
-                {!isHost && !activeVote.active && (
+            <div className="my-4 flex w-full gap-2">
+                {showResults && averages && (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="my-auto me-auto flex h-9 w-[5ch] rounded-md border border-black px-2 text-sm dark:border-white">
+                                    <div className="m-auto">
+                                        {averages.mean}
+                                    </div>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent
+                                side="bottom"
+                                className="text-center"
+                            >
+                                <div>average</div>
+                                {averages.peter && (
+                                    <>
+                                        <Separator className="my-1" />
+                                        <div className="">
+                                            peter: {averages.peter}
+                                        </div>
+                                    </>
+                                )}
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
+                <div className="ms-auto flex gap-2">
+                    {!isHost && !activeVote.active && (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        size="sm"
+                                        className="fade-in ms-1 aspect-square"
+                                        variant="outline"
+                                        onClick={() => followHost()}
+                                    >
+                                        <EyeOpenIcon />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                    Spectate host
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
+                    <div className="my-auto ms-1 font-mono text-xs opacity-70">
+                        {(currentIndex ?? 0) + 1}/{voteCount}
+                    </div>
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
                                     size="sm"
-                                    className="fade-in ms-1 aspect-square"
+                                    className="ms-1 aspect-square"
                                     variant="outline"
-                                    onClick={() => followHost()}
+                                    disabled={isStart}
+                                    onClick={() => progressVote(true)}
                                 >
-                                    <EyeOpenIcon />
+                                    <DoubleArrowLeftIcon />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
-                                Spectate host
+                                Previous vote
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-                )}
-                <div className="my-auto ms-1 font-mono text-xs opacity-70">
-                    {(currentIndex ?? 0) + 1}/{voteCount}
-                </div>
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                size="sm"
-                                className="ms-1 aspect-square"
-                                variant="outline"
-                                disabled={isStart}
-                                onClick={() => progressVote(true)}
-                            >
-                                <DoubleArrowLeftIcon />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                            Previous vote
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
 
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="ms-0 aspect-square"
-                                disabled={isEnd}
-                                onClick={() => progressVote(false)}
-                            >
-                                <DoubleArrowRightIcon />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">Next vote</TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-                {isHost && (
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className="ms-2 w-28"
-                        onClick={() => toggleResults()}
-                    >
-                        {showResults ? 'Hide Results' : 'Show Results'}
-                    </Button>
-                )}
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="ms-0 aspect-square"
+                                    disabled={isEnd}
+                                    onClick={() => progressVote(false)}
+                                >
+                                    <DoubleArrowRightIcon />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                                Next vote
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    {isHost && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="ms-2 w-28"
+                            onClick={() => toggleResults()}
+                        >
+                            {showResults ? 'Hide Results' : 'Show Results'}
+                        </Button>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -374,6 +374,27 @@ export const useVoteControls = () => {
     const utils = api.useContext();
     const anonUser = useAnonUser();
 
+    const averages = useMemo(() => {
+        if (typeof currentIndex === 'undefined') return;
+        const votes = pokerState?.pokerVote[currentIndex]?.voteChoice;
+        if (!votes) return null;
+
+        const mean =
+            votes
+                ?.map(x => +x.choice)
+                .filter(Number)
+                .reduce((x, prev) => x + prev, 0) / votes.length || 0;
+
+        const peter =
+            votes.find(
+                x =>
+                    x.user?.name?.toLowerCase() === 'peter' ||
+                    x.anonUser?.name.toLowerCase() === 'peter'
+            )?.choice ?? null;
+
+        return { mean: mean.toFixed(1), peter };
+    }, [currentIndex, pokerState?.pokerVote]);
+
     const toggleResultsMutation = api.vote.pokerState.toggleResults.useMutation(
         {
             onMutate(data) {
@@ -500,5 +521,6 @@ export const useVoteControls = () => {
         isStart: !prevVote,
         isHost,
         followHost: () => setActiveVoteId(null),
+        averages,
     };
 };
