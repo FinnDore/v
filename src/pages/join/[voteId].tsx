@@ -58,7 +58,7 @@ const Home: NextPage = () => {
             )}
             {status === 'authenticated' && (
                 <Button
-                    // variant="outline"
+                    variant="outline"
                     className="hover:!bg-[#00000000]  dark:border-white"
                     onClick={() => void joinVoteAndRedirect()}
                 >
