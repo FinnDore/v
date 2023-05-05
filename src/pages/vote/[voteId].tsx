@@ -137,7 +137,7 @@ const VoteDescription = () => {
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <div className="my-auto me-auto flex h-9 w-[5ch] rounded-md border border-black px-2 text-sm dark:border-white">
+                                <div className="my-auto me-auto flex h-9 w-[6ch] rounded-md border border-black px-2 text-sm dark:border-white">
                                     <div className="m-auto">
                                         {averages.mean}
                                     </div>
