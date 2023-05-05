@@ -14,13 +14,13 @@ import {
     TooltipTrigger,
 } from '@/components/tool-tip';
 import { usePokerId } from '@/hooks/poker-hooks';
-import { useHopUpdates } from '@/hooks/use-hop-updates';
+import { useUserJoined } from '@/hooks/use-hop-updates';
 import { ChannelEvents } from '@/server/channel-events';
 import { type UsersInVote } from '@/server/hop';
 
 const Start = () => {
     const pokerId = usePokerId();
-    const { channelId } = useHopUpdates();
+    const { channelId } = useUserJoined();
     const utils = api.useContext();
     const router = useRouter();
 

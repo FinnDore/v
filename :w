@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import {
     CheckIcon,
     DoubleArrowLeftIcon,
@@ -8,7 +7,6 @@ import {
 import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { animated } from '@react-spring/web';
 
-import { pickHex } from '@/utils/pick-hex';
 import { Button } from '@/components/button';
 import { Pfp } from '@/components/pfp';
 import { Separator } from '@/components/seperator';
@@ -19,7 +17,6 @@ import {
 } from '@/components/tool-tip';
 import { VoteButton } from '@/components/vote/vote-button';
 import { useVoteControls, useVotes } from '@/hooks/poker-hooks';
-import { useUserJoined } from '@/hooks/use-hop-updates';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Vote = () => {
@@ -33,7 +30,6 @@ const Vote = () => {
         pokerState,
         isWhiteListed,
     } = useVotes();
-    useUserJoined();
     if (status === 'loading') return null;
     const createdByUser =
         pokerState?.createdByUser ?? pokerState?.createdByAnonUser;
@@ -114,17 +110,6 @@ const VoteDescription = () => {
         stats,
     } = useVoteControls();
 
-    const color = useMemo(() => {
-        if (typeof stats?.votePercent !== 'undefined') {
-            return pickHex(
-                [34, 197, 94],
-                [190, 18, 60],
-                stats.votePercent / 100
-            );
-        }
-    }, [stats?.votePercent]);
-
-    const voteComplete = stats?.votePercent >= 100;
     if (!activeVote) return null;
 
     return (
@@ -150,38 +135,47 @@ const VoteDescription = () => {
                 </p>
             </div>
             <div className="my-4 flex w-full gap-2">
-                {stats && isHost && (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <div
-                                    className="my-auto grid h-9 w-[6ch] place-items-center rounded-md border px-2 text-xs transition-colors"
-                                    style={{
-                                        borderColor: color,
-                                        color,
-                                    }}
-                                >
-                                    {voteComplete && (
-                                        <CheckIcon
-                                            className="m-auto animate-[fadeIn_250ms_ease-out] text-green-500"
-                                            height={20}
-                                            width={20}
-                                        />
-                                    )}
-                                    {!voteComplete && <>{stats.votePercent}%</>}
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                                {voteComplete && <>Voting complete</>}
-                                {!voteComplete && (
-                                    <>
-                                        {stats.votePercent}% of the votes are
-                                        cast
-                                    </>
-                                )}
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                {stats && (
+                    <>
+                        {stats.votePercent === 100 && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <div className="my-auto flex aspect-square w-9 rounded-md border border-green-500 text-xs">
+                                            <CheckIcon
+                                                className="m-auto text-green-500"
+                                                height={20}
+                                                width={20}
+                                            />
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent
+                                        side="bottom"
+                                        className="!border-green-500"
+                                    >
+                                        Voting complete
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                        {stats.votePercent !== 100 && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <div className="my-auto flex grid h-9 justify-items-center rounded-md border border-orange-500 px-2 text-xs">
+                                            {stats.votePercent}%
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent
+                                        side="bottom"
+                                        className="!border-orange-500"
+                                    >
+                                        {stats.votePercent}% of the votes cast
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                    </>
                 )}
                 {showResults && averages && (
                     <TooltipProvider>

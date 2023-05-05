@@ -188,12 +188,6 @@ export const pokerStateRouter = createTRPCRouter({
                                 anonUserId: true,
                                 userId: true,
                             },
-                            where: {
-                                userId: ctx.session?.user.id ?? null,
-                                anonUserId: ctx.session?.user.id
-                                    ? null
-                                    : input.anonUser?.id ?? null,
-                            },
                         },
                     },
                     where: {

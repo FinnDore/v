@@ -1,14 +1,16 @@
 import { useChannelMessage } from '@onehop/react';
 
 import { api } from '@/utils/api';
+import { useAnonUser } from '@/utils/local-user';
 import { ChannelEvents } from '@/server/channel-events';
 import { type UsersInVote } from '@/server/hop';
 import { usePokerId } from './poker-hooks';
 
-export const useHopUpdates = (): { channelId: string } => {
+export const useUserJoined = (): { channelId: string } => {
     const pokerId = usePokerId();
     const utils = api.useContext();
     const channelId = `poker_${pokerId ?? ''}`;
+    const anonUser = useAnonUser();
 
     useChannelMessage(
         channelId,
@@ -18,6 +20,10 @@ export const useHopUpdates = (): { channelId: string } => {
                 { voteId: pokerId ?? '' },
                 () => incomingUsers
             );
+            void utils.vote.pokerState.getPokerState.invalidate({
+                pokerId: pokerId ?? '',
+                anonUser,
+            });
         }
     );
 

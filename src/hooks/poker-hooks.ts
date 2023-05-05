@@ -395,6 +395,26 @@ export const useVoteControls = () => {
         return { mean: mean.toFixed(1), peter };
     }, [currentIndex, pokerState?.pokerVote]);
 
+    const stats = useMemo(() => {
+        if (!pokerState || !pokerState.userInVote.length) return null;
+
+        const userCount = pokerState.userInVote.length;
+        // TODO Could filter non joined votes
+        const submittedVotesCount = pokerState.pokerVote.reduce(
+            (prev, curr) => prev + curr.voteChoice.length,
+            0
+        );
+        const voteCount = pokerState.pokerVote.length;
+
+        return {
+            votePercent: (submittedVotesCount !== 0
+                ? (submittedVotesCount / (voteCount * userCount)) * 100
+                : 0
+            ).toFixed(),
+            userCount,
+        };
+    }, [pokerState]);
+
     const toggleResultsMutation = api.vote.pokerState.toggleResults.useMutation(
         {
             onMutate(data) {
@@ -522,5 +542,6 @@ export const useVoteControls = () => {
         isHost,
         followHost: () => setActiveVoteId(null),
         averages,
+        stats,
     };
 };
