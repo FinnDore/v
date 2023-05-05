@@ -407,9 +407,10 @@ export const useVoteControls = () => {
         const voteCount = pokerState.pokerVote.length;
 
         return {
-            votePercent: (submittedVotesCount !== 0
-                ? (submittedVotesCount / (voteCount * userCount)) * 100
-                : 0
+            votePercent: +(
+                submittedVotesCount !== 0
+                    ? (submittedVotesCount / (voteCount * userCount)) * 100
+                    : 0
             ).toFixed(),
             userCount,
         };

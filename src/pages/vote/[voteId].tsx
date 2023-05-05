@@ -124,7 +124,7 @@ const VoteDescription = () => {
         }
     }, [stats?.votePercent]);
 
-    const voteComplete = stats?.votePercent >= 100;
+    const voteComplete = stats?.votePercent ?? 0 >= 100;
     if (!activeVote) return null;
 
     return (
