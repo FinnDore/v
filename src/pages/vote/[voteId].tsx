@@ -155,7 +155,7 @@ const VoteDescription = () => {
                         <Tooltip>
                             <TooltipTrigger>
                                 <div
-                                    className="my-auto grid h-9 w-[6ch] place-items-center rounded-md border px-2 text-xs transition-colors"
+                                    className="my-auto grid h-9 w-[6ch] place-items-center rounded-md border px-2 text-sm transition-colors"
                                     style={{
                                         borderColor: color,
                                         color,
