@@ -39,7 +39,7 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
     )
     .mutation(async ({ input, ctx }) => {
         // Max of 50 sessions per user and 3 sessions per anon user
-        const maxPokerSessions = ctx.session ? 50 : 3;
+        const maxPokerSessions = ctx.session ? 50 : 5;
         const [voteCount, voteCountError] = await to(
             prisma.poker.count({
                 where: {
