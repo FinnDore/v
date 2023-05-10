@@ -77,6 +77,13 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
                             })),
                         },
                     },
+                    userInVote: {
+                        create: {
+                            userId: ctx?.session?.user?.id ?? null,
+                            anonUserId: ctx?.anonSession?.id ?? null,
+                            whiteListed: true,
+                        },
+                    },
                 },
             })
         );

@@ -102,7 +102,7 @@ export const lobbyRouter = createTRPCRouter({
 
                 return;
             }
-            return await dispatchVoteUpdate({
+            await dispatchVoteUpdate({
                 pokerId: input.voteId,
                 users: formatUsers(
                     usersInVote.map(x => ({
@@ -111,6 +111,7 @@ export const lobbyRouter = createTRPCRouter({
                     }))
                 ),
             });
+            return;
         }),
 
     listUsersInVote: publicProcedure

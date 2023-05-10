@@ -22,7 +22,6 @@ export const usePokerId = () => {
 export const usePokerState = () => {
     const pokerId = usePokerId();
     const anonUser = useAnonUser();
-    // const [isWhiteListed, setIsWhiteListed] = useState<boolean>(true);
     const [currentVoteId, setActiveVoteId] = useAtom(currentVoteIdAtom);
 
     const {
@@ -79,6 +78,7 @@ export const usePokerState = () => {
         setActiveVoteId,
         isHost,
         isWhiteListed,
+        currentVoteId,
         ...nextVote,
     };
 };
@@ -154,6 +154,7 @@ export const useVotes = () => {
         (e: { data: string }) => {
             const updatedVoteChoice: Vote = parse(e.data);
             if (!pokerId) return;
+
             const existingVote = utils.vote.pokerState.getPokerState
                 .getData({
                     pokerId,
@@ -369,6 +370,7 @@ export const useVoteControls = () => {
         setActiveVoteId,
         status,
         isHost,
+        currentVoteId,
     } = usePokerState();
     const pokerId = usePokerId();
     const utils = api.useContext();
@@ -419,6 +421,15 @@ export const useVoteControls = () => {
     const toggleResultsMutation = api.vote.pokerState.toggleResults.useMutation(
         {
             onMutate(data) {
+                void utils.vote.pokerState.getPokerState.cancel(
+                    {
+                        pokerId: data.pokerId,
+                        anonUser: data.anonUser,
+                    },
+                    {
+                        silent: true,
+                    }
+                );
                 utils.vote.pokerState.getPokerState.setData(
                     {
                         pokerId: data.pokerId,
@@ -488,19 +499,10 @@ export const useVoteControls = () => {
     const progressVote = useCallback(
         (prev = false) => {
             if (!isHost) {
-                const currentlyShownVoteId = pokerState?.pokerVote.find(
-                    x => x.active
-                )?.id;
                 if (!prev && nextVote) {
                     setActiveVoteId(nextVote.id);
-                    if (nextVote.id === currentlyShownVoteId) {
-                        setActiveVoteId(null);
-                    }
                 } else if (prev && prevVote) {
                     setActiveVoteId(prevVote.id);
-                    if (prevVote.id === currentlyShownVoteId) {
-                        setActiveVoteId(null);
-                    }
                 }
             } else {
                 if (prev && prevVote && pokerId) {
@@ -523,7 +525,6 @@ export const useVoteControls = () => {
             isHost,
             nextVote,
             pokerId,
-            pokerState?.pokerVote,
             prevVote,
             progressVoteMutation,
             setActiveVoteId,
@@ -544,5 +545,6 @@ export const useVoteControls = () => {
         followHost: () => setActiveVoteId(null),
         averages,
         stats,
+        isFollowing: currentVoteId === null,
     };
 };

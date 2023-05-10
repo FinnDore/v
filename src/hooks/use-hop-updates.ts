@@ -15,10 +15,10 @@ export const useUserJoined = (): { channelId: string } => {
     useChannelMessage(
         channelId,
         ChannelEvents.USER_JOINED,
-        ({ users: incomingUsers }: { users: UsersInVote }) => {
+        (event: { users: UsersInVote }) => {
             utils.vote.lobby.listUsersInVote.setData(
                 { voteId: pokerId ?? '' },
-                () => incomingUsers
+                () => event.users
             );
             void utils.vote.pokerState.getPokerState.invalidate({
                 pokerId: pokerId ?? '',

@@ -45,7 +45,7 @@ export const Nav = () => {
                 >
                     <span className="my-auto flex">
                         <EnterIcon className="my-auto mr-2" />
-                        Login
+                        <span className="my-auto leading-none">Login</span>
                     </span>
                 </button>
             )}

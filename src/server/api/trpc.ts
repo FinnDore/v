@@ -187,11 +187,6 @@ export const pokerOwnerProcedure = anonOrUserProcedure
             })
         );
 
-        console.log({
-            id: input.pokerId,
-            createdByAnonUserId: ctx.anonSession?.id ?? null,
-            createdByUserId: ctx.session?.user?.id ?? null,
-        });
         if (getPokerSessionError) {
             console.error(
                 `pokerOwnerProcedure: Could not find poker session to verify ownership: ${

@@ -39,7 +39,6 @@ const Vote = () => {
         pokerState?.createdByUser ?? pokerState?.createdByAnonUser;
 
     return (
-        <div className="mx-auto flex h-full w-max max-w-full flex-col px-6 pb-6 sm:px-12 lg:max-w-screen-lg">
             {!isWhiteListed && (
                 <div className="flex h-full">
                     <span className="m-auto opacity-70">
@@ -112,6 +111,7 @@ const VoteDescription = () => {
         followHost,
         averages,
         stats,
+        isFollowing,
     } = useVoteControls();
 
     const color = useMemo(() => {
@@ -124,7 +124,7 @@ const VoteDescription = () => {
         }
     }, [stats?.votePercent]);
 
-    const voteComplete = stats?.votePercent ?? 0 >= 100;
+    const voteComplete = (stats?.votePercent ?? 0) >= 100;
     if (!activeVote) return null;
 
     return (
@@ -211,7 +211,7 @@ const VoteDescription = () => {
                     </TooltipProvider>
                 )}
                 <div className="ms-auto flex gap-2">
-                    {!isHost && !activeVote.active && (
+                    {!isHost && !isFollowing && (
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
