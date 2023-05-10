@@ -39,6 +39,7 @@ const Vote = () => {
         pokerState?.createdByUser ?? pokerState?.createdByAnonUser;
 
     return (
+        <div className="mx-auto flex h-full w-max max-w-full flex-col px-6 pb-6 sm:px-12 lg:max-w-screen-lg">
             {!isWhiteListed && (
                 <div className="flex h-full">
                     <span className="m-auto opacity-70">
