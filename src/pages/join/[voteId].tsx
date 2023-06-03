@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
@@ -16,6 +16,7 @@ const Home: NextPage = () => {
     const voteId = usePokerId();
     const anonUser = useAnonUser();
     const { user, status } = useUser();
+    const attemptedToJoin = useRef(false);
 
     const { mutateAsync: joinVote, status: joinVoteStatus } =
         api.vote.lobby.joinVote.useMutation();
@@ -23,8 +24,26 @@ const Home: NextPage = () => {
     const joinVoteAndRedirect = useCallback(async () => {
         if (!voteId || joinVoteStatus === 'loading') return;
         await joinVote({ voteId, anonUser: anonUser });
-        void router.push(`/vote/${voteId}`);
+        void router.push(`/vote/${encodeURIComponent(voteId)}`);
     }, [anonUser, joinVote, joinVoteStatus, router, voteId]);
+
+    // CBA to get sessions working in middleware, so we'll just do it here
+    useEffect(() => {
+        async function tryJoin() {
+            if (
+                !voteId ||
+                status === 'loading' ||
+                (!user && !anonUser) ||
+                attemptedToJoin.current
+            ) {
+                return;
+            }
+            attemptedToJoin.current = true;
+            await joinVote({ voteId, anonUser: anonUser });
+            void router.push(`/vote/${encodeURIComponent(voteId)}`);
+        }
+        void tryJoin();
+    }, [anonUser, joinVote, router, status, user, voteId]);
 
     if (!voteId) return null;
 
