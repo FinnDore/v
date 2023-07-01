@@ -25,7 +25,7 @@ const Home: NextPage = () => {
                 <h1 className="text-2xl font-bold md:mt-16 md:text-6xl">
                     <Balancer>The better way to point things</Balancer>
                 </h1>
-                <h2 className="mt-6  text-gray-400">
+                <h2 className="mt-6 text-center text-gray-400">
                     <Balancer>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Pellentesque vitae quam ac eros malesuada molestie ac
@@ -37,15 +37,21 @@ const Home: NextPage = () => {
 
                 <div className="mt-12 flex w-full justify-around px-4 text-center text-xl">
                     <h3>
-                        <div>{statsQuery.data?.pokerVotes}</div>
+                        <div className="font-bold">
+                            {statsQuery.data?.pokerVotes}
+                        </div>
                         <div className="text-sm">Votes cast</div>
                     </h3>
                     <h3>
-                        <div>{statsQuery.data?.pokerSessions}</div>{' '}
-                        <div className="text-sm">Sessions</div>
+                        <div className="font-bold">
+                            {statsQuery.data?.pokerSessions}
+                        </div>
+                        <div className="text-sm">Sessions created</div>
                     </h3>
                     <h3>
-                        <div>{statsQuery.data?.users}</div>
+                        <div className="font-bold">
+                            {statsQuery.data?.users}
+                        </div>
                         <div className="text-sm">Cumulative points</div>
                     </h3>
                 </div>
