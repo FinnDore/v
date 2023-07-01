@@ -1,30 +1,21 @@
 import { type NextPage } from 'next';
 import Balancer, { Provider } from 'react-wrap-balancer';
 
-import { api } from '@/utils/api';
-import { useAnonUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { VoteButton } from '@/components/vote/vote-button';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Home: NextPage = () => {
-    const anonUser = useAnonUser();
-
-    const pokerStateQuery = api.vote.pokerState.getPokerState.useQuery(
-        { pokerId: 'cljka47sc0005mv3n80a2rd89', anonUser },
-        {
-            retry: false,
-        }
-    );
     return (
         <Provider>
-            <div className="absolute -z-10 h-screen w-screen object-cover">
-                <picture className="h-screen w-screen object-cover">
+            <div className=" absolute -z-10 h-screen w-screen object-cover">
+                <picture>
                     <img
                         src="/temp-rays.png"
-                        className=" h-screen w-screen object-cover"
+                        className=" h-full w-full object-cover"
                     />
                 </picture>
+                <div className="noise absolute h-full w-full"></div>
             </div>
             <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center  px-12 pb-6 lg:max-w-screen-lg">
                 <h1 className="text-2xl font-bold md:mt-16 md:text-6xl">
@@ -62,7 +53,7 @@ const Home: NextPage = () => {
                             vote={vote}
                             showVotes={true}
                             users={[]}
-                            currentVotes={i}
+                            currentVotes={Math.max(1, Math.random() * 10)}
                             totalVotes={voteOptions.length - 1}
                             doVote={() => ({})}
                             current={i === 2}
@@ -74,7 +65,9 @@ const Home: NextPage = () => {
                     className="mx-auto mt-12 flex rounded-md  px-3 py-2 text-2xl"
                 >
                     <span className="my-auto flex">
-                        <span className="my-auto leading-none">Start Vote</span>
+                        <span className="my-auto leading-none">
+                            create Vote
+                        </span>
                     </span>
                 </Button>
             </div>

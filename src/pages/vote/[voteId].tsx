@@ -68,6 +68,7 @@ const Vote = () => {
                     </div>
                     <div className="m-auto">
                         <animated.div className="mx-auto mt-auto flex flex-wrap justify-center gap-2 md:gap-4">
+                            <div className="absolute top-1/2 h-10 w-full translate-y-1/2 bg-white blur-md dark:bg-black"></div>
                             {voteOptions.map(vote => (
                                 <VoteButton
                                     key={vote}
