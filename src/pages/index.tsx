@@ -1,7 +1,21 @@
 import { type NextPage } from 'next';
 import Balancer, { Provider } from 'react-wrap-balancer';
 
+import { api } from '@/utils/api';
+import { useAnonUser } from '@/utils/local-user';
+import { Button } from '@/components/button';
+import { VoteButton } from '@/components/vote/vote-button';
+
+const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Home: NextPage = () => {
+    const anonUser = useAnonUser();
+
+    const pokerStateQuery = api.vote.pokerState.getPokerState.useQuery(
+        { pokerId: 'cljka47sc0005mv3n80a2rd89', anonUser },
+        {
+            retry: false,
+        }
+    );
     return (
         <Provider>
             <div className="absolute -z-10 h-screen w-screen object-cover">
@@ -25,6 +39,44 @@ const Home: NextPage = () => {
                         aliquet tempor
                     </Balancer>
                 </h2>
+
+                <div className="mt-12 flex w-full justify-around px-4 text-center text-xl">
+                    <h3>
+                        <div>100k</div>
+                        <div className="text-sm">Votes cast</div>
+                    </h3>
+                    <h3>
+                        <div>2.5k</div> <div className="text-sm">Sessions</div>
+                    </h3>
+                    <h3>
+                        <div>10.5k</div>{' '}
+                        <div className="text-sm">Culmative points</div>
+                    </h3>
+                </div>
+
+                <div className="relative mx-auto mt-12 flex flex-wrap justify-center gap-2 md:gap-4">
+                    <div className="absolute top-1/2 h-10 w-full bg-white  blur-xl dark:bg-black"></div>
+                    {voteOptions.map((vote, i) => (
+                        <VoteButton
+                            key={vote}
+                            vote={vote}
+                            showVotes={true}
+                            users={[]}
+                            currentVotes={i}
+                            totalVotes={voteOptions.length - 1}
+                            doVote={() => ({})}
+                            current={i === 2}
+                        />
+                    ))}
+                </div>
+                <Button
+                    variant="ghost"
+                    className="mx-auto mt-12 flex rounded-md  px-3 py-2 text-2xl"
+                >
+                    <span className="my-auto flex">
+                        <span className="my-auto leading-none">Start Vote</span>
+                    </span>
+                </Button>
             </div>
         </Provider>
     );
