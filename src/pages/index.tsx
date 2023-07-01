@@ -1,16 +1,20 @@
 import { type NextPage } from 'next';
 import Balancer, { Provider } from 'react-wrap-balancer';
 
+import { api } from '@/utils/api';
 import { Button } from '@/components/button';
 import { VoteButton } from '@/components/vote/vote-button';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Home: NextPage = () => {
+    const statsQuery = api.stats.stats.useQuery();
+
     return (
         <Provider>
             <div className=" absolute -z-10 h-screen w-screen object-cover">
                 <picture>
                     <img
+                        alt="bg image of light rays"
                         src="/temp-rays.png"
                         className=" h-full w-full object-cover"
                     />
@@ -21,7 +25,7 @@ const Home: NextPage = () => {
                 <h1 className="text-2xl font-bold md:mt-16 md:text-6xl">
                     <Balancer>The better way to point things</Balancer>
                 </h1>
-                <h2 className="mt-6 text-center text-gray-400">
+                <h2 className="mt-6  text-gray-400">
                     <Balancer>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Pellentesque vitae quam ac eros malesuada molestie ac
@@ -33,20 +37,21 @@ const Home: NextPage = () => {
 
                 <div className="mt-12 flex w-full justify-around px-4 text-center text-xl">
                     <h3>
-                        <div>100k</div>
+                        <div>{statsQuery.data?.pokerVotes}</div>
                         <div className="text-sm">Votes cast</div>
                     </h3>
                     <h3>
-                        <div>2.5k</div> <div className="text-sm">Sessions</div>
+                        <div>{statsQuery.data?.pokerSessions}</div>{' '}
+                        <div className="text-sm">Sessions</div>
                     </h3>
                     <h3>
-                        <div>10.5k</div>
+                        <div>{statsQuery.data?.users}</div>
                         <div className="text-sm">Cumulative points</div>
                     </h3>
                 </div>
 
                 <div className="relative mx-auto mt-12 flex flex-wrap justify-center gap-2 md:gap-4">
-                    <div className="absolute top-1/2 h-10 w-full translate-y-1/2 bg-white blur-md dark:bg-black"></div>
+                    <div className="absolute top-1/2 h-14 w-full bg-white blur-lg dark:bg-black/90"></div>
                     {voteOptions.map((vote, i) => (
                         <VoteButton
                             key={vote}
