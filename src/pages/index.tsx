@@ -49,13 +49,13 @@ const Home: NextPage = () => {
                         <div>2.5k</div> <div className="text-sm">Sessions</div>
                     </h3>
                     <h3>
-                        <div>10.5k</div>{' '}
-                        <div className="text-sm">Culmative points</div>
+                        <div>10.5k</div>
+                        <div className="text-sm">Cumulative points</div>
                     </h3>
                 </div>
 
                 <div className="relative mx-auto mt-12 flex flex-wrap justify-center gap-2 md:gap-4">
-                    <div className="absolute top-1/2 h-10 w-full bg-white  blur-xl dark:bg-black"></div>
+                    <div className="absolute top-1/2 h-10 w-full translate-y-1/2 bg-white blur-md dark:bg-black"></div>
                     {voteOptions.map((vote, i) => (
                         <VoteButton
                             key={vote}
