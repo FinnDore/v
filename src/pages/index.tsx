@@ -27,7 +27,6 @@ const Home: NextPage = () => {
                         className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%]"
                     />
                 </picture>
-                <div className="noise absolute h-full w-full"></div>
             </div>
             <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center px-12 pb-6 lg:max-w-screen-lg">
                 <h1 className="w-full text-center text-4xl font-bold md:mt-16 md:text-6xl">
@@ -43,7 +42,7 @@ const Home: NextPage = () => {
                     </Balancer>
                 </h2>
 
-                <div className="relative mt-4 flex w-full justify-around rounded-md border border-white/20 px-4 py-4 text-center text-xl  md:mt-12">
+                <div className="mt-4 flex w-full justify-around px-4 text-center text-xl md:mt-12">
                     <h3>
                         <div className="text-2xl font-bold">
                             {statsQuery.data?.pokerVotes}
@@ -62,8 +61,6 @@ const Home: NextPage = () => {
                         </div>
                         <div className="text-sm">Cumulative points</div>
                     </h3>
-
-                    <div className="absolute top-0 -z-10 h-full w-full bg-black/50 blur-sm" />
                 </div>
 
                 <div className="relative mx-auto mt-12 flex flex-wrap justify-center gap-2 md:gap-4">

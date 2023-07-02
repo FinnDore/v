@@ -39,6 +39,13 @@
         0px 50.6px 33.4px rgba(0, 0, 0, 0.077),
         0px 121px 80px rgba(0, 0, 0, 0.07);
 }
+
+@media (prefers-color-scheme: light) {
+    .noise {
+        filter: invert(1);
+    }
+}
+
 .noise {
     background-repeat: repeat;
     pointer-events: none;
