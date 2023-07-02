@@ -1,4 +1,5 @@
 import { type NextPage } from 'next';
+import Link from 'next/link';
 import Balancer, { Provider } from 'react-wrap-balancer';
 
 import { api } from '@/utils/api';
@@ -11,21 +12,28 @@ const Home: NextPage = () => {
 
     return (
         <Provider>
-            <div className=" absolute -z-10 h-screen w-screen object-cover">
-                <picture>
+            <div className="absolute -z-10 h-screen w-screen">
+                <picture className="hidden dark:block">
                     <img
                         alt="bg image of light rays"
-                        src="/temp-rays.png"
-                        className=" h-full w-full object-cover"
+                        src="/temp-rays-dark.png"
+                        className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%]"
+                    />
+                </picture>
+                <picture className="dark:hidden">
+                    <img
+                        alt="bg image of light rays"
+                        src="/temp-rays-light.png"
+                        className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%]"
                     />
                 </picture>
                 <div className="noise absolute h-full w-full"></div>
             </div>
-            <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center  px-12 pb-6 lg:max-w-screen-lg">
-                <h1 className="text-2xl font-bold md:mt-16 md:text-6xl">
+            <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center px-12 pb-6 lg:max-w-screen-lg">
+                <h1 className="w-full text-center text-4xl font-bold md:mt-16 md:text-6xl">
                     <Balancer>The better way to point things</Balancer>
                 </h1>
-                <h2 className="mt-6 text-center text-gray-400">
+                <h2 className="mt-4 w-full text-center text-gray-700 dark:text-gray-300 md:mt-6">
                     <Balancer>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Pellentesque vitae quam ac eros malesuada molestie ac
@@ -35,29 +43,31 @@ const Home: NextPage = () => {
                     </Balancer>
                 </h2>
 
-                <div className="mt-12 flex w-full justify-around px-4 text-center text-xl">
+                <div className="relative mt-4 flex w-full justify-around rounded-md border border-white/20 px-4 py-4 text-center text-xl  md:mt-12">
                     <h3>
-                        <div className="font-bold">
+                        <div className="text-2xl font-bold">
                             {statsQuery.data?.pokerVotes}
                         </div>
                         <div className="text-sm">Votes cast</div>
                     </h3>
                     <h3>
-                        <div className="font-bold">
+                        <div className="text-2xl font-bold ">
                             {statsQuery.data?.pokerSessions}
                         </div>
                         <div className="text-sm">Sessions created</div>
                     </h3>
                     <h3>
-                        <div className="font-bold">
+                        <div className="text-2xl font-bold">
                             {statsQuery.data?.users}
                         </div>
                         <div className="text-sm">Cumulative points</div>
                     </h3>
+
+                    <div className="absolute top-0 -z-10 h-full w-full bg-black/50 blur-sm" />
                 </div>
 
                 <div className="relative mx-auto mt-12 flex flex-wrap justify-center gap-2 md:gap-4">
-                    <div className="absolute top-1/2 h-14 w-full bg-white blur-lg dark:bg-black/90"></div>
+                    <div className="absolute top-1/2 h-[39.6px] w-full bg-white blur-lg dark:bg-black"></div>
                     {voteOptions.map((vote, i) => (
                         <VoteButton
                             key={vote}
@@ -67,20 +77,23 @@ const Home: NextPage = () => {
                             currentVotes={Math.max(1, Math.random() * 10)}
                             totalVotes={voteOptions.length - 1}
                             doVote={() => ({})}
-                            current={i === 2}
+                            current={true}
                         />
                     ))}
                 </div>
-                <Button
-                    variant="ghost"
-                    className="mx-auto mt-12 flex rounded-md  px-3 py-2 text-2xl"
-                >
-                    <span className="my-auto flex">
-                        <span className="my-auto leading-none">
-                            create Vote
+
+                <Link href="/create" className="mx-auto mt-12">
+                    <Button
+                        variant="outline"
+                        className="flex rounded-md  px-3 py-2 text-2xl dark:hover:border-white/50 dark:hover:bg-white/10 dark:hover:text-white"
+                    >
+                        <span className="my-auto flex">
+                            <span className="my-auto leading-none">
+                                create Vote
+                            </span>
                         </span>
-                    </span>
-                </Button>
+                    </Button>
+                </Link>
             </div>
         </Provider>
     );
