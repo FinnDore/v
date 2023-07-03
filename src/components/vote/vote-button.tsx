@@ -100,11 +100,7 @@ export const VoteButton = ({
                                                         ? 'border-black dark:border-white'
                                                         : 'border-transparent'
                                                 }
-                                                name={
-                                                    !user.name
-                                                        ? 'Anonymous'
-                                                        : user.name
-                                                }
+                                                name={user.name}
                                                 className="absolute top-0 h-4"
                                             />
                                         </TooltipTrigger>

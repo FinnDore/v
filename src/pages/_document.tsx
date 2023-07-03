@@ -4,12 +4,7 @@ import { env } from '@/env.mjs';
 
 export default function Document() {
     return (
-        <Html
-            style={{
-                background: '#000',
-                color: 'white',
-            }}
-        >
+        <Html>
             <title>Vote</title>
             <Head>
                 <link rel="icon" href="/favicon.ico" />

@@ -40,6 +40,26 @@
         0px 121px 80px rgba(0, 0, 0, 0.07);
 }
 
+@media (prefers-color-scheme: light) {
+    .noise {
+        filter: invert(1);
+    }
+}
+
+.noise {
+    background-repeat: repeat;
+    pointer-events: none;
+    background-image: url(/NOISE.webp);
+    background-position: 0px 0px;
+    background-size: 250px;
+    opacity: 0.15;
+    left: 0%;
+    top: 0%;
+    z-index: -20;
+    width: 100%;
+    height: 100%;
+}
+
 @keyframes clipPathKeyframes {
     0% {
         -webkit-clip-path: polygon(

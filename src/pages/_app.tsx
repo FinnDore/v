@@ -27,6 +27,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <SessionProvider session={session}>
             <Nav />
             <Component {...pageProps} />
+
+            <div className="noise absolute -z-10 h-full w-full"></div>
             <footer className="mt-auto w-full pb-4 text-center">
                 Made with ❤️ by{' '}
                 <a

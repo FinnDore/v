@@ -67,7 +67,7 @@ const Vote = () => {
                         </h2>
                     </div>
                     <div className="m-auto">
-                        <animated.div className="mx-auto mt-auto flex flex-wrap justify-center gap-2 md:gap-4">
+                        <animated.div className="relative mx-auto mt-auto flex flex-wrap justify-center gap-2 md:gap-4">
                             {voteOptions.map(vote => (
                                 <VoteButton
                                     key={vote}
