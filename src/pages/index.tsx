@@ -12,12 +12,12 @@ const Home: NextPage = () => {
 
     return (
         <Provider>
-            <div className="absolute -z-10 h-screen w-screen">
+            <div className="absolute  top-0 -z-10 h-screen w-screen max-w-[100vw] overflow-hidden">
                 <picture className="hidden dark:block">
                     <img
                         alt="bg image of light rays"
                         src="/temp-rays-dark.png"
-                        className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%]"
+                        className="absolute left-1/2 aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%]"
                     />
                 </picture>
                 <picture className="dark:hidden">
@@ -64,7 +64,6 @@ const Home: NextPage = () => {
                 </div>
 
                 <div className="relative mx-auto mt-12 flex flex-wrap justify-center gap-2 md:gap-4">
-                    <div className="absolute top-1/2 h-[39.6px] w-full bg-white blur-lg dark:bg-black"></div>
                     {voteOptions.map((vote, i) => (
                         <VoteButton
                             key={vote}
