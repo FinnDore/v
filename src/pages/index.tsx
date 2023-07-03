@@ -96,24 +96,24 @@ const Home: NextPage = () => {
                 <div className="lg:gridw mx-4 mt-12 flex w-full max-w-lg grid-cols-1 flex-wrap items-center justify-center gap-5 md:mx-auto md:grid  md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[800px] lg:grid-cols-3">
                     <div className="relative h-48 w-full rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
                         <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-5 blur-lg transition-opacity hover:opacity-10"></div>
+                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
                     </div>
                     <div className="relative h-48 w-full rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white lg:col-span-2">
                         <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-5 blur-lg transition-opacity hover:opacity-10"></div>
+                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
                     </div>
                     <div className="relative h-48 w-full rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
                         <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
 
-                        <div className="absolute h-full w-full bg-orange-600 opacity-5 blur-lg transition-opacity hover:opacity-10"></div>
+                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
                     </div>
                     <div className="relative h-48 w-full rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
                         <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-5 blur-lg transition-opacity hover:opacity-10"></div>
+                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
                     </div>
                     <div className="relative h-48 w-full rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
                         <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-5 blur-lg transition-opacity hover:opacity-10"></div>
+                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
                     </div>
                 </div>
             </div>
