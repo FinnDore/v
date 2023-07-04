@@ -16,7 +16,7 @@ const Home: NextPage = () => {
 
     return (
         <>
-            <div className="relative left-0 top-0 -z-20 h-screen w-screen max-w-[100vw]">
+            <div className="relative left-0 top-0 -z-20 h-screen w-screen max-w-[100vw] overflow-x-clip">
                 <Image
                     width={982}
                     height={1005}
