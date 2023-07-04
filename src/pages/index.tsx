@@ -7,6 +7,8 @@ import Balancer, { Provider } from 'react-wrap-balancer';
 import { api } from '@/utils/api';
 import { Button } from '@/components/button';
 import { VoteButton } from '@/components/vote/vote-button';
+import darkLightRays from '../../public/temp-rays-dark.png';
+import lightLightRays from '../../public/temp-rays-light.png';
 
 const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Home: NextPage = () => {
@@ -14,23 +16,25 @@ const Home: NextPage = () => {
 
     return (
         <>
-            <div className="absolute  top-0 -z-20 h-screen w-screen max-w-[100vw] overflow-hidden">
+            <div className="relative left-0 top-0 -z-20 h-screen w-screen max-w-[100vw]">
                 <Image
                     width={982}
                     height={1005}
                     alt="bg image of light rays"
-                    src="/temp-rays-dark.png"
+                    src={darkLightRays}
                     className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
+                    placeholder="blur"
                 />
                 <Image
                     width={982}
                     height={1005}
                     alt="bg image of light rays"
-                    src="/temp-rays-light.png"
+                    src={lightLightRays}
                     className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%] dark:hidden"
+                    placeholder="blur"
                 />
             </div>
-            <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center px-4 pb-6  lg:max-w-screen-lg">
+            <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center px-4 pb-6 lg:max-w-screen-lg">
                 <Provider>
                     <h1 className="w-full text-center text-4xl font-bold md:mt-16 md:text-6xl">
                         <Balancer>The better way to point things</Balancer>
@@ -94,10 +98,10 @@ const Home: NextPage = () => {
                         </span>
                     </Button>
                 </Link>
-                <div className="lg:gridw mx-4 mt-12 flex w-full max-w-lg grid-cols-1 flex-wrap items-center justify-center gap-5 md:mx-auto md:grid  md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[800px] lg:grid-cols-3">
-                    <div className="relative flex h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
+                <div className="mt-12 flex w-full max-w-lg grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid  md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[800px] lg:grid-cols-3">
+                    <div className="group relative flex h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
+                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                         <Button
                             variant="outline"
                             onClick={() => void signOut()}
@@ -110,9 +114,9 @@ const Home: NextPage = () => {
                             </span>
                         </Button>
                     </div>
-                    <div className="relative flex h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white lg:col-span-2">
+                    <div className="group relative flex h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white md:row-span-2 md:h-full lg:col-span-2 lg:h-48 lg:[grid-row:_unset]">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
+                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                         <Button
                             variant="outline"
                             onClick={() => void signIn('github')}
@@ -125,18 +129,17 @@ const Home: NextPage = () => {
                             </span>
                         </Button>
                     </div>
-                    <div className="relative h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
+                    <div className="group relative h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
                         <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-
-                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
+                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
-                    <div className="relative h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
+                    <div className="group relative h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
                         <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
+                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
-                    <div className="relative h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
+                    <div className="group relative h-48 w-full overflow-hidden rounded border border-black/70 transition-colors hover:border-black dark:border-white/70 dark:hover:border-white">
                         <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity hover:opacity-20"></div>
+                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
                 </div>
             </div>
