@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { type NextPage } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -6,41 +7,120 @@ import Balancer, { Provider } from 'react-wrap-balancer';
 
 import { api } from '@/utils/api';
 import { formatCompactNumber } from '@/utils/format-numbers';
+import { useAnonUser, useUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { VoteButton } from '@/components/vote/vote-button';
+import { voteOptions } from '@/constants';
 import darkLightRays from '../../public/temp-rays-dark.png';
 import lightLightRays from '../../public/temp-rays-light.png';
 
-const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
+const randomVoteCounts = voteOptions.map(() => Math.max(1, Math.random() * 10));
+
 const Home: NextPage = () => {
-    const statsQuery = api.stats.stats.useQuery();
+    const anonUser = useAnonUser();
+    const statsQuery = api.landing.landingStats.useQuery();
+    const votesQuery = api.landing.landingVotes.useQuery();
+    const voteMutation = api.landing.vote.useMutation({
+        onSuccess: () => {
+            void statsQuery.refetch();
+            void votesQuery.refetch();
+        },
+    });
+    const session = useUser();
+
+    const { votesMap, currentVote, highestVote } = useMemo(() => {
+        const currentVote = votesQuery.data?.find(
+            v => (v.user?.id ?? v.anonUser?.id) === session?.user?.id
+        );
+
+        if (!votesQuery.data) {
+            return {
+                currentVote,
+                votesMap: {} as Record<
+                    string,
+                    {
+                        count: number;
+                        users: {
+                            name: string;
+                            id: string;
+                        }[];
+                    }
+                >,
+                highestVote: ['-1', 0] as const,
+            };
+        }
+
+        // Compute vote count, and users per vote choice
+        const votesMap = votesQuery.data.reduce(
+            (acc, v) => ({
+                ...acc,
+                [v.choice]: {
+                    count: (acc[v.choice]?.count ?? 0) + 1,
+                    users: [
+                        ...(acc[v.choice]?.users ?? []),
+                        v.user ?? v.anonUser,
+                    ].filter(
+                        (
+                            x
+                        ): x is {
+                            id: string;
+                            name: string;
+                            image?: string;
+                            pfpHash?: string;
+                        } => !!x
+                    ),
+                },
+            }),
+            {} as Record<
+                string,
+                {
+                    count: number;
+                    users: {
+                        name: string;
+                        id: string;
+                        image?: string;
+                        pfpHash?: string;
+                    }[];
+                }
+            >
+        );
+
+        // get the highest vote
+        const highestVote = Object.entries(votesMap).reduce(
+            (a, e): [string, number] =>
+                e[1].count > a[1] ? [e[0], e[1].count] : a,
+            ['-1', 0] as [string, number]
+        );
+
+        return { currentVote, votesMap, highestVote };
+    }, [session?.user?.id, votesQuery.data]);
 
     return (
         <>
-            <div className="relative left-0 top-0 -z-20 h-screen w-screen max-w-[100vw] animate-fade-in overflow-x-clip opacity-0">
-                <Image
-                    width={982}
-                    height={1005}
-                    alt="bg image of light rays"
-                    src={darkLightRays}
-                    className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
-                    placeholder="blur"
-                />
-                <Image
-                    width={982}
-                    height={1005}
-                    alt="bg image of light rays"
-                    src={lightLightRays}
-                    className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%] dark:hidden"
-                    placeholder="blur"
-                />
-            </div>
             <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center px-4 pb-6 lg:max-w-screen-lg">
+                <div className="absolute left-0 top-0 -z-20 h-screen w-screen max-w-[100vw] animate-fade-in overflow-x-clip opacity-0">
+                    <Image
+                        width={982}
+                        height={1005}
+                        alt="bg image of light rays"
+                        src={darkLightRays}
+                        className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
+                        placeholder="blur"
+                    />
+                    <Image
+                        width={982}
+                        height={1005}
+                        alt="bg image of light rays"
+                        src={lightLightRays}
+                        className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%] dark:hidden"
+                        placeholder="blur"
+                    />
+                </div>
                 <Provider>
-                    <h1 className="w-full animate-fade-in text-center text-4xl font-bold opacity-0 [animation-delay:_200ms] md:mt-16 md:text-6xl ">
+                    <h1 className="w-full animate-fade-in text-center text-4xl font-bold opacity-0 [animation-delay:_200ms] md:mt-8 md:text-6xl ">
                         <Balancer>The better way to point things</Balancer>
                     </h1>
-                    <h2 className="mt-4 w-full animate-fade-in text-center text-gray-700 opacity-0 [animation-delay:_300ms] dark:text-gray-300 md:mt-6">
+                    <h2 className="mt-4 w-full animate-fade-in text-center text-sm text-gray-700 opacity-0 [animation-delay:_300ms] dark:text-gray-300 md:mt-6 md:text-base">
                         <Balancer>
                             Lorem ipsum dolor sit amet, consectetur adipiscing
                             elit. Pellentesque vitae quam ac eros malesuada
@@ -72,11 +152,20 @@ const Home: NextPage = () => {
                             key={vote}
                             vote={vote}
                             showVotes={true}
-                            users={[]}
-                            currentVotes={Math.max(1, Math.random() * 10)}
-                            totalVotes={voteOptions.length - 1}
-                            doVote={() => ({})}
-                            current={true}
+                            users={votesMap[vote.toString()]?.users ?? []}
+                            currentVotes={
+                                (typeof votesQuery.data !== 'undefined'
+                                    ? votesMap[vote.toString()]?.count
+                                    : randomVoteCounts[i]) ?? 0
+                            }
+                            totalVotes={highestVote[1] ?? 1}
+                            doVote={() => {
+                                voteMutation.mutate({
+                                    choice: vote,
+                                    anonUser,
+                                });
+                            }}
+                            current={currentVote?.choice === vote.toString()}
                         />
                     ))}
                 </div>

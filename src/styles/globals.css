@@ -8,10 +8,12 @@
 }
 
 #__next {
-    height: 100%;
+    height: min-content;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    position: relative;
 }
 
 @keyframes floatIn {
@@ -51,9 +53,10 @@
     }
 }
 
-.noise {
+#__next::after {
     background-repeat: repeat;
     pointer-events: none;
+    content: ' ';
     background-image: url(/NOISE.webp);
     background-position: 0px 0px;
     background-size: 250px;
@@ -62,6 +65,8 @@
     top: 0%;
     z-index: -20;
     width: 100%;
+    display: block;
+    position: absolute;
     height: 100%;
 }
 

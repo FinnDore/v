@@ -18,10 +18,10 @@ import {
     TooltipProvider,
 } from '@/components/tool-tip';
 import { VoteButton } from '@/components/vote/vote-button';
+import { voteOptions } from '@/constants';
 import { useVoteControls, useVotes } from '@/hooks/poker-hooks';
 import { useUserJoined } from '@/hooks/use-hop-updates';
 
-const voteOptions = [1, 2, 3, 5, 8, 13, 21, 34, 55, '??'];
 const Vote = () => {
     const {
         doVote,
@@ -39,7 +39,7 @@ const Vote = () => {
         pokerState?.createdByUser ?? pokerState?.createdByAnonUser;
 
     return (
-        <div className="mx-auto flex h-full w-max max-w-full flex-col px-6 pb-6 sm:px-12 lg:max-w-screen-lg">
+        <div className="mx-auto flex w-max max-w-full flex-1 flex-col px-6 pb-6 sm:px-12 lg:max-w-screen-lg">
             {!isWhiteListed && (
                 <div className="flex h-full">
                     <span className="m-auto opacity-70">

@@ -43,7 +43,7 @@ const limiters: Record<RateLimitPrefix, Ratelimit> = {
         Ratelimit.slidingWindow(20, '20s')
     ),
     [RateLimitPrefix.landingStats]: createRateLimiterWithAlgo(
-        Ratelimit.slidingWindow(10, '1m')
+        Ratelimit.slidingWindow(15, '1m')
     ),
 } as const;
 

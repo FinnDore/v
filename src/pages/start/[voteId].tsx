@@ -219,7 +219,9 @@ const WhiteListOrKick = ({ user }: { user: UsersInVote[number] }) => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <button
-                        onClick={() => kickOrWhiteList(false)}
+                        onClick={() => {
+                            kickOrWhiteList(false);
+                        }}
                         className="my-auto ms-auto h-max  w-max rounded-sm px-[2px] py-[2px] text-green-500"
                     >
                         <CheckIcon className="ms-auto" />

@@ -8,6 +8,7 @@ export const pickHex = (
     const w1 = (w / 1 + 1) / 2;
     const w2 = 1 - w1;
     return `rgb(${Math.round(+color1[0] * w1 + +color2[0] * w2)},${Math.round(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         +color1[1]! * w1 + +color2[1] * w2
     )},${Math.round(+color1[2] * w1 + +color2[2] * w2)})`;
 };

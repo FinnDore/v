@@ -28,8 +28,12 @@ export const VoteButton = ({
 }) => {
     const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({
-        height: !showVotes || isNaN(height) ? '0%' : `${height}%`,
-        opacity: !showVotes || isNaN(height) || !height ? 0 : 1,
+        height:
+            !showVotes || isNaN(height) || !isFinite(height)
+                ? '0%'
+                : `${height}%`,
+        opacity:
+            !showVotes || isNaN(height) || !isFinite(height) || !height ? 0 : 1,
         config: config.wobbly,
     });
 

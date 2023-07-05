@@ -17,6 +17,7 @@ import {
     type Vote,
 } from '@/server/hop';
 import { prisma } from '../../../db';
+import { landingRouter } from '../landing';
 import { pokerStateRouter } from '../poker-state';
 import { lobbyRouter } from './lobby';
 
@@ -248,4 +249,5 @@ export const vote = createTRPCRouter({
     deletePokerSession,
     createAccount,
     vote: castVote,
+    landing: landingRouter,
 });
