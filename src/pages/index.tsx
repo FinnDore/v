@@ -5,6 +5,7 @@ import { signIn, signOut } from 'next-auth/react';
 import Balancer, { Provider } from 'react-wrap-balancer';
 
 import { api } from '@/utils/api';
+import { formatCompactNumber } from '@/utils/format-numbers';
 import { Button } from '@/components/button';
 import { VoteButton } from '@/components/vote/vote-button';
 import darkLightRays from '../../public/temp-rays-dark.png';
@@ -51,24 +52,18 @@ const Home: NextPage = () => {
                 </Provider>
 
                 <div className="mt-4 grid w-full grid-cols-3 justify-around px-4 text-center text-xl md:mt-12">
-                    <h3>
-                        <div className="text-2xl font-bold">
-                            {statsQuery.data?.pokerVotes ?? ''}
-                        </div>
-                        <div className="text-sm">Votes cast</div>
-                    </h3>
-                    <h3>
-                        <div className="text-2xl font-bold ">
-                            {statsQuery.data?.pokerSessions ?? ''}
-                        </div>
-                        <div className="text-sm">Sessions created</div>
-                    </h3>
-                    <h3>
-                        <div className="text-2xl font-bold">
-                            {statsQuery.data?.culmativeVotes ?? ''}
-                        </div>
-                        <div className="text-sm">Cumulative points</div>
-                    </h3>
+                    <Stat
+                        name="Votes Cast"
+                        value={statsQuery.data?.totalVoteChoices}
+                    />
+                    <Stat
+                        name="Sessions created"
+                        value={statsQuery.data?.totalVoteChoices}
+                    />
+                    <Stat
+                        name="Cumulative points"
+                        value={statsQuery.data?.culmativeVotes}
+                    />
                 </div>
 
                 <div className="relative mx-auto mt-12 flex flex-wrap justify-center gap-2 md:gap-4">
@@ -148,3 +143,13 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+const Stat = (props: { name: string; value: number | undefined }) => (
+    <h3 className="flex flex-col gap-1">
+        <div className="text-2xl font-bold">
+            {' '}
+            {props.value ? formatCompactNumber(props.value) : ' '}
+        </div>
+        <div className="text-sm">{props.name}</div>
+    </h3>
+);
