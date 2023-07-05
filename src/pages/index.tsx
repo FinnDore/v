@@ -58,7 +58,7 @@ const Home: NextPage = () => {
                     />
                     <Stat
                         name="Sessions created"
-                        value={statsQuery.data?.totalVoteChoices}
+                        value={statsQuery.data?.totalSessions}
                     />
                     <Stat
                         name="Cumulative points"
