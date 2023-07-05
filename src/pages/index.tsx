@@ -146,9 +146,8 @@ export default Home;
 
 const Stat = (props: { name: string; value: number | undefined }) => (
     <h3 className="flex flex-col gap-1">
-        <div className="text-2xl font-bold">
-            {' '}
-            {props.value ? formatCompactNumber(props.value) : ' '}
+        <div className="h-8 text-2xl font-bold">
+            {props.value && formatCompactNumber(props.value)}
         </div>
         <div className="text-sm">{props.name}</div>
     </h3>
