@@ -28,11 +28,10 @@ export const statsRouter = createTRPCRouter({
             });
         }
 
-        console.log(stats[2][0].C);
         return {
-            pokerSessions: stats[0],
-            pokerVotes: stats[1],
-            culmativeVotes: stats[2][0].C.toString(),
+            totalSessions: stats[0],
+            totalVoteChoices: stats[1],
+            culmativeVotes: parseInt(stats[2][0].C.toString(), 10),
         };
     }),
 });
