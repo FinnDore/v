@@ -20,6 +20,7 @@ export const RateLimitPrefix = {
     vote: 'VOTE_',
     joinVote: 'JOIN_VOTE_',
     progressVoteOrToggleResults: 'PROGRESS_VOTE_OR_TOGGLE_RESULTS_',
+    landingStats: 'LANDING_STATS_',
 } satisfies Record<string, `${string}_`>;
 
 export type RateLimitPrefix =
@@ -40,6 +41,9 @@ const limiters: Record<RateLimitPrefix, Ratelimit> = {
     ),
     [RateLimitPrefix.progressVoteOrToggleResults]: createRateLimiterWithAlgo(
         Ratelimit.slidingWindow(20, '20s')
+    ),
+    [RateLimitPrefix.landingStats]: createRateLimiterWithAlgo(
+        Ratelimit.slidingWindow(10, '1m')
     ),
 } as const;
 

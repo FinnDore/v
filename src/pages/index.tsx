@@ -50,22 +50,22 @@ const Home: NextPage = () => {
                     </h2>
                 </Provider>
 
-                <div className="mt-4 flex w-full justify-around px-4 text-center text-xl md:mt-12">
+                <div className="mt-4 grid w-full grid-cols-3 justify-around px-4 text-center text-xl md:mt-12">
                     <h3>
                         <div className="text-2xl font-bold">
-                            {statsQuery.data?.pokerVotes}
+                            {statsQuery.data?.pokerVotes ?? ''}
                         </div>
                         <div className="text-sm">Votes cast</div>
                     </h3>
                     <h3>
                         <div className="text-2xl font-bold ">
-                            {statsQuery.data?.pokerSessions}
+                            {statsQuery.data?.pokerSessions ?? ''}
                         </div>
                         <div className="text-sm">Sessions created</div>
                     </h3>
                     <h3>
                         <div className="text-2xl font-bold">
-                            {statsQuery.data?.users}
+                            {statsQuery.data?.culmativeVotes ?? ''}
                         </div>
                         <div className="text-sm">Cumulative points</div>
                     </h3>
