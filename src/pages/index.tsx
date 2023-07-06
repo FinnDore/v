@@ -234,6 +234,12 @@ const Vote = () => {
         if (voteId) setLocalVoteIdVoteId(voteId);
     }, []);
 
+    useEffect(() => {
+        if (session.user) {
+            localStorage.removeItem('landingVoteId');
+        }
+    }, [session.user]);
+
     const { votesMap, currentVote, highestVote } = useMemo(() => {
         const currentVote = votesQuery.data?.find(
             v =>
