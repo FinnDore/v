@@ -5,30 +5,32 @@ import { to } from '@/utils/to';
 import { prisma } from '@/server/db';
 import { rateLimitedTrpcProc } from '../../trpc';
 
+export const selectLandingVoteQuery = {
+    choice: true,
+    id: true,
+    updatedAt: true,
+    user: {
+        select: {
+            id: true,
+            name: true,
+            image: true,
+        },
+    },
+    anonUser: {
+        select: {
+            id: true,
+            name: true,
+            pfpHash: true,
+        },
+    },
+};
+
 export const landingVotes = rateLimitedTrpcProc(
     RateLimitPrefix.landingStats
 ).query(async () => {
     const [votes, votesError] = await to(
         prisma.landingPokerVoteChoice.findMany({
-            select: {
-                choice: true,
-                id: true,
-                updatedAt: true,
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                        image: true,
-                    },
-                },
-                anonUser: {
-                    select: {
-                        id: true,
-                        name: true,
-                        pfpHash: true,
-                    },
-                },
-            },
+            select: selectLandingVoteQuery,
         })
     );
 
