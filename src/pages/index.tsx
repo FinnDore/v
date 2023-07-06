@@ -169,7 +169,7 @@ const Vote = () => {
     const session = useUser();
     const votesQuery = api.landing.landingVotes.useQuery();
 
-    const [localVoteId, setLocalVoteIdVoteId] = useState<string | null>();
+    const [localVoteId, setLocalVoteIdVoteId] = useState<string | null>(null);
     const updateClumativePoints = useCallback(
         (oldChoice: string, newChoice: string) => {
             let oldChoiceAsNumber = parseInt(oldChoice, 10);
@@ -197,6 +197,7 @@ const Vote = () => {
 
     const voteMutation = api.landing.vote.useMutation({
         onMutate: ({ choice }) => {
+            void utils.landing.landingVotes.cancel();
             utils.landing.landingVotes.setData(undefined, prev => {
                 if (!prev) return prev;
 
