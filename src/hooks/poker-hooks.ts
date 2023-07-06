@@ -340,6 +340,7 @@ export const useVotes = () => {
         showVotes: activeVote?.showResults,
         status,
         isWhiteListed,
+        currentUserId: session?.user?.id,
     };
 };
 

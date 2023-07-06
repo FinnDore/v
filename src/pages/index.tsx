@@ -250,6 +250,11 @@ const Vote = () => {
                     }
                     unshownUsers={votesMap[vote.toString()]?.extraUsers}
                     totalVotes={highestVote[1] ?? 1}
+                    currentUserId={
+                        session.status === 'authenticated'
+                            ? session.user.id
+                            : vote => !!(vote.id === voteId && voteId)
+                    }
                     doVote={() => {
                         voteMutation.mutate({
                             choice: vote,

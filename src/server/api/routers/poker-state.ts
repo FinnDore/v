@@ -251,7 +251,6 @@ export const pokerStateRouter = createTRPCRouter({
                     votes.createdByUser?.id === userId ||
                     votes.createdByAnonUser?.id === userId;
 
-                console.log(votes.private, !userInVote, !isOwner);
                 if (votes.private && !userInVote && !isOwner) {
                     throw new TRPCError({
                         code: 'UNAUTHORIZED',

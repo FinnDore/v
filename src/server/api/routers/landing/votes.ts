@@ -13,6 +13,7 @@ export const landingVotes = rateLimitedTrpcProc(
             select: {
                 choice: true,
                 id: true,
+                updatedAt: true,
                 user: {
                     select: {
                         id: true,
@@ -42,5 +43,5 @@ export const landingVotes = rateLimitedTrpcProc(
         });
     }
 
-    return votes;
+    return votes.sort((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime());
 });

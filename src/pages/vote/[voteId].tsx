@@ -32,6 +32,7 @@ const Vote = () => {
         status,
         pokerState,
         isWhiteListed,
+        currentUserId,
     } = useVotes();
     useUserJoined();
     if (status === 'loading') return null;
@@ -79,6 +80,7 @@ const Vote = () => {
                                     currentVotes={
                                         votesMap[vote.toString()]?.count ?? 0
                                     }
+                                    currentUserId={currentUserId}
                                     totalVotes={highestVote[1]}
                                     doVote={doVote}
                                     current={

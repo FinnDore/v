@@ -10,6 +10,7 @@ import {
     TooltipTrigger,
 } from '../tool-tip';
 
+type Users = { name: string; id: string; image?: string; pfpHash?: string }[];
 export const VoteButton = ({
     vote,
     doVote,
@@ -19,15 +20,17 @@ export const VoteButton = ({
     users,
     showVotes,
     unshownUsers = 0,
+    currentUserId,
 }: {
     current: boolean;
     vote: number | string;
     doVote: (vote: number | string) => void;
     currentVotes: number;
     totalVotes: number;
-    users: { name: string; id: string; image?: string; pfpHash?: string }[];
+    users: Users;
     showVotes?: boolean;
     unshownUsers?: number;
+    currentUserId: string | ((v: { id: string }) => boolean) | undefined;
 }) => {
     const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({
@@ -46,12 +49,37 @@ export const VoteButton = ({
         config: showVotes ? config.wobbly : config.default,
     });
 
-    const [firstUsers, extraUsers] = useMemo(
-        () => [users.slice(0, 4), users.slice(4, users.length)],
-        [users]
-    );
+    const { firstUsers, totalExtraUsers } = useMemo(() => {
+        const splitUsers = {
+            firstUsers: users.slice(0, 4),
+            extraUsers: users.slice(4, users.length),
+        };
 
-    const totalExtraUsers = extraUsers.length + unshownUsers;
+        // We allways want to show the pfp of the current user even if were overflowing
+        if (
+            currentUserId &&
+            splitUsers.extraUsers.length &&
+            splitUsers.extraUsers.find(user => user.id === currentUserId)
+        ) {
+            const index = splitUsers.extraUsers.findIndex(
+                typeof currentUserId === 'function'
+                    ? currentUserId
+                    : user => user.id === currentUserId
+            );
+            const currentUser = splitUsers.extraUsers.splice(index, 1)[0];
+            const firstUserToSwitch = splitUsers.firstUsers.splice(
+                splitUsers.firstUsers.length - 1,
+                1
+            )[0];
+            if (currentUser && firstUserToSwitch) {
+                splitUsers.firstUsers.push(currentUser);
+                splitUsers.extraUsers.push(firstUserToSwitch);
+            }
+        }
+
+        const totalExtraUsers = splitUsers.extraUsers.length + unshownUsers;
+        return { firstUsers: splitUsers.firstUsers, totalExtraUsers };
+    }, [currentUserId, unshownUsers, users]);
 
     return (
         <TooltipProvider delayDuration={300}>
