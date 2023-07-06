@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { type NextPage } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,16 +21,30 @@ const Home: NextPage = () => {
     const statsQuery = api.landing.landingStats.useQuery();
     const votesQuery = api.landing.landingVotes.useQuery();
     const voteMutation = api.landing.vote.useMutation({
-        onSuccess: () => {
+        onSuccess: res => {
+            if (res) {
+                localStorage.setItem('landingVoteId', res);
+                setVoteId(res);
+            }
             void statsQuery.refetch();
             void votesQuery.refetch();
         },
     });
-    const session = useUser();
 
+    const [voteId, setVoteId] = useState<string | null>();
+    useEffect(() => {
+        const voteId = localStorage.getItem('landingVoteId');
+        if (voteId) setVoteId(voteId);
+    }, []);
+
+    const session = useUser();
     const { votesMap, currentVote, highestVote } = useMemo(() => {
         const currentVote = votesQuery.data?.find(
-            v => (v.user?.id ?? v.anonUser?.id) === session?.user?.id
+            v =>
+                ((session.status === 'anon' ||
+                    session.status === 'authenticated') &&
+                    (v.user?.id ?? v.anonUser?.id) === session?.user?.id) ||
+                (voteId && voteId === v.id)
         );
 
         if (!votesQuery.data) {
@@ -93,7 +107,7 @@ const Home: NextPage = () => {
         );
 
         return { currentVote, votesMap, highestVote };
-    }, [session?.user?.id, votesQuery.data]);
+    }, [session.status, session?.user?.id, voteId, votesQuery.data]);
 
     return (
         <>
@@ -163,6 +177,7 @@ const Home: NextPage = () => {
                                 voteMutation.mutate({
                                     choice: vote,
                                     anonUser,
+                                    voteId: voteId ?? undefined,
                                 });
                             }}
                             current={currentVote?.choice === vote.toString()}

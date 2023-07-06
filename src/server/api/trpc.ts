@@ -120,11 +120,11 @@ export const anonOrUserProcedure = t.procedure
             }
 
             if (!anonUser) {
-                console.error(
+                console.warn(
                     `anonOrUserProcedure: Could not find anon user with id: ${input.anonUser.id}`
                 );
                 throw new TRPCError({
-                    code: 'INTERNAL_SERVER_ERROR',
+                    code: 'UNAUTHORIZED',
                 });
             }
 
@@ -143,6 +143,78 @@ export const anonOrUserProcedure = t.procedure
         }
     });
 
+export const procedureWithUserOrAnon = t.procedure
+    .input(
+        z.object({
+            anonUser: anonUserSchema,
+        })
+    )
+    .use(async ({ ctx, input, next }) => {
+        let result: {
+            ctx:
+                | {
+                      session: Session;
+                      anonSession: null;
+                  }
+                | {
+                      session: null;
+                      anonSession: AnonUser;
+                  }
+                | null;
+        } | null = null;
+
+        if (ctx.session?.user) {
+            result = {
+                ctx: {
+                    // infers the `session` as non-nullable
+                    session: { ...ctx.session, user: ctx.session.user },
+                    anonSession: null,
+                },
+            } as const;
+        } else if (input.anonUser) {
+            console.log(input.anonUser);
+            const [anonUser, getAnonUserError] =
+                await AnonHelper.getAnonUserByIdAndSecret({
+                    userId: input.anonUser.id,
+                    secret: input.anonUser.secret,
+                } as const);
+
+            if (getAnonUserError) {
+                console.error(
+                    `anonOrUserProcedure: Could not find anon user due to error: ${
+                        getAnonUserError.message
+                    } ${getAnonUserError.stack ?? 'no stack'}`
+                );
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                });
+            }
+
+            if (!anonUser) {
+                console.warn(
+                    `anonOrUserProcedure: Could not find anon user with id: ${input.anonUser.id}`
+                );
+                throw new TRPCError({
+                    code: 'UNAUTHORIZED',
+                });
+            }
+
+            result = {
+                ctx: {
+                    session: null,
+                    anonSession: anonUser,
+                },
+            } as const;
+        } else {
+            result = { ctx: null };
+        }
+        if (!result) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        return next(result);
+    });
+
 export const rateLimitedAnonOrUserProcedure = (
     rateLimitPrefix: RateLimitPrefix,
     byIp?: boolean
@@ -154,6 +226,20 @@ export const rateLimitedAnonOrUserProcedure = (
             anonSession: ctx.anonSession,
             userSession: ctx.session,
             byIp: !!byIp,
+        });
+        return next();
+    });
+
+export const rateLimitedProcedureWithUserOrAnon = (
+    rateLimitPrefix: RateLimitPrefix
+) =>
+    procedureWithUserOrAnon.use(async ({ ctx, next }) => {
+        await rateLimitTrpcProc({
+            prefix: rateLimitPrefix,
+            ip: ctx.ip,
+            anonSession: ctx.anonSession,
+            userSession: ctx.session,
+            byIp: !ctx.session?.user && !ctx.session,
         });
         return next();
     });
