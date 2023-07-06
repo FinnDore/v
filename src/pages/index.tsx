@@ -18,8 +18,6 @@ import { type LandingPageVote } from '@/server/hop';
 import darkLightRays from '../../public/temp-rays-dark.png';
 import lightLightRays from '../../public/temp-rays-light.png';
 
-const randomVoteCounts = voteOptions.map(() => Math.max(1, Math.random() * 10));
-
 const Home: NextPage = () => {
     const statsQuery = api.landing.landingStats.useQuery();
 
@@ -347,11 +345,7 @@ const Vote = () => {
                     vote={vote}
                     showVotes={true}
                     users={votesMap[vote.toString()]?.users ?? []}
-                    currentVotes={
-                        (typeof votesQuery.data !== 'undefined'
-                            ? votesMap[vote.toString()]?.count
-                            : randomVoteCounts[i]) ?? 0
-                    }
+                    currentVotes={votesMap[vote.toString()]?.count ?? 0}
                     unshownUsers={votesMap[vote.toString()]?.extraUsers}
                     totalVotes={highestVote[1] ?? 1}
                     currentUserId={
