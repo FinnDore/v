@@ -11,7 +11,7 @@ import {
     rateLimitedTrpcProc,
 } from '@/server/api/trpc';
 import {
-    dispatchVoteUpdateEvent,
+    dispatchLandingVoteUpdateEvent,
     hop,
     selectPokerVote,
     type Vote,
@@ -44,8 +44,8 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
         const [voteCount, voteCountError] = await to(
             prisma.poker.count({
                 where: {
-                    createdByUserId: ctx.session?.user?.id ?? null,
-                    createdByAnonUserId: ctx.anonSession?.id ?? null,
+                    createdByUserId: ctx.session?.user?.id,
+                    createdByAnonUserId: ctx.anonSession?.id,
                 },
             })
         );
@@ -66,8 +66,8 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
             prisma.poker.create({
                 data: {
                     title: input.title,
-                    createdByUserId: ctx?.session?.user?.id ?? null,
-                    createdByAnonUserId: ctx?.anonSession?.id ?? null,
+                    createdByUserId: ctx?.session?.user?.id,
+                    createdByAnonUserId: ctx?.anonSession?.id,
                     private: input.private,
                     pokerVote: {
                         createMany: {
@@ -80,8 +80,8 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
                     },
                     userInVote: {
                         create: {
-                            userId: ctx?.session?.user?.id ?? null,
-                            anonUserId: ctx?.anonSession?.id ?? null,
+                            userId: ctx?.session?.user?.id,
+                            anonUserId: ctx?.anonSession?.id,
                             whiteListed: true,
                         },
                     },
@@ -196,8 +196,8 @@ const castVote = rateLimitedAnonOrUserProcedure(RateLimitPrefix.vote)
                     choice: input.choice,
                 },
                 create: {
-                    anonUserId: ctx.anonSession?.id ?? null,
-                    userId: ctx.session?.user.id ?? null,
+                    anonUserId: ctx.anonSession?.id,
+                    userId: ctx.session?.user.id,
                     choice: input.choice,
                     pokerVoteId: input.pokerVoteId,
                 },
@@ -220,7 +220,7 @@ const castVote = rateLimitedAnonOrUserProcedure(RateLimitPrefix.vote)
             });
         }
 
-        await dispatchVoteUpdateEvent({ vote });
+        await dispatchLandingVoteUpdateEvent({ vote });
         return vote;
     });
 

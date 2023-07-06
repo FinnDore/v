@@ -12,3 +12,5 @@ export const voteOptionSchema = z
     .or(z.literal(34))
     .or(z.literal(55))
     .or(z.literal('??'));
+
+export const LANDING_CHANNEL_ID = 'LANDING_CHANNEL';

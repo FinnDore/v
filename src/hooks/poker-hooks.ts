@@ -143,7 +143,7 @@ export const useVotes = () => {
     const channelId = `poker_${pokerId ?? ''}`;
     useChannelMessage(
         channelId,
-        ChannelEvents.VOTE_UPDATED,
+        ChannelEvents.VOTE_UPDATE,
         (e: { data: string }) => {
             const updatedVoteChoice: Vote = parse(e.data);
             if (!pokerId) return;

@@ -1,16 +1,20 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { type NextPage } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useChannelMessage } from '@onehop/react';
 import { signIn, signOut } from 'next-auth/react';
 import Balancer, { Provider } from 'react-wrap-balancer';
+import { parse } from 'superjson';
 
 import { api } from '@/utils/api';
 import { formatCompactNumber } from '@/utils/format-numbers';
 import { useAnonUser, useUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
 import { VoteButton } from '@/components/vote/vote-button';
-import { voteOptions } from '@/constants';
+import { LANDING_CHANNEL_ID, voteOptions } from '@/constants';
+import { ChannelEvents } from '@/server/channel-events';
+import { LandingPageVote } from '@/server/hop';
 import darkLightRays from '../../public/temp-rays-dark.png';
 import lightLightRays from '../../public/temp-rays-light.png';
 
@@ -160,17 +164,63 @@ type VoteMap = Record<
 
 const Vote = () => {
     const anonUser = useAnonUser();
-    const statsQuery = api.landing.landingStats.useQuery();
+    const utils = api.useContext();
+    const voteLastUpdated = useRef<number>(0);
+    const session = useUser();
     const votesQuery = api.landing.landingVotes.useQuery();
+
     const voteMutation = api.landing.vote.useMutation({
+        onMutate: ({ choice, voteId }) => {
+            utils.landing.landingVotes.setData(undefined, prev => {
+                if (!prev) return prev;
+
+                const newState = [...prev];
+                const newVoteIndex = newState.findIndex(
+                    x =>
+                        (session.user?.id &&
+                            (session.user.id === x.user?.id ||
+                                session.user.id === x.anonUser?.id)) ||
+                        (voteId && voteId === x.id)
+                );
+
+                if (newVoteIndex === -1) return prev;
+
+                const oldItem = newState.splice(newVoteIndex, 1)[0];
+                if (!oldItem) return prev;
+
+                newState.push({ ...oldItem, choice: `${choice}` });
+                voteLastUpdated.current = Date.now();
+
+                let oldChoiceAsNumber = parseInt(oldItem.choice, 10);
+                if (isNaN(oldChoiceAsNumber)) oldChoiceAsNumber = 0;
+                let newChoiceAsNumber = parseInt(`${choice}`, 10);
+                if (isNaN(newChoiceAsNumber)) newChoiceAsNumber = 0;
+
+                utils.landing.landingStats.setData(undefined, prev => {
+                    if (!prev) return prev;
+
+                    const newStats = {
+                        ...prev,
+                        culmativeVotes:
+                            oldChoiceAsNumber > newChoiceAsNumber
+                                ? prev.culmativeVotes -
+                                  (oldChoiceAsNumber - newChoiceAsNumber)
+                                : prev.culmativeVotes +
+                                  (newChoiceAsNumber - oldChoiceAsNumber),
+                    };
+                    return newStats;
+                });
+
+                return newState;
+            });
+        },
         onSuccess: res => {
             if (res) {
                 localStorage.setItem('landingVoteId', res);
                 setVoteId(res);
             }
-            void statsQuery.refetch();
-            void votesQuery.refetch();
         },
+        onError: () => votesQuery.refetch(),
     });
 
     const [voteId, setVoteId] = useState<string | null>();
@@ -179,7 +229,6 @@ const Vote = () => {
         if (voteId) setVoteId(voteId);
     }, []);
 
-    const session = useUser();
     const { votesMap, currentVote, highestVote } = useMemo(() => {
         const currentVote = votesQuery.data?.find(
             v =>
@@ -235,6 +284,14 @@ const Vote = () => {
         return { currentVote, votesMap, highestVote };
     }, [session.status, session?.user?.id, voteId, votesQuery.data]);
 
+    useChannelMessage(
+        LANDING_CHANNEL_ID,
+        ChannelEvents.VOTE_UPDATE,
+        (event: { data: string }) => {
+            const vote = parse<LandingPageVote>(event.data);
+        }
+    );
+
     return (
         <div className="relative mx-auto mt-12 flex animate-fade-in flex-wrap justify-center gap-2 opacity-0 [animation-delay:_750ms] md:gap-4">
             {voteOptions.map((vote, i) => (
@@ -259,7 +316,9 @@ const Vote = () => {
                         voteMutation.mutate({
                             choice: vote,
                             anonUser,
-                            voteId: voteId ?? undefined,
+                            voteId: session.user
+                                ? voteId ?? undefined
+                                : undefined,
                         });
                     }}
                     current={

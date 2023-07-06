@@ -1,7 +1,13 @@
-import { Hop, type APIAuthentication } from '@onehop/js';
+import {
+    ChannelType,
+    Hop,
+    HopAPIError,
+    type APIAuthentication,
+} from '@onehop/js';
 import { stringify } from 'superjson';
 
 import { to } from '@/utils/to';
+import { LANDING_CHANNEL_ID } from '@/constants';
 import { env } from '@/env.mjs';
 import { ChannelEvents } from './channel-events';
 
@@ -13,7 +19,7 @@ export const dispatchVoteUpdateEvent = async ({ vote }: { vote: Vote }) => {
     const [, updateChannelStateError] = await to(
         hop.channels.publishMessage(
             `poker_${vote.pokerVote.poker.id}`,
-            'VOTE_UPDATE',
+            ChannelEvents.VOTE_UPDATE,
             {
                 data: stringify(vote),
             }
@@ -36,6 +42,7 @@ export const dispatchVoteUpdateEvent = async ({ vote }: { vote: Vote }) => {
         );
     }
 };
+
 export const dispatchUserJoinedEvent = async ({
     pokerId,
     users,
@@ -87,6 +94,67 @@ export const dispatchPokerStateUpdateEvent = async (event: {
         );
     } else {
         console.log(`Published poker state update for poker_${event.pokerId}`);
+    }
+};
+
+export const dispatchLandingVoteUpdateEvent = async ({
+    vote,
+}: {
+    vote: LandingPageVote;
+}) => {
+    let [, updateChannelStateError] = await to(
+        hop.channels.publishMessage(
+            LANDING_CHANNEL_ID,
+            ChannelEvents.VOTE_UPDATE,
+            {
+                data: stringify(vote),
+            }
+        )
+    );
+
+    if (
+        (updateChannelStateError as unknown as HopAPIError)?.data?.error
+            .code === 'channel_not_found'
+    ) {
+        console.error(
+            `Could not publish votes for LANDING_CHANNEL as it didnt exist, will create it and re publish`
+        );
+        const [, createChannelError] = await to(
+            hop.channels.create(ChannelType.UNPROTECTED, LANDING_CHANNEL_ID)
+        );
+
+        if (createChannelError) {
+            console.error(
+                `Could not create channel LANDING_CHANNEL error: ${
+                    createChannelError.message ?? 'no error message'
+                } ${createChannelError.stack ?? 'no stack'} \n ${JSON.stringify(
+                    createChannelError
+                )}`
+            );
+        }
+        updateChannelStateError = null;
+
+        [, updateChannelStateError] = await to(
+            hop.channels.publishMessage(
+                LANDING_CHANNEL_ID,
+                ChannelEvents.VOTE_UPDATE,
+                {
+                    data: stringify(vote),
+                }
+            )
+        );
+    }
+
+    if (updateChannelStateError) {
+        console.error(
+            `Could not publish votes for LANDING_CHANNEL due to error: ${
+                updateChannelStateError.message
+            } ${updateChannelStateError.stack ?? 'no stack'}
+            ${JSON.stringify(updateChannelStateError, null, 2)}
+            `
+        );
+    } else {
+        console.log(`Published votes for LANDING to channel`);
     }
 };
 
@@ -144,3 +212,11 @@ export type UsersInVote = {
     pfpHash?: string | null;
     whiteListed: boolean;
 }[];
+
+export type LandingPageVote = {
+    id: string;
+    choice: string;
+    updatedAt: Date;
+    anonUser: { name: string; id: string; pfpHash: string } | null;
+    user: { name: string | null; id: string; image: string | null } | null;
+};
