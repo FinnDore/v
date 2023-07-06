@@ -58,6 +58,7 @@ const Home: NextPage = () => {
                             name: string;
                             id: string;
                         }[];
+                        extraUsers: number;
                     }
                 >,
                 highestVote: ['-1', 0] as const,
@@ -83,6 +84,10 @@ const Home: NextPage = () => {
                             pfpHash?: string;
                         } => !!x
                     ),
+                    extraUsers:
+                        !v.anonUser || !v.user
+                            ? (acc[v.choice]?.count ?? 0) + 1
+                            : acc[v.choice]?.count ?? 0,
                 },
             }),
             {} as Record<
@@ -95,6 +100,7 @@ const Home: NextPage = () => {
                         image?: string;
                         pfpHash?: string;
                     }[];
+                    extraUsers: number;
                 }
             >
         );
@@ -172,6 +178,7 @@ const Home: NextPage = () => {
                                     ? votesMap[vote.toString()]?.count
                                     : randomVoteCounts[i]) ?? 0
                             }
+                            unshownUsers={votesMap[vote.toString()]?.extraUsers}
                             totalVotes={highestVote[1] ?? 1}
                             doVote={() => {
                                 voteMutation.mutate({
@@ -180,7 +187,10 @@ const Home: NextPage = () => {
                                     voteId: voteId ?? undefined,
                                 });
                             }}
-                            current={currentVote?.choice === vote.toString()}
+                            current={
+                                currentVote?.choice === vote.toString() ||
+                                !currentVote
+                            }
                         />
                     ))}
                 </div>
