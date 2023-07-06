@@ -237,6 +237,7 @@ const Vote = () => {
     useEffect(() => {
         if (session.user) {
             localStorage.removeItem('landingVoteId');
+            setLocalVoteIdVoteId(null);
         }
     }, [session.user]);
 
