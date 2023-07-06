@@ -17,103 +17,7 @@ import lightLightRays from '../../public/temp-rays-light.png';
 const randomVoteCounts = voteOptions.map(() => Math.max(1, Math.random() * 10));
 
 const Home: NextPage = () => {
-    const anonUser = useAnonUser();
     const statsQuery = api.landing.landingStats.useQuery();
-    const votesQuery = api.landing.landingVotes.useQuery();
-    const voteMutation = api.landing.vote.useMutation({
-        onSuccess: res => {
-            if (res) {
-                localStorage.setItem('landingVoteId', res);
-                setVoteId(res);
-            }
-            void statsQuery.refetch();
-            void votesQuery.refetch();
-        },
-    });
-
-    const [voteId, setVoteId] = useState<string | null>();
-    useEffect(() => {
-        const voteId = localStorage.getItem('landingVoteId');
-        if (voteId) setVoteId(voteId);
-    }, []);
-
-    const session = useUser();
-    const { votesMap, currentVote, highestVote } = useMemo(() => {
-        const currentVote = votesQuery.data?.find(
-            v =>
-                ((session.status === 'anon' ||
-                    session.status === 'authenticated') &&
-                    (v.user?.id ?? v.anonUser?.id) === session?.user?.id) ||
-                (voteId && voteId === v.id)
-        );
-
-        if (!votesQuery.data) {
-            return {
-                currentVote,
-                votesMap: {} as Record<
-                    string,
-                    {
-                        count: number;
-                        users: {
-                            name: string;
-                            id: string;
-                        }[];
-                        extraUsers: number;
-                    }
-                >,
-                highestVote: ['-1', 0] as const,
-            };
-        }
-
-        // Compute vote count, and users per vote choice
-        const votesMap = votesQuery.data.reduce(
-            (acc, v) => ({
-                ...acc,
-                [v.choice]: {
-                    count: (acc[v.choice]?.count ?? 0) + 1,
-                    users: [
-                        ...(acc[v.choice]?.users ?? []),
-                        v.user ?? v.anonUser,
-                    ].filter(
-                        (
-                            x
-                        ): x is {
-                            id: string;
-                            name: string;
-                            image?: string;
-                            pfpHash?: string;
-                        } => !!x
-                    ),
-                    extraUsers:
-                        !v.anonUser || !v.user
-                            ? (acc[v.choice]?.count ?? 0) + 1
-                            : acc[v.choice]?.count ?? 0,
-                },
-            }),
-            {} as Record<
-                string,
-                {
-                    count: number;
-                    users: {
-                        name: string;
-                        id: string;
-                        image?: string;
-                        pfpHash?: string;
-                    }[];
-                    extraUsers: number;
-                }
-            >
-        );
-
-        // get the highest vote
-        const highestVote = Object.entries(votesMap).reduce(
-            (a, e): [string, number] =>
-                e[1].count > a[1] ? [e[0], e[1].count] : a,
-            ['-1', 0] as [string, number]
-        );
-
-        return { currentVote, votesMap, highestVote };
-    }, [session.status, session?.user?.id, voteId, votesQuery.data]);
 
     return (
         <>
@@ -166,35 +70,7 @@ const Home: NextPage = () => {
                     />
                 </div>
 
-                <div className="relative mx-auto mt-12 flex animate-fade-in flex-wrap justify-center gap-2 opacity-0 [animation-delay:_750ms] md:gap-4">
-                    {voteOptions.map((vote, i) => (
-                        <VoteButton
-                            key={vote}
-                            vote={vote}
-                            showVotes={true}
-                            users={votesMap[vote.toString()]?.users ?? []}
-                            currentVotes={
-                                (typeof votesQuery.data !== 'undefined'
-                                    ? votesMap[vote.toString()]?.count
-                                    : randomVoteCounts[i]) ?? 0
-                            }
-                            unshownUsers={votesMap[vote.toString()]?.extraUsers}
-                            totalVotes={highestVote[1] ?? 1}
-                            doVote={() => {
-                                voteMutation.mutate({
-                                    choice: vote,
-                                    anonUser,
-                                    voteId: voteId ?? undefined,
-                                });
-                            }}
-                            current={
-                                currentVote?.choice === vote.toString() ||
-                                !currentVote
-                            }
-                        />
-                    ))}
-                </div>
-
+                <Vote />
                 <Link
                     href="/create"
                     className="mx-auto mt-12 animate-fade-in opacity-0 [animation-delay:_750ms]"
@@ -269,3 +145,123 @@ const Stat = (props: { name: string; value: number | undefined }) => (
         <div className="text-sm">{props.name}</div>
     </h3>
 );
+
+type VoteMap = Record<
+    string,
+    {
+        count: number;
+        users: {
+            name: string;
+            id: string;
+        }[];
+        extraUsers: number;
+    }
+>;
+
+const Vote = () => {
+    const anonUser = useAnonUser();
+    const statsQuery = api.landing.landingStats.useQuery();
+    const votesQuery = api.landing.landingVotes.useQuery();
+    const voteMutation = api.landing.vote.useMutation({
+        onSuccess: res => {
+            if (res) {
+                localStorage.setItem('landingVoteId', res);
+                setVoteId(res);
+            }
+            void statsQuery.refetch();
+            void votesQuery.refetch();
+        },
+    });
+
+    const [voteId, setVoteId] = useState<string | null>();
+    useEffect(() => {
+        const voteId = localStorage.getItem('landingVoteId');
+        if (voteId) setVoteId(voteId);
+    }, []);
+
+    const session = useUser();
+    const { votesMap, currentVote, highestVote } = useMemo(() => {
+        const currentVote = votesQuery.data?.find(
+            v =>
+                ((session.status === 'anon' ||
+                    session.status === 'authenticated') &&
+                    (v.user?.id ?? v.anonUser?.id) === session?.user?.id) ||
+                (voteId && voteId === v.id)
+        );
+
+        if (!votesQuery.data) {
+            return {
+                currentVote,
+                votesMap: {} as VoteMap,
+                highestVote: ['-1', 0] as const,
+            };
+        }
+
+        // Compute vote count, and users per vote choice
+        const votesMap = votesQuery.data.reduce(
+            (acc, v) => ({
+                ...acc,
+                [v.choice]: {
+                    count: (acc[v.choice]?.count ?? 0) + 1,
+                    users: [
+                        ...(acc[v.choice]?.users ?? []),
+                        v.user ?? v.anonUser,
+                    ].filter(
+                        (
+                            x
+                        ): x is {
+                            id: string;
+                            name: string;
+                            image?: string;
+                            pfpHash?: string;
+                        } => !!x
+                    ),
+                    extraUsers:
+                        !v.anonUser || !v.user
+                            ? (acc[v.choice]?.count ?? 0) + 1
+                            : acc[v.choice]?.count ?? 0,
+                },
+            }),
+            {} as VoteMap
+        );
+
+        // get the highest vote
+        const highestVote = Object.entries(votesMap).reduce(
+            (a, e): [string, number] =>
+                e[1].count > a[1] ? [e[0], e[1].count] : a,
+            ['-1', 0] as [string, number]
+        );
+
+        return { currentVote, votesMap, highestVote };
+    }, [session.status, session?.user?.id, voteId, votesQuery.data]);
+
+    return (
+        <div className="relative mx-auto mt-12 flex animate-fade-in flex-wrap justify-center gap-2 opacity-0 [animation-delay:_750ms] md:gap-4">
+            {voteOptions.map((vote, i) => (
+                <VoteButton
+                    key={vote}
+                    vote={vote}
+                    showVotes={true}
+                    users={votesMap[vote.toString()]?.users ?? []}
+                    currentVotes={
+                        (typeof votesQuery.data !== 'undefined'
+                            ? votesMap[vote.toString()]?.count
+                            : randomVoteCounts[i]) ?? 0
+                    }
+                    unshownUsers={votesMap[vote.toString()]?.extraUsers}
+                    totalVotes={highestVote[1] ?? 1}
+                    doVote={() => {
+                        voteMutation.mutate({
+                            choice: vote,
+                            anonUser,
+                            voteId: voteId ?? undefined,
+                        });
+                    }}
+                    current={
+                        currentVote?.choice === vote.toString() || !currentVote
+                    }
+                />
+            ))}
+        </div>
+    );
+};
