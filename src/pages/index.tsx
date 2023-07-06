@@ -321,13 +321,12 @@ const Vote = () => {
                 )
                     return prev;
 
-                if (!existingVote) return [...prev, vote];
                 const newState = [...prev];
 
                 const indexOfVoteToUpdate = newState.findIndex(
                     v => v.id === vote.id
                 );
-                if (indexOfVoteToUpdate === -1) return prev;
+                if (indexOfVoteToUpdate === -1) return [...prev, vote];
                 const voteToUpdate = newState[indexOfVoteToUpdate];
                 if (voteToUpdate) {
                     updateClumativePoints(voteToUpdate.choice, vote.choice);
