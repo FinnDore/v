@@ -39,17 +39,10 @@ export const usePokerState = () => {
     const isWhiteListed = error?.data?.code === 'UNAUTHORIZED' ? false : true;
 
     const session = useUser();
-    const isHost = useMemo(
-        () =>
-            session?.user?.id &&
-            (pokerState?.createdByUser?.id === session.user?.id ||
-                pokerState?.createdByAnonUser?.id === session?.user?.id),
-        [
-            pokerState?.createdByAnonUser?.id,
-            pokerState?.createdByUser?.id,
-            session.user?.id,
-        ]
-    );
+    const isHost =
+        session?.user?.id &&
+        (pokerState?.createdByUser?.id === session.user?.id ||
+            pokerState?.createdByAnonUser?.id === session?.user?.id);
 
     const activeVote = useMemo(() => {
         if (currentVoteId && !isHost) {
@@ -106,13 +99,13 @@ export const useVotes = () => {
                 old => {
                     const userId = session.user?.id;
                     if (!userId || !old) return old;
-                    // TODO deep clone /shrug
+
                     const newState = {
                         ...old,
                         pokerVote: [
-                            ...old.pokerVote?.map(x => ({
-                                ...x,
-                                voteChoice: [...x.voteChoice],
+                            ...old.pokerVote?.map(pokerVote => ({
+                                ...pokerVote,
+                                voteChoice: [...pokerVote.voteChoice],
                             })),
                         ],
                     };
@@ -183,13 +176,13 @@ export const useVotes = () => {
                 { pokerId, anonUser },
                 old => {
                     if (!old) return old;
-                    // TODO deep clone /shrug
+
                     const newState = {
                         ...old,
                         pokerVote: [
-                            ...old.pokerVote.map(x => ({
-                                ...x,
-                                voteChoice: [...x.voteChoice],
+                            ...old.pokerVote.map(pokerVote => ({
+                                ...pokerVote,
+                                voteChoice: [...pokerVote.voteChoice],
                             })),
                         ],
                     };
@@ -233,9 +226,9 @@ export const useVotes = () => {
                     return {
                         ...old,
                         pokerVote: [
-                            ...old.pokerVote?.map(x => ({
-                                ...x,
-                                active: x.id === event.currentVote,
+                            ...old.pokerVote?.map(pokerVote => ({
+                                ...pokerVote,
+                                active: pokerVote.id === event.currentVote,
                             })),
                         ],
                     };
@@ -270,6 +263,16 @@ export const useVotes = () => {
         }
     );
 
+    type VoteMap = Record<
+        string,
+        {
+            count: number;
+            users: {
+                name: string;
+                id: string;
+            }[];
+        }
+    >;
     const { votesMap, currentVote, highestVote } = useMemo(() => {
         const currentVote = activeVote?.voteChoice?.find(
             v => (v.user?.id ?? v.anonUser?.id) === session?.user?.id
@@ -278,16 +281,7 @@ export const useVotes = () => {
         if (!activeVote) {
             return {
                 currentVote,
-                votesMap: {} as Record<
-                    string,
-                    {
-                        count: number;
-                        users: {
-                            name: string;
-                            id: string;
-                        }[];
-                    }
-                >,
+                votesMap: {} as VoteMap,
                 highestVote: ['-1', 0] as const,
             };
         }
@@ -313,18 +307,7 @@ export const useVotes = () => {
                     ),
                 },
             }),
-            {} as Record<
-                string,
-                {
-                    count: number;
-                    users: {
-                        name: string;
-                        id: string;
-                        image?: string;
-                        pfpHash?: string;
-                    }[];
-                }
-            >
+            {} as VoteMap
         );
 
         // get the highest vote
