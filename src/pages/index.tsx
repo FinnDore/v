@@ -156,7 +156,6 @@ type VoteMap = Record<
             name: string;
             id: string;
         }[];
-        extraUsers: number;
     }
 >;
 
@@ -276,10 +275,6 @@ const Vote = () => {
                             pfpHash?: string;
                         } => !!x
                     ),
-                    extraUsers:
-                        !v.anonUser || !v.user
-                            ? (acc[v.choice]?.count ?? 0) + 1
-                            : acc[v.choice]?.count ?? 0,
                 },
             }),
             {} as VoteMap
@@ -346,7 +341,6 @@ const Vote = () => {
                     showVotes={true}
                     users={votesMap[vote.toString()]?.users ?? []}
                     currentVotes={votesMap[vote.toString()]?.count ?? 0}
-                    unshownUsers={votesMap[vote.toString()]?.extraUsers}
                     totalVotes={highestVote[1] ?? 1}
                     currentUserId={
                         session.status === 'authenticated'

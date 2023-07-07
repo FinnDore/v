@@ -19,7 +19,6 @@ export const VoteButton = ({
     current,
     users,
     showVotes,
-    unshownUsers = 0,
     currentUserId,
 }: {
     current: boolean;
@@ -29,7 +28,6 @@ export const VoteButton = ({
     totalVotes: number;
     users: Users;
     showVotes?: boolean;
-    unshownUsers?: number;
     currentUserId: string | ((v: { id: string }) => boolean) | undefined;
 }) => {
     const height = (currentVotes / totalVotes) * 100;
@@ -49,7 +47,7 @@ export const VoteButton = ({
         config: showVotes ? config.wobbly : config.default,
     });
 
-    const { firstUsers, totalExtraUsers } = useMemo(() => {
+    const { firstUsers } = useMemo(() => {
         const splitUsers = {
             firstUsers: users.slice(0, 4),
             extraUsers: users.slice(4, users.length),
@@ -77,9 +75,8 @@ export const VoteButton = ({
             }
         }
 
-        const totalExtraUsers = splitUsers.extraUsers.length + unshownUsers;
-        return { firstUsers: splitUsers.firstUsers, totalExtraUsers };
-    }, [currentUserId, unshownUsers, users]);
+        return { firstUsers: splitUsers.firstUsers };
+    }, [currentUserId, users]);
 
     return (
         <TooltipProvider delayDuration={300}>
@@ -151,43 +148,6 @@ export const VoteButton = ({
                                         </TooltipContent>
                                     </Tooltip>
                                 ))}
-                                {/** todo make this look nice */}
-                                {/* {totalExtraUsers > 0 && (
-                                    <Tooltip>
-                                        <TooltipTrigger
-                                            asChild
-                                            className="absolute aspect-square h-4 animate-[floatIn_250ms_ease-out]"
-                                            style={{
-                                                zIndex: 10 + firstUsers.length,
-                                                right: `${
-                                                    firstUsers.length * 0.5
-                                                }rem`,
-                                            }}
-                                        >
-                                            <div className="absolute top-0 h-4">
-                                                <div className="text-bold absolute left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 text-xs leading-none text-gray-400">
-                                                    {totalExtraUsers <= 9 &&
-                                                        totalExtraUsers}
-                                                    {totalExtraUsers > 9 && '+'}
-                                                </div>
-                                                <Pfp
-                                                    pfpHash={'AA'}
-                                                    border={
-                                                        'border-transparent'
-                                                    }
-                                                    name={`And ${extraUsers.length} more`}
-                                                    className=" !rounded-sm "
-                                                />
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent
-                                            side="bottom"
-                                            className="text-xs"
-                                        >
-                                            <p>{`And ${totalExtraUsers} more`}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                )} */}
                             </div>
                         </div>
                     )}
