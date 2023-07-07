@@ -56,7 +56,7 @@ const Vote = () => {
                                 {pokerState.title}
                             </h1>
                         )}
-                        <h2 className="ms-auto flex gap-2">
+                        <h2 className="ms-auto mt-auto flex gap-2">
                             <span className="opacity-70">hosted by</span>
                             <b>{createdByUser?.name ?? 'Unknown user'}</b>
                             <Pfp

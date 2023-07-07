@@ -11,6 +11,7 @@ import { api } from '@/utils/api';
 import { formatCompactNumber } from '@/utils/format-numbers';
 import { useAnonUser, useUser } from '@/utils/local-user';
 import { Button } from '@/components/button';
+import { Pfp } from '@/components/pfp';
 import { VoteButton } from '@/components/vote/vote-button';
 import { LANDING_CHANNEL_ID, voteOptions } from '@/constants';
 import { ChannelEvents } from '@/server/channel-events';
@@ -88,21 +89,10 @@ const Home: NextPage = () => {
                         </span>
                     </Button>
                 </Link>
-                <div className="mt-12 flex w-full max-w-lg  grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[800px] lg:grid-cols-3">
+                <div className="mt-12 flex w-full max-w-lg  grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[900px] lg:grid-cols-3">
                     <div className="group relative flex h-48 w-full animate-fade-in overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1000ms] hover:border-black dark:border-white/50 dark:hover:border-white">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
-                        <Button
-                            variant="outline"
-                            onClick={() => void signOut()}
-                            className="m-auto flex rounded-md px-3 py-2 text-2xl dark:hover:border-white/50 dark:hover:bg-white/10 dark:hover:text-white"
-                        >
-                            <span className="my-auto flex">
-                                <span className="my-auto leading-none">
-                                    Logout
-                                </span>
-                            </span>
-                        </Button>
                     </div>
                     <div className="group relative flex h-48 w-full animate-fade-in overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1150ms] hover:border-black dark:border-white/50 dark:hover:border-white md:row-span-2 md:h-full lg:col-span-2 lg:h-48 lg:[grid-row:_unset]">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
@@ -118,18 +108,49 @@ const Home: NextPage = () => {
                                 </span>
                             </span>
                         </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => void signOut()}
+                            className="m-auto flex rounded-md px-3 py-2 text-2xl dark:hover:border-white/50 dark:hover:bg-white/10 dark:hover:text-white"
+                        >
+                            <span className="my-auto flex">
+                                <span className="my-auto leading-none">
+                                    Logout
+                                </span>
+                            </span>
+                        </Button>
                     </div>
-                    <div className="group relative h-48 w-full animate-fade-in overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1300ms] hover:border-black dark:border-white/50 dark:hover:border-white">
-                        <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1300ms] hover:border-black dark:border-white/50 dark:hover:border-white">
+                        <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
+                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+
+                        <Tweet
+                            quote="If I wanted to point something it'd be this website for how useless it is"
+                            name="Samuel Gunter"
+                            username="samathingamajig"
+                            pfpUrl="https://pbs.twimg.com/profile_images/1299465480214900739/Van7fqYL_400x400.jpg"
+                        />
                     </div>
-                    <div className="group relative h-48 w-full animate-fade-in overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:hover:border-white">
-                        <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:hover:border-white">
+                        <Tweet
+                            quote="Works great with darkreader 👍"
+                            name="anna_devminer"
+                            username="samathingamajig"
+                            pfpUrl="https://cdn.discordapp.com/attachments/966629731086774302/1126886860094967868/unknown.png"
+                        />
+                        <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
+                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
-                    <div className="group relative h-48 w-full animate-fade-in overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1750ms] hover:border-black dark:border-white/50 dark:hover:border-white">
-                        <div className="absolute h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1750ms] hover:border-black dark:border-white/50 dark:hover:border-white">
+                        <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
+                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+
+                        <Tweet
+                            quote="never seen this much layout shift in my life"
+                            name="Julius"
+                            username="Julius"
+                            pfpUrl="https://pbs.twimg.com/profile_images/1526143235067985922/DmFx1k13_400x400.jpg"
+                        />
                     </div>
                 </div>
             </div>
@@ -147,6 +168,30 @@ const Stat = (props: { name: string; value: number | undefined }) => (
         <div className="text-sm">{props.name}</div>
     </h3>
 );
+
+const Tweet = (props: {
+    name: string;
+    pfpUrl: string;
+    quote: string;
+    username: string;
+}) => {
+    return (
+        <div className="flex h-full w-full flex-col gap-4 p-4 opacity-80 transition-opacity group-hover:opacity-90">
+            <div>
+                <div className="text-center">{props.quote}</div>
+            </div>
+            <div className="mx-auto flex  gap-2 leading-none">
+                <Pfp
+                    image={props.pfpUrl}
+                    className="w-8"
+                    name={`@${props.username}`}
+                />
+
+                <div className="my-auto font-bold">{props.name}</div>
+            </div>
+        </div>
+    );
+};
 
 type VoteMap = Record<
     string,
