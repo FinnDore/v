@@ -115,7 +115,7 @@ export const VoteButton = ({
                             {vote}
                         </div>
                     </div>
-                    {showVotes && (firstUsers?.length || totalExtraUsers) && (
+                    {showVotes && firstUsers?.length && (
                         <div className="absolute -right-0 -top-2 h-4 w-full ">
                             <div className="relative">
                                 {firstUsers.map((user, i) => (
