@@ -90,13 +90,37 @@ const Home: NextPage = () => {
                     </Button>
                 </Link>
                 <div className="mt-12 flex w-full max-w-lg  grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[900px] lg:grid-cols-3">
-                    <div className="group relative flex h-48 w-full animate-fade-in overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1000ms] hover:border-black dark:border-white/50 dark:hover:border-white">
-                        <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                    <div class=" group relative h-48 w-full">
+                        <div className="absolute left-1/2 z-10 w-max -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-black/40 px-6 py-1.5 text-sm font-bold transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
+                            <div className="absolute left-0 top-0 -z-10 h-full w-full bg-white dark:bg-black"></div>
+                            <div clas>Linear integration</div>
+                        </div>
+                        <div className="relative flex h-full w-full animate-fade-in overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1000ms] group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
+                            <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
+                            <div className="absolute -z-10 h-full w-full bg-blue-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                            <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+
+                            <div className="relative m-auto aspect-square h-4/5 transition-transform group-hover:scale-110">
+                                <Image
+                                    className="group-hover: animate-ping blur-md saturate-150 [animation-duration:_4s] group-hover:[animation-duration:_2s]"
+                                    src="/linear.png"
+                                    alt="linear icon"
+                                    fill={true}
+                                />
+                                <Image
+                                    className=""
+                                    src="/linear.png"
+                                    alt="linear icon"
+                                    fill={true}
+                                />
+                            </div>
+                        </div>
                     </div>
+
                     <div className="group relative flex h-48 w-full animate-fade-in overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1150ms] hover:border-black dark:border-white/50 dark:hover:border-white md:row-span-2 md:h-full lg:col-span-2 lg:h-48 lg:[grid-row:_unset]">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+
                         <Button
                             variant="outline"
                             onClick={() => void signIn('github')}
@@ -120,6 +144,7 @@ const Home: NextPage = () => {
                             </span>
                         </Button>
                     </div>
+
                     <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1300ms] hover:border-black dark:border-white/50 dark:hover:border-white">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
@@ -131,6 +156,7 @@ const Home: NextPage = () => {
                             pfpUrl="https://pbs.twimg.com/profile_images/1299465480214900739/Van7fqYL_400x400.jpg"
                         />
                     </div>
+
                     <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:hover:border-white">
                         <Tweet
                             quote="Works great with darkreader 👍"
@@ -141,6 +167,7 @@ const Home: NextPage = () => {
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
+
                     <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1750ms] hover:border-black dark:border-white/50 dark:hover:border-white">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
