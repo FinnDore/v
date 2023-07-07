@@ -20,6 +20,8 @@ export const VoteButton = ({
     users,
     showVotes,
     currentUserId,
+    small,
+    barHeight = 120,
 }: {
     current: boolean;
     vote: number | string;
@@ -29,6 +31,8 @@ export const VoteButton = ({
     users: Users;
     showVotes?: boolean;
     currentUserId: string | ((v: { id: string }) => boolean) | undefined;
+    small?: boolean;
+    barHeight?: number;
 }) => {
     const height = (currentVotes / totalVotes) * 100;
     const styles = useSpring({
@@ -42,7 +46,7 @@ export const VoteButton = ({
     });
 
     const outerStyles = useSpring({
-        height: !showVotes ? 0 : 120,
+        height: !showVotes ? 0 : barHeight,
         opacity: !showVotes ? 0 : 1,
         config: showVotes ? config.wobbly : config.default,
     });
@@ -88,15 +92,21 @@ export const VoteButton = ({
                     <div className="absolute top-0 z-10 h-1/3 w-full bg-gradient-to-b from-white dark:from-black"></div>
                     <animated.div
                         style={styles}
-                        className="w-6 rounded-b-md border-2 border-orange-400 border-t-transparent bg-orange-600 md:w-8"
+                        className={clsx(
+                            {
+                                '!w-[1.45rem]': small,
+                            },
+                            'w-[1.45rem] rounded-b-md border-2 border-orange-400 border-t-transparent bg-orange-600 md:w-8'
+                        )}
                     ></animated.div>
                 </animated.div>
                 <button
                     role="button"
                     className={clsx(
-                        'btn-shadow  relative h-9 w-12 text-white transition-all dark:shadow-none md:h-12 md:w-16',
+                        'btn-shadow relative z-20 h-9 w-12 text-white transition-all dark:shadow-none md:h-12 md:w-16',
                         {
                             'opacity-60': !current,
+                            '!h-9 !w-12': small,
                         }
                     )}
                     onClick={() => doVote(vote)}
