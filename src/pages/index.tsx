@@ -127,7 +127,7 @@ const Home: NextPage = () => {
                         <Tweet
                             quote="If I wanted to point something it'd be this website for how useless it is"
                             name="Samuel Gunter"
-                            username="samathingamajig"
+                            url="https://twitter.com/samathingamajig"
                             pfpUrl="https://pbs.twimg.com/profile_images/1299465480214900739/Van7fqYL_400x400.jpg"
                         />
                     </div>
@@ -135,7 +135,7 @@ const Home: NextPage = () => {
                         <Tweet
                             quote="Works great with darkreader 👍"
                             name="anna_devminer"
-                            username="samathingamajig"
+                            url="https://twitter.com/TheDevMinerTV"
                             pfpUrl="https://cdn.discordapp.com/attachments/966629731086774302/1126886860094967868/unknown.png"
                         />
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
@@ -148,7 +148,7 @@ const Home: NextPage = () => {
                         <Tweet
                             quote="never seen this much layout shift in my life"
                             name="Julius"
-                            username="Julius"
+                            url="https://twitter.com/jullerino"
                             pfpUrl="https://pbs.twimg.com/profile_images/1526143235067985922/DmFx1k13_400x400.jpg"
                         />
                     </div>
@@ -172,8 +172,8 @@ const Stat = (props: { name: string; value: number | undefined }) => (
 const Tweet = (props: {
     name: string;
     pfpUrl: string;
+    url: string;
     quote: string;
-    username: string;
 }) => {
     return (
         <div className="flex h-full w-full flex-col gap-4 p-4 opacity-80 transition-opacity group-hover:opacity-90">
@@ -181,13 +181,17 @@ const Tweet = (props: {
                 <div className="text-center">{props.quote}</div>
             </div>
             <div className="mx-auto flex  gap-2 leading-none">
-                <Pfp
-                    image={props.pfpUrl}
-                    className="w-8"
-                    name={`@${props.username}`}
-                />
+                <Link href={props.url}>
+                    <Pfp
+                        image={props.pfpUrl}
+                        className="w-8"
+                        name={`@${props.username}`}
+                    />
+                </Link>
 
-                <div className="my-auto font-bold">{props.name}</div>
+                <Link href={props.url} className="my-auto font-bold">
+                    <div>{props.name}</div>
+                </Link>
             </div>
         </div>
     );

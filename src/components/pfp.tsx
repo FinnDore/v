@@ -25,7 +25,7 @@ export const Pfp = forwardRef<
                         'absolute z-10 h-full w-full overflow-clip rounded-full border border-black/20 dark:border-white/40'
                     )}
                 >
-                    <picture className="block h-[70px]  min-h-full w-[70px]  min-w-full overflow-clip">
+                    <picture className="block h-[70px] min-h-full w-[70px]  min-w-full overflow-clip">
                         <source srcSet={'/NOISE.webp'} type="image/webp" />
                         <img
                             alt={`profile picture for ${name ?? 'a user'}`}
