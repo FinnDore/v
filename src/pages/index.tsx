@@ -135,7 +135,7 @@ const Home: NextPage = () => {
                         <Tweet
                             quote="Works great with darkreader 👍"
                             name="anna_devminer"
-                            url="https://twitter.com/TheDevMinerTV"
+                            url="https://devminer.xyz"
                             pfpUrl="https://cdn.discordapp.com/attachments/966629731086774302/1126886860094967868/unknown.png"
                         />
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
@@ -176,16 +176,16 @@ const Tweet = (props: {
     quote: string;
 }) => {
     return (
-        <div className="flex h-full w-full flex-col gap-4 p-4 opacity-80 transition-opacity group-hover:opacity-90">
-            <div>
-                <div className="text-center">{props.quote}</div>
+        <div className="flex h-full w-full flex-col gap-4 p-4 opacity-80 transition-opacity group-hover:opacity-100">
+            <div className="text-center text-sm md:text-base">
+                {props.quote}
             </div>
-            <div className="mx-auto flex  gap-2 leading-none">
+            <div className="mx-auto flex gap-2 leading-none">
                 <Link href={props.url}>
                     <Pfp
-                        image={props.pfpUrl}
                         className="w-8"
-                        name={`@${props.username}`}
+                        image={props.pfpUrl}
+                        name={props.name}
                     />
                 </Link>
 
