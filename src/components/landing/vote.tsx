@@ -195,7 +195,7 @@ export const Vote = () => {
 
     return (
         <div className="relative mx-auto mt-12 flex animate-fade-in flex-wrap justify-center gap-2 opacity-0 [animation-delay:_750ms] md:gap-4">
-            {voteOptions.map((vote, i) => (
+            {voteOptions.map(vote => (
                 <VoteButton
                     key={vote}
                     vote={vote}

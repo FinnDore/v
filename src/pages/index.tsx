@@ -94,7 +94,7 @@ const Home: NextPage = () => {
 
                                 <div className="relative m-auto aspect-square h-4/5 transition-transform group-hover:scale-110">
                                     <Image
-                                        className="group-hover: animate-ping blur-md saturate-150 [animation-duration:_4s] group-hover:[animation-duration:_2s]"
+                                        className="group-hover: animate-ping blur-md saturate-150 [animation-duration:_3s] group-hover:[animation-duration:_1s]"
                                         src="/linear.png"
                                         alt="linear icon"
                                         fill={true}
