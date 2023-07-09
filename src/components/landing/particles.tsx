@@ -31,6 +31,7 @@ function hexToRgb(hex: string): number[] {
     return [red, green, blue];
 }
 
+// TODO fix last remaing bugs and add creddit to creddit page thing V-23
 export const Particles: React.FC<ParticlesProps> = ({
     className = '',
     quantity = 30,
