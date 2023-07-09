@@ -50,6 +50,7 @@ export const Particles: React.FC<ParticlesProps> = ({
     const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+    const isHovering = useRef<boolean>(false);
 
     const onMouseMove = useCallback(() => {
         if (canvasRef.current) {
@@ -61,7 +62,12 @@ export const Particles: React.FC<ParticlesProps> = ({
             if (inside) {
                 mouse.current.x = x;
                 mouse.current.y = y;
+                isHovering.current = true;
+            } else {
+                isHovering.current = false;
             }
+
+            console.log(isHovering.current);
         }
     }, [mousePosition.x, mousePosition.y]);
 
@@ -158,10 +164,13 @@ export const Particles: React.FC<ParticlesProps> = ({
                 const image = imageElements.current?.[circle.imageIndex];
                 if (image && update) {
                     context.current.globalAlpha = alpha;
+
+                    context.current.filter = `blur(${
+                        !isHovering.current ? alpha * 3 : 0
+                    }px)`;
                     context.current.drawImage(image, x, y, size, size);
 
                     // context.current.globalAlpha = 1;
-                    // context.current.filter = `blur(${alpha}px)`;
                 }
                 context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
                 // if (!context.) {
