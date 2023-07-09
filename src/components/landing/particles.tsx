@@ -1,6 +1,5 @@
-'use client';
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import MousePosition from './mouse-position';
 
@@ -13,7 +12,7 @@ interface ParticlesProps {
     color?: string;
     vx?: number;
     vy?: number;
-    images: string[];
+    images?: string[];
 }
 function hexToRgb(hex: string): number[] {
     // Remove the "#" character from the beginning of the hex color code
@@ -46,7 +45,7 @@ export const Particles: React.FC<ParticlesProps> = ({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const canvasContainerRef = useRef<HTMLDivElement>(null);
     const context = useRef<CanvasRenderingContext2D | null>(null);
-    const circles = useRef<any[]>([]);
+    const circles = useRef<Circle[]>([]);
     const mousePosition = MousePosition();
     const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
@@ -67,8 +66,6 @@ export const Particles: React.FC<ParticlesProps> = ({
             } else {
                 isHovering.current = false;
             }
-
-            console.log(isHovering.current);
         }
     }, [mousePosition.x, mousePosition.y]);
 
@@ -129,9 +126,12 @@ export const Particles: React.FC<ParticlesProps> = ({
             dx,
             dy,
             magnetism,
-            imageIndex: Math.floor(Math.random() * images.length ?? 1),
+            imageIndex: Math.floor(Math.random() * (images?.length ?? 1)),
         };
-    }, [images.length]);
+    }, [images?.length]);
+
+    const rgb = useMemo(() => hexToRgb(color), [color]);
+
 
     const imageElements = useRef<HTMLImageElement[] | null>(null);
     useEffect(() => {
@@ -157,41 +157,32 @@ export const Particles: React.FC<ParticlesProps> = ({
             if (context.current) {
                 const { x, y, translateX, translateY, size, alpha } = circle;
                 context.current.translate(translateX, translateY);
-                // context.current.beginPath();
-                // context.current.arc(x, y, size, 0, 2 * Math.PI);
-                // context.current.fillStyle = `rgba(${rgb.join(', ')}, ${alpha})`;
-                // context.current.fill();
-                // context.current.closePath();
-                const image = imageElements.current?.[circle.imageIndex];
-                if (image && update) {
-                    context.current.globalAlpha = alpha;
-
-                    context.current.filter = `blur(${
-                        !isHovering.current ? alpha * 3 : 0
-                    }px)`;
-                    context.current.drawImage(image, x, y, size, size);
-
-                    // context.current.globalAlpha = 1;
+                if (!images) {
+                    context.current.beginPath();
+                    context.current.arc(x, y, size, 0, 2 * Math.PI);
+                    context.current.fillStyle = `rgba(${rgb.join(
+                        ', '
+                    )}, ${alpha})`;
+                    context.current.fill();
+                    context.current.closePath();
+                } else {
+                    const image = imageElements.current?.[circle.imageIndex];
+                    if (image && update) {
+                        context.current.globalAlpha = alpha;
+                        context.current.filter = `blur(${
+                            !isHovering.current ? alpha * 3 : 0
+                        }px)`;
+                        context.current.drawImage(image, x, y, size, size);
+                    }
+                    context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
                 }
-                context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
-                // if (!context.) {
-                //     const image = new Image();
-
-                //     image.onload = (e) => {
-                //         if (context.current) {
-                //         }
-                //         console.log('image looad');
-                //     };
-
-                //     image.src = 'in-progress.svg';
-                // }
-
+              
                 if (!update) {
                     circles.current.push(circle);
                 }
             }
         },
-        [dpr]
+        [dpr, images, rgb]
     );
 
     const clearContext = useCallback(() => {
@@ -302,9 +293,20 @@ export const Particles: React.FC<ParticlesProps> = ({
         initCanvas();
         return () => {
             circles.current = [];
-            console.log('reset');
         };
-    }, [initCanvas, refresh]);
+    }, [
+        initCanvas,
+        refresh,
+        circles,
+        images,
+        quantity,
+        staticity,
+        vx,
+        vy,
+        ease,
+        color,
+    ]);
+
 
     useEffect(() => {
         if (canvasRef.current) {
