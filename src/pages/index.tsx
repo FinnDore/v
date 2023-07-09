@@ -6,6 +6,7 @@ import Balancer, { Provider } from 'react-wrap-balancer';
 import { api } from '@/utils/api';
 import { formatCompactNumber } from '@/utils/format-numbers';
 import { Button } from '@/components/button';
+import { Linear } from '@/components/landing/linear';
 import { Vote } from '@/components/landing/vote';
 import { VoteDemo } from '@/components/landing/vote-demo';
 import { Pfp } from '@/components/pfp';
@@ -91,21 +92,7 @@ const Home: NextPage = () => {
                                 <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                                 <div className="absolute -z-10 h-full w-full bg-blue-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                                 <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
-
-                                <div className="relative m-auto aspect-square h-4/5 transition-transform group-hover:scale-110">
-                                    <Image
-                                        className="group-hover: animate-ping blur-md saturate-150 [animation-duration:_3s] group-hover:[animation-duration:_1s]"
-                                        src="/linear.png"
-                                        alt="linear icon"
-                                        fill={true}
-                                    />
-                                    <Image
-                                        className=""
-                                        src="/linear.png"
-                                        alt="linear icon"
-                                        fill={true}
-                                    />
-                                </div>
+                                <Linear />
                             </div>
                         </div>
                     </div>
