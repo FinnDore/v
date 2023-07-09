@@ -1,3 +1,4 @@
+import { HTMLProps, PropsWithChildren, forwardRef } from 'react';
 import Image from 'next/image';
 
 import { Particles } from './particles';
@@ -9,17 +10,18 @@ export const Linear = () => {
         <>
             <div className="pointer-events-none relative m-auto aspect-square h-4/5 transition-transform duration-500 group-hover:scale-110">
                 <Image
-                    className="pointer-events-none animate-ping blur-md saturate-150 [animation-duration:_3s] group-hover:[animation-duration:_1s]"
+                    className="pointer-events-none animate-ping blur-md saturate-150 [animation-duration:_3s] group-hover:[animation-duration:_2s]"
                     src="/linear/linear.png"
                     alt="linear icon"
                     fill={true}
                 />
-                <Image
-                    className="pointer-events-none"
-                    src="/linear/linear.png"
-                    alt="linear icon"
-                    fill={true}
-                />
+                <WithBlur className="pointer-events-none h-full w-full">
+                    <Image
+                        src="/linear/linear.png"
+                        alt="linear icon"
+                        fill={true}
+                    />
+                </WithBlur>
             </div>
             <Particles
                 images={[
@@ -34,3 +36,17 @@ export const Linear = () => {
         </>
     );
 };
+
+const WithBlur = forwardRef<
+    HTMLDivElement,
+    HTMLProps<HTMLDivElement> & PropsWithChildren
+>(function WithBlur({ children, ...props }, ref) {
+    return (
+        <div className="relative" ref={ref} {...props}>
+            <div className="absolute top-0 h-full w-full scale-110 animate-pulse blur-md">
+                {children}
+            </div>
+            {children}
+        </div>
+    );
+});
