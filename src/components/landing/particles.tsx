@@ -1,4 +1,3 @@
-'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
@@ -133,6 +132,7 @@ export const Particles: React.FC<ParticlesProps> = ({
 
     const rgb = useMemo(() => hexToRgb(color), [color]);
 
+
     const imageElements = useRef<HTMLImageElement[] | null>(null);
     useEffect(() => {
         if (!images) return;
@@ -176,6 +176,7 @@ export const Particles: React.FC<ParticlesProps> = ({
                     }
                     context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
                 }
+              
                 if (!update) {
                     circles.current.push(circle);
                 }
@@ -305,6 +306,7 @@ export const Particles: React.FC<ParticlesProps> = ({
         ease,
         color,
     ]);
+
 
     useEffect(() => {
         if (canvasRef.current) {
