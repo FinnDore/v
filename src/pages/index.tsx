@@ -10,7 +10,6 @@ import { Linear } from '@/components/landing/linear';
 import { Vote } from '@/components/landing/vote';
 import { VoteDemo } from '@/components/landing/vote-demo';
 import { Pfp } from '@/components/pfp';
-import darkLightRays from '../../public/temp-rays-dark.png';
 import lightLightRays from '../../public/temp-rays-light.png';
 
 const Home: NextPage = () => {
@@ -20,17 +19,20 @@ const Home: NextPage = () => {
         <>
             <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center px-4 pb-6 lg:max-w-screen-lg">
                 <div className="absolute left-0 top-0 -z-20 h-screen w-screen max-w-[100vw] animate-fade-in overflow-x-clip opacity-0 ">
+                    <picture>
+                        <source
+                            media="(prefers-color-scheme: dark)"
+                            srcset="/temp-rays-dark.png"
+                        />
+                        <img
+                            src="/temp-rays-light.png"
+                            width={982}
+                            height={1005}
+                            className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
+                            alt="background image of light rays"
+                        />
+                    </picture>
                     <Image
-                        width={982}
-                        height={1005}
-                        alt="bg image of light rays"
-                        src={darkLightRays}
-                        className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
-                        placeholder="blur"
-                    />
-                    <Image
-                        width={982}
-                        height={1005}
                         alt="bg image of light rays"
                         src={lightLightRays}
                         className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%] dark:hidden"
