@@ -22,7 +22,7 @@ const Home: NextPage = () => {
                     <picture>
                         <source
                             media="(prefers-color-scheme: dark)"
-                            srcset="/temp-rays-dark.png"
+                            srcSet="/temp-rays-dark.png"
                         />
                         <img
                             src="/temp-rays-light.png"
