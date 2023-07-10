@@ -14,16 +14,16 @@ type LocalUserStore = {
 };
 
 // We dont use zod as this is used on the front page and zod is large
-const parseUerStore = <T extends LocalUserStore>(
+const parseUerStore = <T extends LocalUserStore | null>(
     userStore: T
 ):
     | { success: true; data: LocalUserStore }
     | { success: false; data: null; error: string } => {
-    if (typeof userStore.version !== 'string')
+    if (typeof userStore?.version !== 'string')
         return { success: false, data: null, error: 'version not string' };
     if (typeof userStore.user !== 'object')
         return { success: false, data: null, error: 'user not object' };
-    if (typeof userStore.user.id !== 'string')
+    if (typeof userStore.user?.id !== 'string')
         return { success: false, data: null, error: 'user.id not string' };
     if (typeof userStore.user.name !== 'string')
         return { success: false, data: null, error: 'user.name not string' };
