@@ -1,5 +1,4 @@
 import { type NextPage } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import Balancer, { Provider } from 'react-wrap-balancer';
 
@@ -10,7 +9,6 @@ import { Linear } from '@/components/landing/linear';
 import { Vote } from '@/components/landing/vote';
 import { VoteDemo } from '@/components/landing/vote-demo';
 import { Pfp } from '@/components/pfp';
-import lightLightRays from '../../public/temp-rays-light.png';
 
 const Home: NextPage = () => {
     const statsQuery = api.landing.landingStats.useQuery();
@@ -22,22 +20,16 @@ const Home: NextPage = () => {
                     <picture>
                         <source
                             media="(prefers-color-scheme: dark)"
-                            srcSet="/temp-rays-dark.png"
+                            srcSet="/rays-dark.webp"
                         />
                         <img
-                            src="/temp-rays-light.png"
+                            src="/rays-light.webp"
                             width={982}
                             height={1005}
                             className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
                             alt="background image of light rays"
                         />
                     </picture>
-                    <Image
-                        alt="bg image of light rays"
-                        src={lightLightRays}
-                        className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%] dark:hidden"
-                        placeholder="blur"
-                    />
                 </div>
                 <Provider>
                     <h1 className="w-full animate-fade-in text-center text-4xl font-bold opacity-0 [animation-delay:_200ms] md:mt-8 md:text-6xl ">
