@@ -27,7 +27,7 @@
     }
 }
 
-@keyframes fadeIn {
+@keyframes dropIn {
     0% {
         opacity: 0;
     }
@@ -36,8 +36,19 @@
     }
 }
 
+@keyframes dropIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
 .fade-in {
-    animation: fadeIn 0.25s ease-in;
+    animation: dropIn 0.25s ease-in;
 }
 
 .btn-shadow {
