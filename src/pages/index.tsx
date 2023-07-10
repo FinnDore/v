@@ -26,7 +26,7 @@ const Home: NextPage = () => {
                             src="/rays-light.webp"
                             height={982}
                             width={1005}
-                            className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
+                            className="absolute left-1/2 aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%]"
                             alt="background image of light rays"
                         />
                     </picture>
