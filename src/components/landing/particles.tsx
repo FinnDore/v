@@ -305,7 +305,7 @@ export const Particles: React.FC<ParticlesProps> = ({
         return () => {
             circles.current = [];
         };
-    }, [initCanvas]);
+    }, []);
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -318,7 +318,7 @@ export const Particles: React.FC<ParticlesProps> = ({
         return () => {
             window.removeEventListener('resize', initCanvas);
         };
-    }, [animate, initCanvas]);
+    }, []);
 
     return (
         <div className={className} ref={canvasContainerRef} aria-hidden="true">

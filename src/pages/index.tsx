@@ -24,8 +24,8 @@ const Home: NextPage = () => {
                         />
                         <img
                             src="/rays-light.webp"
-                            width={982}
-                            height={1005}
+                            height={982}
+                            width={1005}
                             className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
                             alt="background image of light rays"
                         />
@@ -46,7 +46,7 @@ const Home: NextPage = () => {
                     </h2>
                 </Provider>
 
-                <div className="mt-4 grid w-full grid-cols-3 justify-around px-4 text-center text-xl md:mt-12">
+                <div className="mt-4 flex w-full justify-around text-center sm:grid sm:grid-cols-3">
                     <Stat
                         name="Votes Cast"
                         value={statsQuery.data?.totalVoteChoices}
@@ -167,11 +167,11 @@ const Home: NextPage = () => {
 export default Home;
 
 const Stat = (props: { name: string; value: number | undefined }) => (
-    <h3 className="flex animate-fade-in flex-col gap-1 opacity-0 [animation-delay:_500ms]">
-        <div className="h-8 text-2xl font-bold">
+    <h3 className="gap flex animate-fade-in flex-col opacity-0 [animation-delay:_500ms] md:gap-1">
+        <div className="h-8 text-xl font-bold sm:text-2xl">
             {props.value && formatCompactNumber(props.value)}
         </div>
-        <div className="text-sm">{props.name}</div>
+        <div className="text-xs sm:text-sm">{props.name}</div>
     </h3>
 );
 
