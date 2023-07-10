@@ -1,5 +1,4 @@
 import { type NextPage } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import Balancer, { Provider } from 'react-wrap-balancer';
 
@@ -10,8 +9,6 @@ import { Linear } from '@/components/landing/linear';
 import { Vote } from '@/components/landing/vote';
 import { VoteDemo } from '@/components/landing/vote-demo';
 import { Pfp } from '@/components/pfp';
-import darkLightRays from '../../public/temp-rays-dark.png';
-import lightLightRays from '../../public/temp-rays-light.png';
 
 const Home: NextPage = () => {
     const statsQuery = api.landing.landingStats.useQuery();
@@ -20,22 +17,19 @@ const Home: NextPage = () => {
         <>
             <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center px-4 pb-6 lg:max-w-screen-lg">
                 <div className="absolute left-0 top-0 -z-20 h-screen w-screen max-w-[100vw] animate-fade-in overflow-x-clip opacity-0 ">
-                    <Image
-                        width={982}
-                        height={1005}
-                        alt="bg image of light rays"
-                        src={darkLightRays}
-                        className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
-                        placeholder="blur"
-                    />
-                    <Image
-                        width={982}
-                        height={1005}
-                        alt="bg image of light rays"
-                        src={lightLightRays}
-                        className="absolute left-1/2 aspect-auto -translate-x-1/2 -translate-y-[30%] dark:hidden"
-                        placeholder="blur"
-                    />
+                    <picture>
+                        <source
+                            media="(prefers-color-scheme: dark)"
+                            srcSet="/rays-dark.webp"
+                        />
+                        <img
+                            src="/rays-light.webp"
+                            width={982}
+                            height={1005}
+                            className="absolute left-1/2 hidden aspect-auto min-w-[50rem] -translate-x-1/2 -translate-y-[30%] dark:block"
+                            alt="background image of light rays"
+                        />
+                    </picture>
                 </div>
                 <Provider>
                     <h1 className="w-full animate-fade-in text-center text-4xl font-bold opacity-0 [animation-delay:_200ms] md:mt-8 md:text-6xl ">
@@ -138,7 +132,7 @@ const Home: NextPage = () => {
                             quote="If I wanted to point something it'd be this website for how useless it is"
                             name="Samuel Gunter"
                             url="https://twitter.com/samathingamajig"
-                            pfpUrl="https://pbs.twimg.com/profile_images/1299465480214900739/Van7fqYL_400x400.jpg"
+                            pfpUrl="/pfp/samuel_gunter.webp"
                         />
                     </div>
 
@@ -147,7 +141,7 @@ const Home: NextPage = () => {
                             quote="Works great with darkreader 👍"
                             name="anna_devminer"
                             url="https://devminer.xyz"
-                            pfpUrl="https://cdn.discordapp.com/attachments/966629731086774302/1126886860094967868/unknown.png"
+                            pfpUrl="/pfp/anna_devminer.webp"
                         />
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
@@ -161,7 +155,7 @@ const Home: NextPage = () => {
                             quote="I've never seen this much layout shift in my life"
                             name="Julius"
                             url="https://twitter.com/jullerino"
-                            pfpUrl="https://pbs.twimg.com/profile_images/1526143235067985922/DmFx1k13_400x400.jpg"
+                            pfpUrl="/pfp/julius.webp"
                         />
                     </div>
                 </div>

@@ -2,19 +2,38 @@ import { useEffect, useMemo, useState, version } from 'react';
 import { type AnonUser } from '@prisma/client';
 import { type Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
-import { z } from 'zod';
 
-const LocalUserStoreSchema = z.object({
-    version: z.string(),
-    user: z.object({
-        id: z.string(),
-        name: z.string(),
-        secret: z.string().cuid(),
-        pfpHash: z.string(),
-    }),
-});
+type LocalUserStore = {
+    version: string;
+    user: {
+        id: string;
+        name: string;
+        secret: string;
+        pfpHash: string;
+    };
+};
 
-type LocalUserStore = z.infer<typeof LocalUserStoreSchema>;
+// We dont use zod as this is used on the front page and zod is large
+const parseUerStore = <T extends LocalUserStore | null>(
+    userStore: T
+):
+    | { success: true; data: LocalUserStore }
+    | { success: false; data: null; error: string } => {
+    if (typeof userStore?.version !== 'string')
+        return { success: false, data: null, error: 'version not string' };
+    if (typeof userStore.user !== 'object')
+        return { success: false, data: null, error: 'user not object' };
+    if (typeof userStore.user?.id !== 'string')
+        return { success: false, data: null, error: 'user.id not string' };
+    if (typeof userStore.user.name !== 'string')
+        return { success: false, data: null, error: 'user.name not string' };
+    if (typeof userStore.user.secret !== 'string')
+        return { success: false, data: null, error: 'user.secret not string' };
+    if (typeof userStore.user.pfpHash !== 'string')
+        return { success: false, data: null, error: 'user.pfpHash not string' };
+
+    return { success: true, data: userStore };
+};
 
 export function useAnonUser() {
     const [user, setUser] = useState<LocalUserStore['user'] | null>();
@@ -48,7 +67,7 @@ export function useAnonUser() {
 }
 
 export function storeUser(user: AnonUser) {
-    const existingUsersParseResult = LocalUserStoreSchema.safeParse(
+    const existingUsersParseResult = parseUerStore(
         JSON.parse(localStorage.getItem('users') || 'null')
     );
 
@@ -79,7 +98,7 @@ export function storeUser(user: AnonUser) {
 }
 
 function getLocalUserStore() {
-    const existingUsersParseResult = LocalUserStoreSchema.safeParse(
+    const existingUsersParseResult = parseUerStore(
         JSON.parse(localStorage.getItem('user') || 'null')
     );
     if (!existingUsersParseResult.success) {
