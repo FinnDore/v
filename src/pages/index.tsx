@@ -1,5 +1,6 @@
 import { type NextPage } from 'next';
 import Link from 'next/link';
+import clsx from 'clsx';
 import Balancer, { Provider } from 'react-wrap-balancer';
 
 import { api } from '@/utils/api';
@@ -47,7 +48,7 @@ const Home: NextPage = () => {
                     </h2>
                 </Provider>
 
-                <div className="mt-4 flex w-full justify-around text-center sm:grid sm:grid-cols-3">
+                <div className="mt-4 grid w-full grid-cols-3 justify-around text-center">
                     <Stat
                         name="Votes Cast"
                         value={statsQuery.data?.totalVoteChoices}
@@ -105,7 +106,10 @@ const Home: NextPage = () => {
 
                     <div className="group relative h-48 w-full ">
                         <div className="group h-full w-full animate-fade-in opacity-0 [animation-delay:_1300ms]">
-                            {/* <FeatureTitle title="Linear integration" /> */}
+                            <FeatureTitle
+                                title="Anonymous login"
+                                className="bottom-0 translate-y-1/2"
+                            />
 
                             <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
                                 <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
@@ -189,8 +193,13 @@ const Tweet = (props: {
     );
 };
 
-const FeatureTitle = (props: { title: string }) => (
-    <div className="user-select-none absolute left-1/2 z-10 w-max -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-black/40 px-6 py-1.5 text-sm font-bold transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
+const FeatureTitle = (props: { title: string; className?: string }) => (
+    <div
+        className={clsx(
+            props.className,
+            'user-select-none absolute left-1/2 z-10 w-max -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-black/40 px-6 py-1.5 text-sm font-bold transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white'
+        )}
+    >
         <div className="absolute left-0 top-0 -z-10 h-full w-full bg-white dark:bg-black"></div>
         <h2>{props.title}</h2>
     </div>
