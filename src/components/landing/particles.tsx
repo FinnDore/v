@@ -56,7 +56,7 @@ const remapValue = (
     return remapped > 0 ? remapped : 0;
 };
 
-const fps = 30;
+const fps = 15;
 // TODO fix last remaing bugs and add creddit to creddit page thing V-23
 export const Particles: React.FC<ParticlesProps> = ({
     className = '',
@@ -201,6 +201,7 @@ export const Particles: React.FC<ParticlesProps> = ({
             const interval = 1000 / fps;
             const delta = timestamp - prevFrame.current;
             window.requestAnimationFrame(animate);
+
             if (delta < interval) return;
 
             clearContext();
@@ -276,7 +277,6 @@ export const Particles: React.FC<ParticlesProps> = ({
                     );
                 }
             });
-
             prevFrame.current = timestamp - (delta % interval);
         },
         [circleParams, clearContext, drawCircle, ease, staticity, vx, vy]

@@ -5,6 +5,7 @@ import Balancer, { Provider } from 'react-wrap-balancer';
 import { api } from '@/utils/api';
 import { formatCompactNumber } from '@/utils/format-numbers';
 import { Button } from '@/components/button';
+import { ShowcaseAnonUsers } from '@/components/landing/anon-users';
 import { Linear } from '@/components/landing/linear';
 import { Vote } from '@/components/landing/vote';
 import { VoteDemo } from '@/components/landing/vote-demo';
@@ -100,40 +101,25 @@ const Home: NextPage = () => {
                                 <VoteDemo />
                             </div>
                         </div>
-                        {/* <Button
-                            variant="outline"
-                            onClick={() => void signIn('github')}
-                            className="m-auto flex rounded-md px-3 py-2 text-2xl dark:hover:border-white/50 dark:hover:bg-white/10 dark:hover:text-white"
-                        >
-                            <span className="my-auto flex">
-                                <span className="my-auto leading-none">
-                                    signIn
-                                </span>
-                            </span>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => void signOut()}
-                            className="m-auto flex rounded-md px-3 py-2 text-2xl dark:hover:border-white/50 dark:hover:bg-white/10 dark:hover:text-white"
-                        >
-                            <span className="my-auto flex">
-                                <span className="my-auto leading-none">
-                                    Logout
-                                </span>
-                            </span>
-                        </Button> */}
                     </div>
 
-                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1300ms] hover:border-black dark:border-white/50 dark:hover:border-white">
-                        <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                        <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                    <div className="group relative h-48 w-full ">
+                        <div className="group h-full w-full animate-fade-in opacity-0 [animation-delay:_1300ms]">
+                            {/* <FeatureTitle title="Linear integration" /> */}
 
-                        <Tweet
-                            quote="If I wanted to point something it'd be this website for how useless it is"
-                            name="Samuel Gunter"
-                            url="https://twitter.com/samathingamajig"
-                            pfpUrl="/pfp/samuel_gunter.webp"
-                        />
+                            <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
+                                <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
+                                <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+
+                                <ShowcaseAnonUsers />
+                                {/* <Tweet
+                                    quote="If I wanted to point something it'd be this website for how useless it is"
+                                    name="Samuel Gunter"
+                                    url="https://twitter.com/samathingamajig"
+                                    pfpUrl="/pfp/samuel_gunter.webp"
+                                /> */}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:hover:border-white">
