@@ -11,13 +11,13 @@ export const Linear = () => {
             <div className="pointer-events-none relative m-auto aspect-square h-4/5 transition-transform duration-500 group-hover:scale-110">
                 <Image
                     className="pointer-events-none animate-ping blur-md saturate-150 [animation-duration:_3s] group-hover:[animation-duration:_2s]"
-                    src="/linear/linear.png"
+                    src="/linear/linear.webp"
                     alt="linear icon"
                     fill={true}
                 />
                 <WithBlur className="pointer-events-none h-full w-full">
                     <Image
-                        src="/linear/linear.png"
+                        src="/linear/linear.webp"
                         alt="linear icon"
                         fill={true}
                     />
