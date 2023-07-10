@@ -14,6 +14,20 @@ interface ParticlesProps {
     images?: string[];
 }
 
+type Circle = {
+    x: number;
+    y: number;
+    translateX: number;
+    translateY: number;
+    size: number;
+    alpha: number;
+    targetAlpha: number;
+    dx: number;
+    dy: number;
+    magnetism: number;
+    imageIndex: number;
+};
+
 const hexToRgb = (hex: string): number[] => {
     // Remove the "#" character from the beginning of the hex color code
     hex = hex.replace('#', '');
@@ -49,7 +63,6 @@ export const Particles: React.FC<ParticlesProps> = ({
     quantity = 30,
     staticity = 50,
     ease = 50,
-    refresh = false,
     color = '#ffffff',
     vx = 0,
     vy = 0,
@@ -65,6 +78,8 @@ export const Particles: React.FC<ParticlesProps> = ({
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
     const isHovering = useRef<boolean>(false);
     const prevFrame = useRef<number>(performance.now());
+    const imageElements = useRef<HTMLImageElement[] | null>(null);
+    const rgb = useMemo(() => hexToRgb(color).join(', '), [color]);
 
     const onMouseMove = useCallback(() => {
         if (canvasRef.current) {
@@ -86,37 +101,6 @@ export const Particles: React.FC<ParticlesProps> = ({
     useEffect(() => {
         onMouseMove();
     }, [mousePosition.x, mousePosition.y, onMouseMove]);
-
-    type Circle = {
-        x: number;
-        y: number;
-        translateX: number;
-        translateY: number;
-        size: number;
-        alpha: number;
-        targetAlpha: number;
-        dx: number;
-        dy: number;
-        magnetism: number;
-        imageIndex: number;
-    };
-
-    const resizeCanvas = useCallback(() => {
-        if (
-            canvasContainerRef.current &&
-            canvasRef.current &&
-            context.current
-        ) {
-            circles.current.length = 0;
-            canvasSize.current.w = canvasContainerRef.current.offsetWidth;
-            canvasSize.current.h = canvasContainerRef.current.offsetHeight;
-            canvasRef.current.width = canvasSize.current.w * dpr;
-            canvasRef.current.height = canvasSize.current.h * dpr;
-            canvasRef.current.style.width = `${canvasSize.current.w}px`;
-            canvasRef.current.style.height = `${canvasSize.current.h}px`;
-            context.current.scale(dpr, dpr);
-        }
-    }, [dpr]);
 
     const circleParams = useCallback((): Circle => {
         const x = Math.floor(Math.random() * canvasSize.current.w);
@@ -144,9 +128,6 @@ export const Particles: React.FC<ParticlesProps> = ({
         };
     }, [images?.length]);
 
-    const rgb = useMemo(() => hexToRgb(color), [color]);
-
-    const imageElements = useRef<HTMLImageElement[] | null>(null);
     useEffect(() => {
         if (!images) return;
         if (!imageElements.current) imageElements.current = [];
@@ -173,9 +154,7 @@ export const Particles: React.FC<ParticlesProps> = ({
                 if (!images) {
                     context.current.beginPath();
                     context.current.arc(x, y, size, 0, 2 * Math.PI);
-                    context.current.fillStyle = `rgba(${rgb.join(
-                        ', '
-                    )}, ${alpha})`;
+                    context.current.fillStyle = `rgba(${rgb}, ${alpha})`;
                     context.current.fill();
                     context.current.closePath();
                 } else {
