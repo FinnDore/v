@@ -132,7 +132,7 @@ const Home: NextPage = () => {
                             quote="If I wanted to point something it'd be this website for how useless it is"
                             name="Samuel Gunter"
                             url="https://twitter.com/samathingamajig"
-                            pfpUrl="https://pbs.twimg.com/profile_images/1299465480214900739/Van7fqYL_400x400.jpg"
+                            pfpUrl="/pfp/samuel_gunter.webp"
                         />
                     </div>
 
@@ -141,7 +141,7 @@ const Home: NextPage = () => {
                             quote="Works great with darkreader 👍"
                             name="anna_devminer"
                             url="https://devminer.xyz"
-                            pfpUrl="https://cdn.discordapp.com/attachments/966629731086774302/1126886860094967868/unknown.png"
+                            pfpUrl="/pfp/anna_devminer.webp"
                         />
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
@@ -155,7 +155,7 @@ const Home: NextPage = () => {
                             quote="I've never seen this much layout shift in my life"
                             name="Julius"
                             url="https://twitter.com/jullerino"
-                            pfpUrl="https://pbs.twimg.com/profile_images/1526143235067985922/DmFx1k13_400x400.jpg"
+                            pfpUrl="/pfp/julius.webp"
                         />
                     </div>
                 </div>
