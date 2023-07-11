@@ -11,7 +11,7 @@ import {
     rateLimitedTrpcProc,
 } from '@/server/api/trpc';
 import {
-    dispatchLandingVoteUpdateEvent,
+    dispatchVoteUpdateEvent,
     hop,
     selectPokerVote,
     type Vote,
@@ -220,7 +220,7 @@ const castVote = rateLimitedAnonOrUserProcedure(RateLimitPrefix.vote)
             });
         }
 
-        await dispatchLandingVoteUpdateEvent({ vote });
+        await dispatchVoteUpdateEvent({ vote });
         return vote;
     });
 
