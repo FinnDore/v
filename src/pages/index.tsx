@@ -108,7 +108,7 @@ const Home: NextPage = () => {
                         <div className="group h-full w-full animate-fade-in opacity-0 [animation-delay:_1300ms]">
                             <FeatureTitle
                                 title="Anonymous login"
-                                className="bottom-0 translate-y-1/2"
+                                className="lg:bottom-0 lg:translate-y-1/2"
                             />
 
                             <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">

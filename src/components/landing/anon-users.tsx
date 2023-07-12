@@ -34,7 +34,7 @@ export const ShowcaseAnonUsers = () => {
     }, []);
 
     return (
-        <div className="showcase-anon-users grid h-full w-full place-content-center">
+        <div className="showcase-anon-users grid h-full w-full place-content-center duration-500 group-hover:scale-110">
             <div className="flex">
                 {pfpHashes.map((hash, i) => (
                     <Pfp
@@ -50,7 +50,7 @@ export const ShowcaseAnonUsers = () => {
                 ))}
             </div>
             <Particles
-                className="absolute -z-10 h-full w-full transition-transform duration-500 group-hover:scale-110"
+                className="absolute -z-10 h-full w-full transition-transform"
                 quantity={50}
                 images={bgHashes.map(hash => `api/gradient/${hash}`)}
             />

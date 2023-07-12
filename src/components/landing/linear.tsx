@@ -1,4 +1,4 @@
-import { HTMLProps, PropsWithChildren, forwardRef } from 'react';
+import { forwardRef, type HTMLProps, type PropsWithChildren } from 'react';
 
 import { Particles } from './particles';
 
