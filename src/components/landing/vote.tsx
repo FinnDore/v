@@ -158,24 +158,29 @@ export const Vote = () => {
             const vote = parse<LandingPageVote>(event.data);
             const existingVote = utils.landing.landingVotes
                 .getData()
-                ?.find(vote => localVoteId && vote.id === localVoteId);
+                ?.find(
+                    vote =>
+                        (session.user?.id &&
+                            (vote.user?.id === session.user.id ||
+                                vote.anonUser?.id === session.user.id)) ||
+                        (localVoteId && localVoteId === vote.id)
+                );
 
             const timeSinceLastUpdate = Date.now() - voteLastUpdated.current;
+            const updateGracePeriod = 2000;
+            if (
+                existingVote &&
+                timeSinceLastUpdate < updateGracePeriod &&
+                ((session.user?.id &&
+                    (vote.user?.id === session.user.id ||
+                        vote.anonUser?.id === session.user.id)) ||
+                    (localVoteId && localVoteId === vote.id))
+            )
+                return;
 
             utils.landing.landingVotes.setData(undefined, prev => {
                 if (!prev) return prev;
                 // Ignore events from ourselves x seconds after we optimistically updated if we have our current vote client side
-                const updateGracePeriod = 2000;
-                if (
-                    existingVote &&
-                    timeSinceLastUpdate < updateGracePeriod &&
-                    ((session.user?.id &&
-                        (vote.user?.id === session.user.id ||
-                            vote.anonUser?.id === session.user.id)) ||
-                        (localVoteId && localVoteId === vote.id))
-                )
-                    return prev;
-
                 const newState = [...prev];
 
                 const indexOfVoteToUpdate = newState.findIndex(
