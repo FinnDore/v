@@ -116,7 +116,7 @@ const Home: NextPage = () => {
                         </div>
                     </div>
 
-                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:hover:border-white">
+                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 bg-white opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:bg-black dark:hover:border-white">
                         <Tweet
                             quote="If I wanted to point something it'd be this website for how useless it is"
                             name="Samuel Gunter"
@@ -133,7 +133,7 @@ const Home: NextPage = () => {
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
 
-                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1750ms] hover:border-black dark:border-white/50 dark:hover:border-white">
+                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 bg-white opacity-0 transition-colors [animation-delay:_1750ms] hover:border-black dark:border-white/50 dark:bg-black dark:hover:border-white">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
 
