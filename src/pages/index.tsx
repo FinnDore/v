@@ -79,60 +79,56 @@ const Home: NextPage = () => {
                         </span>
                     </Button>
                 </Link>
+
                 <div className="mt-12 flex w-full max-w-lg  grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[900px] lg:grid-cols-3">
-                    <div className="group relative h-48 w-full ">
-                        <div className="group h-full w-full animate-fade-in opacity-0 [animation-delay:_1000ms]">
-                            <FeatureTitle title="Linear integration" />
+                    <div className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1000ms] dark:bg-black">
+                        <FeatureTitle title="Linear integration" />
 
-                            <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
-                                <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                                <div className="absolute -z-10 h-full w-full bg-blue-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
-                                <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
-                                <Linear />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="group relative h-48 w-full md:row-span-2 md:h-full lg:col-span-2 lg:h-48 lg:[grid-row:_unset]">
-                        <div className="h-full w-full animate-fade-in opacity-0 [animation-delay:_1150ms]">
-                            <FeatureTitle title="Realtime voting" />
-                            <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors hover:border-black dark:border-white/50 dark:hover:border-white ">
-                                <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                                <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
-
-                                <VoteDemo />
-                            </div>
+                        <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
+                            <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
+                            <div className="absolute -z-10 h-full w-full bg-blue-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                            <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                            <Linear />
                         </div>
                     </div>
 
-                    <div className="group relative h-48 w-full ">
-                        <div className="group h-full w-full animate-fade-in opacity-0 [animation-delay:_1300ms]">
-                            <FeatureTitle
-                                title="Anonymous login"
-                                className="lg:bottom-0 lg:translate-y-1/2"
-                            />
+                    <div className="group  relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1150ms] dark:bg-black md:row-span-2 md:h-full lg:col-span-2 lg:h-48 lg:[grid-row:_unset]">
+                        <FeatureTitle title="Realtime voting" />
+                        <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors hover:border-black dark:border-white/50 dark:hover:border-white ">
+                            <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
+                            <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
 
-                            <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
-                                <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
-                                <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+                            <VoteDemo />
+                        </div>
+                    </div>
 
-                                <ShowcaseAnonUsers />
-                                {/* <Tweet
-                                    quote="If I wanted to point something it'd be this website for how useless it is"
-                                    name="Samuel Gunter"
-                                    url="https://twitter.com/samathingamajig"
-                                    pfpUrl="/pfp/samuel_gunter.webp"
-                                /> */}
-                            </div>
+                    <div className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1300ms] dark:bg-black">
+                        <FeatureTitle
+                            title="Anonymous login"
+                            className="lg:bottom-0 lg:translate-y-1/2"
+                        />
+
+                        <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
+                            <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
+                            <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
+
+                            <ShowcaseAnonUsers />
                         </div>
                     </div>
 
                     <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:hover:border-white">
                         <Tweet
+                            quote="If I wanted to point something it'd be this website for how useless it is"
+                            name="Samuel Gunter"
+                            url="https://twitter.com/samathingamajig"
+                            pfpUrl="/pfp/samuel_gunter.webp"
+                        />
+                        {/* <Tweet
                             quote="Works great with darkreader 👍"
                             name="anna_devminer"
                             url="https://devminer.xyz"
                             pfpUrl="/pfp/anna_devminer.webp"
-                        />
+                        /> */}
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
