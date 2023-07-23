@@ -262,12 +262,10 @@ export const Particles: React.FC<ParticlesProps> = ({
                     circle.y < -circle.size ||
                     circle.y > canvasSize.current.h + circle.size
                 ) {
-                    // remove the circle from the array
                     circles.splice(i, 1);
-                    // create a new circle
                     const newCircle = circleParams();
                     drawCircle(newCircle);
-                    // update the circle position
+                    circles.push(newCircle);
                 } else {
                     drawCircle({
                         dx: circle.dx,
