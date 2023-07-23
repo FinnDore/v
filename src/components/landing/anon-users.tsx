@@ -10,7 +10,10 @@ export const ShowcaseAnonUsers = () => {
     );
 
     const bgHashes = useMemo(
-        () => new Array(10).fill(1).map(() => Math.random() * 1000),
+        () =>
+            new Array(10)
+                .fill(1)
+                .map(() => `api/gradient/${Math.random() * 1000}`),
         []
     );
 
@@ -52,7 +55,7 @@ export const ShowcaseAnonUsers = () => {
             <Particles
                 className="absolute -z-10 h-full w-full transition-transform"
                 quantity={50}
-                images={bgHashes.map(hash => `api/gradient/${hash}`)}
+                images={bgHashes}
             />
         </div>
     );

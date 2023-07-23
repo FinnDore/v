@@ -1,8 +1,19 @@
-import { forwardRef, type HTMLProps, type PropsWithChildren } from 'react';
+import {
+    forwardRef,
+    useRef,
+    type HTMLProps,
+    type PropsWithChildren,
+} from 'react';
 
 import { Particles } from './particles';
 
 export const Linear = () => {
+    const images = useRef([
+        'linear/in-progress.svg',
+        'linear/backlog.svg',
+        'linear/todo.svg',
+        'linear/done.svg',
+    ]);
     return (
         <>
             <div className="pointer-events-none relative m-auto aspect-square h-4/5 transition-transform duration-500 group-hover:scale-110">
@@ -16,12 +27,7 @@ export const Linear = () => {
                 </WithBlur>
             </div>
             <Particles
-                images={[
-                    'linear/in-progress.svg',
-                    'linear/backlog.svg',
-                    'linear/todo.svg',
-                    'linear/done.svg',
-                ]}
+                images={images.current}
                 quantity={50}
                 className="absolute -z-10 h-full w-full transition-transform duration-500 group-hover:scale-110"
             />

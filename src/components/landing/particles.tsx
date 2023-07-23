@@ -8,6 +8,8 @@ import React, {
 
 import MousePosition from './mouse-position';
 
+const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+
 interface ParticlesProps {
     className?: string;
     quantity?: number;
@@ -82,14 +84,12 @@ export const Particles: React.FC<ParticlesProps> = ({
     const mousePosition = MousePosition();
     const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
-    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
     const isHovering = useRef<boolean>(false);
     const prevFrame = useRef<number>(performance.now());
     const imageElements = useRef<HTMLImageElement[] | null>(null);
     const rgb = useMemo(() => hexToRgb(color).join(', '), [color]);
 
-    const frameCount = useRef<number>(0);
-    const onMouseMove = useCallback(() => {
+    useEffect(() => {
         if (canvasRef.current) {
             const rect = canvasRef.current.getBoundingClientRect();
             const { w, h } = canvasSize.current;
@@ -105,10 +105,6 @@ export const Particles: React.FC<ParticlesProps> = ({
             }
         }
     }, [mousePosition.x, mousePosition.y]);
-
-    useEffect(() => {
-        onMouseMove();
-    }, [mousePosition.x, mousePosition.y, onMouseMove]);
 
     const circleParams = useCallback((): Circle => {
         const x = Math.floor(Math.random() * canvasSize.current.w);
@@ -134,7 +130,7 @@ export const Particles: React.FC<ParticlesProps> = ({
             magnetism,
             imageIndex: Math.floor(Math.random() * (images?.length ?? 1)),
         };
-    }, [images?.length]);
+    }, [images]);
 
     useEffect(() => {
         if (!images) return;
@@ -178,7 +174,7 @@ export const Particles: React.FC<ParticlesProps> = ({
                 context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
             }
         },
-        [dpr, images, rgb]
+        [images, rgb]
     );
 
     const clearContext = useCallback(() => {
@@ -206,7 +202,7 @@ export const Particles: React.FC<ParticlesProps> = ({
             canvasRef.current.style.height = `${canvasSize.current.h}px`;
             context.current.scale(dpr, dpr);
         }
-    }, [dpr]);
+    }, []);
 
     useEffect(() => {
         let shouldAnimate = true;
@@ -289,7 +285,6 @@ export const Particles: React.FC<ParticlesProps> = ({
                 }
             });
 
-            frameCount.current++;
             prevFrame.current = timestamp - (delta % interval);
         };
 
