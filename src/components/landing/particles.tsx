@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 
 import MousePosition from './mouse-position';
 
@@ -72,7 +78,7 @@ export const Particles: React.FC<ParticlesProps> = ({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const canvasContainerRef = useRef<HTMLDivElement>(null);
     const context = useRef<CanvasRenderingContext2D | null>(null);
-    const circles = useRef<Circle[]>([]);
+    const [circles, setCircles] = useState<Circle[]>([]);
     const mousePosition = MousePosition();
     const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
@@ -192,7 +198,6 @@ export const Particles: React.FC<ParticlesProps> = ({
             canvasRef.current &&
             context.current
         ) {
-            circles.current.length = 0;
             canvasSize.current.w = canvasContainerRef.current.offsetWidth;
             canvasSize.current.h = canvasContainerRef.current.offsetHeight;
             canvasRef.current.width = canvasSize.current.w * dpr;
@@ -214,7 +219,7 @@ export const Particles: React.FC<ParticlesProps> = ({
             if (delta < interval) return;
 
             clearContext();
-            circles.current.forEach((circle: Circle, i: number) => {
+            circles.forEach((circle: Circle, i: number) => {
                 // Handle the alpha value
                 const edge = [
                     circle.x + circle.translateX - circle.size, // distance from left edge
@@ -262,7 +267,7 @@ export const Particles: React.FC<ParticlesProps> = ({
                     circle.y > canvasSize.current.h + circle.size
                 ) {
                     // remove the circle from the array
-                    circles.current.splice(i, 1);
+                    circles.splice(i, 1);
                     // create a new circle
                     const newCircle = circleParams();
                     drawCircle(newCircle);
@@ -286,7 +291,6 @@ export const Particles: React.FC<ParticlesProps> = ({
 
             frameCount.current++;
             prevFrame.current = timestamp - (delta % interval);
-            console.log(1);
         };
 
         if (canvasRef.current) {
@@ -314,16 +318,14 @@ export const Particles: React.FC<ParticlesProps> = ({
     ]);
 
     useEffect(() => {
-        console.log(circles.current);
-
-        if (circles.current.length === quantity) return;
+        if (circles.length === quantity) return;
         const ouputCircles = [];
         for (let i = 0; i < quantity; i++) {
             const circle = circleParams();
             ouputCircles.push(circle);
         }
-        circles.current = ouputCircles;
-    }, [circleParams, quantity]);
+        setCircles(ouputCircles);
+    }, [circleParams, circles, quantity]);
 
     return (
         <div className={className} ref={canvasContainerRef} aria-hidden="true">
