@@ -23,7 +23,7 @@ const FeatureDescriptions = {
     'Linear integration': (
         <p>
             Qucikly import unpointed storys via the Linear integration
-            <i>( coming soon )</i>
+            <i> ( coming soon )</i>
         </p>
     ),
 } as const;
