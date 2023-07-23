@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { type NextPage } from 'next';
 import Link from 'next/link';
 import clsx from 'clsx';
@@ -12,8 +13,27 @@ import { Vote } from '@/components/landing/vote';
 import { VoteDemo } from '@/components/landing/vote-demo';
 import { Pfp } from '@/components/pfp';
 
+const FeatureDescriptions = {
+    'Anonymous login': (
+        <p>
+            Completely anonomys, accounts allowing you to start a vote with your
+            team in seconds
+        </p>
+    ),
+    'Linear integration': (
+        <p>
+            Qucikly import unpointed storys via the Linear integration
+            <i>( coming soon )</i>
+        </p>
+    ),
+} as const;
+
+type FeatureDescription = keyof typeof FeatureDescriptions;
+
 const Home: NextPage = () => {
     const statsQuery = api.landing.landingStats.useQuery();
+    const [hoveredFeature, setHoveredFeature] =
+        useState<FeatureDescription>('Linear integration');
 
     return (
         <>
@@ -66,7 +86,7 @@ const Home: NextPage = () => {
                 <Vote />
                 <Link
                     href="/create"
-                    className="mx-auto mt-12 animate-fade-in opacity-0 [animation-delay:_750ms]"
+                    className="mx-auto mt-10 animate-fade-in opacity-0 [animation-delay:_750ms]"
                 >
                     <Button
                         variant="outline"
@@ -80,8 +100,20 @@ const Home: NextPage = () => {
                     </Button>
                 </Link>
 
-                <div className="mt-12 flex w-full max-w-lg  grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[900px] lg:grid-cols-3">
-                    <div className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1000ms] dark:bg-black">
+                <div className="mt-10 flex flex-col justify-center gap-2 text-center">
+                    <h1 className="text-2xl font-extrabold">
+                        {hoveredFeature}
+                    </h1>
+                    {FeatureDescriptions[hoveredFeature]}
+                </div>
+
+                <div className="mt-10 flex w-full max-w-lg  grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[900px] lg:grid-cols-3">
+                    <div
+                        className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1000ms] dark:bg-black"
+                        onMouseEnter={() =>
+                            setHoveredFeature('Linear integration')
+                        }
+                    >
                         <FeatureTitle title="Linear integration" />
 
                         <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white">
@@ -102,7 +134,12 @@ const Home: NextPage = () => {
                         </div>
                     </div>
 
-                    <div className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1300ms] dark:bg-black">
+                    <div
+                        className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1300ms] dark:bg-black"
+                        onMouseEnter={() =>
+                            setHoveredFeature('Anonymous login')
+                        }
+                    >
                         <FeatureTitle
                             title="Anonymous login"
                             className="lg:bottom-0 lg:translate-y-1/2"
