@@ -15,17 +15,17 @@ export const landingStats = rateLimitedTrpcProc(
             prisma.$queryRaw<
                 [
                     {
-                        C: typeof BigInt;
+                        count: typeof BigInt;
                     }
                 ]
-            >`SELECT CAST(SUM(choice) AS UNSIGNED) AS C FROM PokerVoteChoice WHERE choice != 0`,
+            >`SELECT SUM(CAST(choice AS UNSIGNED)) AS count FROM PokerVoteChoice`,
             prisma.$queryRaw<
                 [
                     {
-                        C: typeof BigInt;
+                        count: typeof BigInt;
                     }
                 ]
-            >`SELECT CAST(SUM(choice) AS UNSIGNED) AS C FROM LandingPokerVoteChoice WHERE choice != 0`,
+            >`SELECT SUM(CAST(choice AS UNSIGNED)) AS count FROM LandingPokerVoteChoice`,
         ])
     );
 
@@ -40,7 +40,7 @@ export const landingStats = rateLimitedTrpcProc(
         totalSessions: stats[0],
         totalVoteChoices: stats[1],
         culmativeVotes:
-            parseInt(stats[2]?.[0]?.C?.toString() ?? '0', 10) +
-            parseInt(stats[3]?.[0]?.C?.toString() ?? '0', 10),
+            parseInt(stats[2]?.[0]?.count?.toString() ?? '0', 10) +
+            parseInt(stats[3]?.[0]?.count?.toString() ?? '0', 10),
     };
 });
