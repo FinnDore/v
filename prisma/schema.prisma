@@ -29,6 +29,7 @@ model Poker {
   @@unique([id, createdByAnonUserId])
   @@index([createdByUserId])
   @@index([createdByAnonUserId])
+  @@index([id])
 }
 
 model PokerVote {
@@ -40,6 +41,7 @@ model PokerVote {
   voteChoice  PokerVoteChoice[]
   title       String            @db.Text
   description String?           @db.LongText
+  url                String?    @db.Text 
   active      Boolean           @default(true)
   showResults Boolean           @default(false)
 

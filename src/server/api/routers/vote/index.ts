@@ -31,6 +31,7 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
                 .array(
                     z.object({
                         title: z.string().trim().max(20),
+                        url: z.string().url().max(100).nullable(),
                         description: z.string().trim().max(2000),
                     })
                 )
@@ -73,6 +74,7 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
                         createMany: {
                             data: input.votes.map((vote, i) => ({
                                 title: vote.title,
+                                url: vote.url,
                                 description: vote.description,
                                 active: i === 0,
                             })),

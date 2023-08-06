@@ -14,6 +14,7 @@ import { Textarea } from '@/components/text-area';
 type CreateVoteItem = {
     title: string;
     description: string;
+    url: string | null;
 };
 
 const CreatePoker = () => {
@@ -23,6 +24,7 @@ const CreatePoker = () => {
         {
             title: '',
             description: '',
+            url: null,
         },
     ]);
 
@@ -54,6 +56,7 @@ const CreatePoker = () => {
                 ref={formRef}
                 onSubmit={e => {
                     e.preventDefault();
+
                     createVoteMutation.mutate({
                         title,
                         votes,
@@ -83,37 +86,78 @@ const CreatePoker = () => {
                 </fieldset>
                 {votes.map((vote, i) => (
                     <fieldset className="relative mb-4 flex flex-col" key={i}>
-                        <Button
-                            variant="outline"
-                            className="absolute right-0 aspect-square"
-                            disabled={votes.length === 1}
-                            size="sm"
-                            type="button"
-                            onClick={() =>
-                                setVotes(old => [
-                                    ...old.filter((_, j) => j !== i),
-                                ])
-                            }
-                        >
-                            <Cross1Icon />
-                        </Button>
-                        <Label>Vote Name</Label>
-                        <Input
-                            placeholder="EFS-60"
-                            className="mb-4 !w-44"
-                            maxLength={15}
-                            min="1"
-                            value={vote.title}
-                            onChange={e => {
-                                setVotes(oldVotes => {
-                                    const vote = oldVotes[i];
-                                    if (vote) {
-                                        vote.title = e.target.value;
-                                    }
-                                    return [...oldVotes];
-                                });
-                            }}
-                        />
+                        <fieldset className="flex gap-4">
+                            <div>
+                                <Label className="mb-2">Vote Name</Label>
+                                <Input
+                                    placeholder="EFS-60"
+                                    className="mb-4 !w-44"
+                                    maxLength={15}
+                                    min="1"
+                                    value={vote.title}
+                                    onChange={e => {
+                                        setVotes(oldVotes => {
+                                            const vote = oldVotes[i];
+                                            if (vote) {
+                                                vote.title = e.target.value;
+                                            }
+                                            return [...oldVotes];
+                                        });
+                                    }}
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <Label className="mb-2">Link</Label>
+                                <Input
+                                    type="url"
+                                    placeholder="https://..."
+                                    className="flex-1"
+                                    maxLength={100}
+                                    onChange={e => {
+                                        setVotes(oldVotes => {
+                                            const vote = oldVotes[i];
+                                            if (!vote) return [...oldVotes];
+                                            if (!e.target.value) {
+                                                vote.url = null;
+                                                return [...oldVotes];
+                                            }
+                                            vote.url = e.target.value?.trim();
+                                            if (vote.title) {
+                                                return [...oldVotes];
+                                            }
+
+                                            const results =
+                                                /[A-Z]{2,}-\d+/.exec(
+                                                    vote.title
+                                                );
+
+                                            const slug =
+                                                results?.[results.length - 1];
+
+                                            if (slug) {
+                                                vote.title = slug;
+                                            }
+
+                                            return [...oldVotes];
+                                        });
+                                    }}
+                                />
+                            </div>
+                            <Button
+                                variant="outline"
+                                className="ms-auto mt-6 aspect-square !h-10"
+                                disabled={votes.length === 1}
+                                size="sm"
+                                type="button"
+                                onClick={() =>
+                                    setVotes(old => [
+                                        ...old.filter((_, j) => j !== i),
+                                    ])
+                                }
+                            >
+                                <Cross1Icon />
+                            </Button>
+                        </fieldset>
                         <Label>Vote Description</Label>
                         <Textarea
                             placeholder="A Very cool description for a very cool story"
@@ -142,6 +186,7 @@ const CreatePoker = () => {
                             {
                                 title: '',
                                 description: '',
+                                url: null,
                             },
                         ]);
                     }}

@@ -3,6 +3,7 @@ import {
     CheckIcon,
     DoubleArrowLeftIcon,
     DoubleArrowRightIcon,
+    ExternalLinkIcon,
     EyeOpenIcon,
 } from '@radix-ui/react-icons';
 import { TooltipTrigger } from '@radix-ui/react-tooltip';
@@ -132,24 +133,16 @@ const VoteDescription = () => {
 
     return (
         <div className="mx-auto mt-8 w-[clamp(90%,85ch,100%)] whitespace-break-spaces">
-            <div className="min-h-[3.50rem] md:min-h-[4rem]">
+            <div>
                 <h1 className="mb-2 h-7 max-w-full text-base md:mb-3 md:text-2xl">
-                    <b>
-                        {activeVote?.title}
-
-                        {!activeVote?.title && status !== 'loading' && (
-                            <span className="italic opacity-70">No title</span>
-                        )}
-                    </b>
+                    <Title
+                        title={activeVote.title}
+                        url={activeVote.url}
+                        loading={status === 'loading'}
+                    />
                 </h1>
                 <p className="max-h-56 max-w-full overflow-auto break-words text-sm md:text-base">
                     {activeVote?.description}
-
-                    {!activeVote?.description && status !== 'loading' && (
-                        <span className="italic opacity-70">
-                            No description provided
-                        </span>
-                    )}
                 </p>
             </div>
             <div className="my-4 flex w-full gap-2">
@@ -286,5 +279,40 @@ const VoteDescription = () => {
                 </div>
             </div>
         </div>
+    );
+};
+
+const Title = (props: {
+    url: string | null;
+    title: string;
+    loading: boolean;
+}) => {
+    const title = useMemo(
+        () =>
+            props.title ? (
+                props.title
+            ) : (
+                <span className="italic opacity-70">No title</span>
+            ),
+        [props.title]
+    );
+
+    if (props.loading) return null;
+
+    return (
+        <b>
+            {props.url ? (
+                <a
+                    className="gap-.5 flex "
+                    referrerPolicy="no-referrer"
+                    target="_blank"
+                    href={props.url}
+                >
+                    {title} <ExternalLinkIcon className="my-auto" />
+                </a>
+            ) : (
+                title
+            )}
+        </b>
     );
 };
