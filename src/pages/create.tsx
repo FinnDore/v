@@ -113,22 +113,16 @@ const CreatePoker = () => {
                                     placeholder="https://..."
                                     className="flex-1"
                                     maxLength={100}
-                                    onChange={e => {
+                                    onPaste={e => {
                                         setVotes(oldVotes => {
                                             const vote = oldVotes[i];
                                             if (!vote) return [...oldVotes];
-                                            if (!e.target.value) {
-                                                vote.url = null;
-                                                return [...oldVotes];
-                                            }
-                                            vote.url = e.target.value?.trim();
-                                            if (vote.title) {
-                                                return [...oldVotes];
-                                            }
 
                                             const results =
                                                 /[A-Z]{2,}-\d+/.exec(
-                                                    vote.title
+                                                    e.clipboardData.getData(
+                                                        'text/plain'
+                                                    )
                                                 );
 
                                             const slug =
@@ -138,6 +132,18 @@ const CreatePoker = () => {
                                                 vote.title = slug;
                                             }
 
+                                            return [...oldVotes];
+                                        });
+                                    }}
+                                    onChange={e => {
+                                        setVotes(oldVotes => {
+                                            const vote = oldVotes[i];
+                                            if (!vote) return [...oldVotes];
+                                            if (!e.target.value) {
+                                                vote.url = null;
+                                                return [...oldVotes];
+                                            }
+                                            vote.url = e.target.value?.trim();
                                             return [...oldVotes];
                                         });
                                     }}
