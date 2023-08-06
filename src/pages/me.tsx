@@ -163,12 +163,12 @@ const VoteItem = ({
 
                                 e.preventDefault();
                             }}
-                            className="ms-2 flex h-full w-6 justify-center overflow-hidden rounded-sm align-middle text-rose-600 transition-all dark:hover:bg-white/10"
+                            className="my-auto ms-2 grid aspect-square h-full w-6 place-items-center justify-center overflow-hidden rounded-sm align-middle leading-none text-rose-600 transition-all dark:hover:bg-white/10"
                         >
                             <TrashIcon
                                 height={20}
                                 width={20}
-                                className="my-auto"
+                                className="leading-none"
                             />
                         </button>
                     </TooltipTrigger>
