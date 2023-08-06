@@ -31,7 +31,7 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
                 .array(
                     z.object({
                         title: z.string().trim().max(20),
-                        url: z.string().url().nullable(),
+                        url: z.string().url().max(100).nullable(),
                         description: z.string().trim().max(2000),
                     })
                 )

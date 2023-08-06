@@ -112,6 +112,7 @@ const CreatePoker = () => {
                                     type="url"
                                     placeholder="https://..."
                                     className="flex-1"
+                                    maxLength={100}
                                     onChange={e => {
                                         setVotes(oldVotes => {
                                             const vote = oldVotes[i];
