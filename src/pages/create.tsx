@@ -116,7 +116,8 @@ const CreatePoker = () => {
                                     onPaste={e => {
                                         setVotes(oldVotes => {
                                             const vote = oldVotes[i];
-                                            if (!vote) return [...oldVotes];
+                                            if (!vote || vote.title)
+                                                return [...oldVotes];
 
                                             const results =
                                                 /[A-Z]{2,}-\d+/.exec(
