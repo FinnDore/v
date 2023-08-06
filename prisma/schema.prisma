@@ -41,7 +41,7 @@ model PokerVote {
   voteChoice  PokerVoteChoice[]
   title       String            @db.Text
   description String?           @db.LongText
-  url                String?      
+  url                String?    @db.Text 
   active      Boolean           @default(true)
   showResults Boolean           @default(false)
 
