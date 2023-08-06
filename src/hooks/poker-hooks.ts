@@ -341,6 +341,7 @@ export const useVotes = () => {
         status,
         isWhiteListed,
         currentUserId: session?.user?.id,
+        url: activeVote?.url,
     };
 };
 
