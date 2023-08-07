@@ -8,6 +8,7 @@ import {
 } from '@radix-ui/react-icons';
 import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { animated } from '@react-spring/web';
+import clsx from 'clsx';
 
 import { pickHex } from '@/utils/pick-hex';
 import { Button } from '@/components/button';
@@ -287,31 +288,26 @@ const Title = (props: {
     title: string;
     loading: boolean;
 }) => {
-    const title = useMemo(
-        () =>
-            props.title ? (
-                props.title
-            ) : (
-                <span className="italic opacity-70">No title</span>
-            ),
-        [props.title]
-    );
-
     if (props.loading) return null;
 
     return (
-        <b>
+        <b
+            className={clsx({
+                'italic opacity-70': !props.title,
+            })}
+        >
             {props.url ? (
                 <a
-                    className="gap-.5 flex "
+                    className="flex gap-1"
                     referrerPolicy="no-referrer"
                     target="_blank"
                     href={props.url}
                 >
-                    {title} <ExternalLinkIcon className="my-auto" />
+                    {props.title || 'No title'}
+                    <ExternalLinkIcon className="my-auto" />
                 </a>
             ) : (
-                title
+                props.title || 'No title'
             )}
         </b>
     );
