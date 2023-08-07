@@ -100,14 +100,14 @@ const Home: NextPage = () => {
                     </Button>
                 </Link>
 
-                <div className="mt-10 flex flex-col justify-center gap-2 text-center">
+                <div className="mt-10 flex animate-fade-in flex-col justify-center gap-2 text-center opacity-0 [animation-delay:_1000ms]">
                     <h1 className="text-2xl font-extrabold">
                         {hoveredFeature}
                     </h1>
                     {FeatureDescriptions[hoveredFeature]}
                 </div>
 
-                <div className="mt-10 flex w-full max-w-lg  grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[900px] lg:grid-cols-3">
+                <div className="mt-10 flex w-full max-w-lg grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[900px] lg:grid-cols-3">
                     <div
                         className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1000ms] dark:bg-black"
                         onMouseEnter={() =>
