@@ -135,7 +135,7 @@ const VoteDescription = () => {
     return (
         <div className="mx-auto mt-8 w-[clamp(90%,85ch,100%)] whitespace-break-spaces">
             <div>
-                <h1 className="mb-2 h-7 max-w-full text-base md:mb-3 md:text-2xl">
+                <h1 className="mb-1 max-w-full text-base md:text-2xl">
                     <Title
                         title={activeVote.title}
                         url={activeVote.url}
@@ -298,7 +298,7 @@ const Title = (props: {
         >
             {props.url ? (
                 <a
-                    className="flex gap-1"
+                    className="flex gap-1 leading-none"
                     referrerPolicy="no-referrer"
                     target="_blank"
                     href={props.url}
