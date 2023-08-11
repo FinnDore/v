@@ -33,7 +33,7 @@ export const landingStats = rateLimitedTrpcProc(
             prisma.$queryRaw<number>`SET @@boost_cached_queries = true`
         );
         querys.push(
-            prisma.$queryRaw<number>`SET @@boost_cached_queries = true`
+            prisma.$queryRaw<number>`SET @@boost_cached_queries = false`
         );
     }
 
