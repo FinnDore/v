@@ -13,12 +13,4 @@ export const prisma =
                 : ['error'],
     });
 
-if (env.NODE_ENV === 'production') {
-    console.log('enabling boost 🥹🥹🥹🥹🥹');
-    void (async () =>
-        await prisma.$queryRaw`SET @@boost_cached_queries = true`.catch(e =>
-            console.error('could not enable boost', e)
-        ))();
-}
-
 if (env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
