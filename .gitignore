@@ -21,6 +21,8 @@ next-env.d.ts
 /build
 
 # misc
+
+.idea
 .DS_Store
 *.pem
 
