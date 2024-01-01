@@ -22,7 +22,7 @@ const FeatureDescriptions = {
     ),
     'Linear integration': (
         <p>
-            Quickly import unpointed story's via the Linear integration
+            Quickly import unpointed story`&apos;s via the Linear integration
             <i> ( coming soon )</i>
         </p>
     ),
