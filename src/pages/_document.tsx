@@ -13,7 +13,7 @@ export default function Document() {
                         async
                         defer
                         data-website-id="2b7c5ed7-8f27-4b03-bdab-622ef35a1e33"
-                        src="https://umami.finndore.dev/umami.js"
+                        src="https://umami.finndore.dev/script.js"
                     ></script>
                 )}
             </Head>
