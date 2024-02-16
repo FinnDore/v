@@ -66,8 +66,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 
 export const anonProcedure = t.procedure.use(async ({ ctx, next }) => {
-    if (ctx.session?.user) {
-        throw new TRPCError({ code: 'UNAUTHORIZED' });
+    if (ctx.session?.user) { throw new TRPCError({ code: 'UNAUTHORIZED' });
     }
     return next({
         ctx,
