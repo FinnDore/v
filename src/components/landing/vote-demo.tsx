@@ -123,7 +123,6 @@ export const VoteDemo = () => {
                     x.find(user => user.id === currentUser.id)
                 );
                 if (currentIndex !== -1) {
-                    console.log('removing', currentUser.name, currentIndex);
                     tempUsersByVote[currentIndex]?.splice(
                         tempUsersByVote[currentIndex]?.findIndex(
                             x => x.id === currentUser.id

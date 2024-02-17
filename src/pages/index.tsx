@@ -16,14 +16,19 @@ import { Pfp } from '@/components/pfp';
 const FeatureDescriptions = {
     'Anonymous login': (
         <p>
-            Completely anonomys, accounts allowing you to start a vote with your
-            team in seconds
+            Completely Anonymous, accounts allowing you to start a vote with
+            your team in seconds
         </p>
     ),
     'Linear integration': (
         <p>
-            Quickly import unpointed story`&apos;s via the Linear integration
-            <i> ( coming soon )</i>
+            Quickly import unpointed story&apos;s via the Linear integration
+            <i> ( coming soon™️ )</i>
+        </p>
+    ),
+    'Realtime voting': (
+        <p>
+            Realtime voting with live updates, see the results as they come in
         </p>
     ),
 } as const;
@@ -59,11 +64,9 @@ const Home: NextPage = () => {
                     </h1>
                     <h2 className="mt-4 w-full animate-fade-in text-center text-sm text-gray-700 opacity-0 [animation-delay:_300ms] dark:text-gray-300 md:mt-6 md:text-base">
                         <Balancer>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit. Pellentesque vitae quam ac eros malesuada
-                            molestie ac sit amet tortor. Aenean vehicula
-                            dignissim dui, et aliquet purus porttitor sed.
-                            Nullam hendrerit orci eget aliquet tempor
+                            Spin up pointing poker sessions for your team in
+                            seconds, no sign up required allowing for
+                            frictionless pointing.
                         </Balancer>
                     </h2>
                 </Provider>
@@ -124,7 +127,12 @@ const Home: NextPage = () => {
                         </div>
                     </div>
 
-                    <div className="group  relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1150ms] dark:bg-black md:row-span-2 md:h-full lg:col-span-2 lg:h-48 lg:[grid-row:_unset]">
+                    <div
+                        className="group  relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1150ms] dark:bg-black md:row-span-2 md:h-full lg:col-span-2 lg:h-48 lg:[grid-row:_unset]"
+                        onMouseEnter={() =>
+                            setHoveredFeature('Realtime voting')
+                        }
+                    >
                         <FeatureTitle title="Realtime voting" />
                         <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors hover:border-black dark:border-white/50 dark:hover:border-white ">
                             <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
@@ -160,12 +168,6 @@ const Home: NextPage = () => {
                             url="https://twitter.com/samathingamajig"
                             pfpUrl="/pfp/samuel_gunter.webp"
                         />
-                        {/* <Tweet
-                            quote="Works great with darkreader 👍"
-                            name="anna_devminer"
-                            url="https://devminer.xyz"
-                            pfpUrl="/pfp/anna_devminer.webp"
-                        /> */}
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
