@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { useUser } from '@/utils/local-user';
 import { voteOptions } from '@/constants';
 import { VoteButton } from '../vote/vote-button';
 
@@ -46,67 +47,103 @@ const votes: Vote[] = [
 const random = (max: number, min = 0) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
 
-const users = [
+type VoteUser = {
+    name: string;
+    id: string;
+    image?: string;
+    pfpHash?: string;
+    vote: typeof voteOptions[number];
+};
+const users: VoteUser[] = [
     {
         name: 'Finn',
         id: '1',
         image: 'https://avatars.githubusercontent.com/u/34718806?v=4',
+        vote: 1,
     },
     {
         name: 'Lois',
         id: '2',
         image: 'https://avatars.githubusercontent.com/u/79988376?s=100&v=4',
+        vote: 1,
     },
     {
         name: 'Nestor',
         id: '3',
         image: 'https://avatars.githubusercontent.com/u/23436531?s=100&v=4',
+        vote: 1,
     },
     {
         name: 'Dan',
         id: '4',
         image: 'https://avatars.githubusercontent.com/u/31937542?s=100&v=4',
+        vote: 1,
     },
     {
         name: 'Anna',
         id: '5',
         image: '/pfp/anna_devminer.webp',
+        vote: 1,
     },
     {
         name: 'Jake',
         id: '6',
         pfpHash: 'ada',
+        vote: 1,
     },
 ];
 
+const clamp = (input: number, max: number, min = 0) => {
+    if (input > max) return max;
+    if (input < min) return min;
+    return input;
+};
+const baseUsersByVote = Array.from(
+    { length: voteOptions.length },
+    () => [] as VoteUser[]
+);
+
 export const VoteDemo = () => {
-    const [votes, setVotes] = useState<number[]>([]);
+    const user = useUser();
+    const usersByVoteRef = useRef(baseUsersByVote);
     const [selected, setSelected] = useState<number | null>(null);
-    const [usersByVote, setUsersByVote] = useState<
-        {
-            name: string;
-            id: string;
-            image?: string;
-            pfpHash?: string;
-        }[][]
-    >([]);
+    const [usersByVote, setUsersByVote] = useState<VoteUser[][]>(
+        usersByVoteRef.current
+    );
 
     useEffect(() => {
-        const updateVotes = () => {
-            setVotes(() => voteOptions.map(() => random(100)));
-            const tempUsersByVote = Array.from(
-                { length: voteOptions.length },
-                () => [] as typeof usersByVote[number]
-            );
-            users.forEach(user =>
-                tempUsersByVote[random(voteOptions.length - 1)]?.push(user)
-            );
+        const shuffleVotes = (first?: true) => {
+            const tempUsersByVote = [
+                ...usersByVoteRef.current.map(x => [...x]),
+            ];
 
+            for (const currentUser of users) {
+                if (random(0, 100) > 20 && !first) continue;
+                const currentIndex = tempUsersByVote.findIndex(x =>
+                    x.find(user => user.id === currentUser.id)
+                );
+                if (currentIndex !== -1) {
+                    console.log('removing', currentUser.name, currentIndex);
+                    tempUsersByVote[currentIndex]?.splice(
+                        tempUsersByVote[currentIndex]?.findIndex(
+                            x => x.id === currentUser.id
+                        ) ?? 0,
+                        1
+                    );
+                }
+                tempUsersByVote[random(voteOptions.length - 1)]?.push(
+                    currentUser
+                );
+            }
+
+            usersByVoteRef.current = tempUsersByVote;
             setUsersByVote(tempUsersByVote);
         };
-        updateVotes();
-        const timeout = setInterval(updateVotes, 3000);
-        return () => clearInterval(timeout);
+        shuffleVotes(true);
+        const interval = setInterval(shuffleVotes, 750);
+        return () => {
+            clearInterval(interval);
+        };
     }, []);
 
     return (
@@ -118,13 +155,42 @@ export const VoteDemo = () => {
                     key={vote}
                     vote={vote}
                     small={true}
-                    barHeight={votes[i] ?? 60}
+                    barHeight={clamp(
+                        ((usersByVote[i]?.length ?? 20) +
+                            (selected === i && !user.user ? 5 : 1)) *
+                            25,
+                        70,
+                        10
+                    )}
                     showVotes={true}
                     users={usersByVote[i] ?? []}
                     currentVotes={1}
                     totalVotes={1}
-                    currentUserId={'1'}
-                    doVote={() => setSelected(i)}
+                    currentUserId={user.user?.id ?? '1'}
+                    doVote={() => {
+                        if (selected === i) return;
+                        if (!user.user) return setSelected(i);
+                        if (selected !== null) {
+                            const userIndex = usersByVote[selected]?.findIndex(
+                                x => x.id === user.user.id
+                            );
+                            if (
+                                userIndex !== -1 &&
+                                typeof userIndex === 'number'
+                            ) {
+                                usersByVote[selected]?.splice(userIndex, 1);
+                            }
+                        }
+                        usersByVote[i]?.push({
+                            name: user.user.name ?? 'Me',
+                            id: user.user.id,
+                            image: user.user.image ?? undefined,
+                            pfpHash: user.user.pfpHash ?? undefined,
+                            vote,
+                        });
+                        setUsersByVote([...usersByVote.map(x => [...x])]);
+                        setSelected(i);
+                    }}
                     current={
                         selected !== null
                             ? selected === i
