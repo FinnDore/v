@@ -76,6 +76,7 @@ const Start = () => {
                                             )}`
                                         }
                                         alt="Blurred gradient background behind the join QR code"
+                                        suppressHydrationWarning
                                     />
                                 </picture>
                             )}

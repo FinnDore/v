@@ -34,7 +34,10 @@ export const Pfp = forwardRef<
                     </picture>
                 </div>
                 <picture className="absolute block h-full w-full overflow-clip rounded-full blur-md saturate-150">
-                    <source srcSet={image ?? `/api/gradient/${pictureName}`} />
+                    <source
+                        srcSet={image ?? `/api/gradient/${pictureName}`}
+                        suppressHydrationWarning
+                    />
                     <img
                         className="block h-full w-full rounded-full"
                         alt={`profile picture for ${name ?? 'a user'}`}
@@ -43,6 +46,7 @@ export const Pfp = forwardRef<
                 <div className="absolute block h-full w-full overflow-clip rounded-full saturate-150">
                     <picture className="">
                         <source
+                            suppressHydrationWarning
                             srcSet={image ?? `/api/gradient/${pictureName}`}
                         />
                         <img
