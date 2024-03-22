@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { type AppType } from 'next/app';
 import { hop } from '@onehop/client';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Analytics } from '@vercel/analytics/react';
 import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 
@@ -41,7 +40,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 </a>
             </footer>
             <ReactQueryDevtools initialIsOpen={false} />
-            <Analytics />
         </SessionProvider>
     );
 };
