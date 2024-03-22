@@ -1,5 +1,4 @@
 import { Head, Html, Main, NextScript } from 'next/document';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import { env } from '@/env.mjs';
 
@@ -18,7 +17,6 @@ export default function Document() {
                     ></script>
                 )}
             </Head>
-            <SpeedInsights />
             <body className="h-screen bg-white text-black dark:bg-black dark:text-white">
                 <Main />
                 <NextScript />

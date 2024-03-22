@@ -2,8 +2,10 @@ import { env } from '@/env.mjs';
 import '@/styles/globals.css';
 import { useEffect } from 'react';
 import { type AppType } from 'next/app';
+import { useRouter } from 'next/router';
 import { hop } from '@onehop/client';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 
@@ -14,6 +16,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     Component,
     pageProps: { session, ...pageProps },
 }) => {
+    const router = useRouter();
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
@@ -40,6 +43,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 </a>
             </footer>
             <ReactQueryDevtools initialIsOpen={false} />
+
+            <SpeedInsights route={router.pathname} />
         </SessionProvider>
     );
 };
