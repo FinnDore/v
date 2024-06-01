@@ -194,7 +194,7 @@ export const Vote = () => {
                 return newState;
             });
         },
-        [session.user?.id, utils]
+        [session.user?.id, utils, updateClumativePoints, localVoteId]
     );
     useChannelMessage(
         LANDING_CHANNEL_ID,
