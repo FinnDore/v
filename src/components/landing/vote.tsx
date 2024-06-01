@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useChannelMessage } from '@onehop/react';
 import { parse } from 'superjson';
 
 import { api } from '@/utils/api';
 import { useAnonUser, useUser } from '@/utils/local-user';
 import { VoteButton } from '@/components/vote/vote-button';
 import { LANDING_CHANNEL_ID, voteOptions } from '@/constants';
+import { useChannelMessage } from '@/hooks/use-updates';
 import { ChannelEvents } from '@/server/channel-events';
 import { type LandingPageVote } from '@/server/hop';
 
@@ -151,9 +151,7 @@ export const Vote = () => {
         return { currentVote, votesMap, highestVote };
     }, [session.user?.id, localVoteId, votesQuery.data]);
 
-    useChannelMessage(
-        LANDING_CHANNEL_ID,
-        ChannelEvents.VOTE_UPDATE,
+    const voteUpdate = useCallback(
         (event: { data: string }) => {
             const vote = parse<LandingPageVote>(event.data);
             const existingVote = utils.landing.landingVotes
@@ -195,7 +193,13 @@ export const Vote = () => {
                 newState[indexOfVoteToUpdate] = vote;
                 return newState;
             });
-        }
+        },
+        [session.user?.id, utils]
+    );
+    useChannelMessage(
+        LANDING_CHANNEL_ID,
+        ChannelEvents.VOTE_UPDATE,
+        voteUpdate
     );
 
     return (

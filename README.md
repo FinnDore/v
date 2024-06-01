@@ -9,4 +9,4 @@
 
 ### Deployment
 
-To deploy vote you will need a Mysql database, somehwre to deploy the nextjs app and a token for [Hop Channels](https://docs.hop.io/sdks/overview)
+To deploy vote you will need a Mysql database, somehwre to deploy the nextjs app and a token for [Soketi](https://soketi.app/)

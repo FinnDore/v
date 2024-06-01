@@ -22,7 +22,10 @@ const server = z.object({
     // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
-    HOP_TOKEN: z.string(),
+    SOKETI_TOKEN: z.string(),
+    SOKETI_APP_ID: z.string(),
+    NEXT_PUBLIC_SOKETI_HOST: z.string(),
+    NEXT_PUBLIC_SOKETI_APP_KEY: z.string(),
     UPSTASH_REDIS_REST_URL: z.string().url(),
     UPSTASH_REDIS_REST_TOKEN: z.string(),
     PROD: NodeEnv.pipe(
@@ -35,7 +38,8 @@ const server = z.object({
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 const client = z.object({
-    NEXT_PUBLIC_HOP_PROJECT_ID: z.string().min(1),
+    NEXT_PUBLIC_SOKETI_APP_KEY: z.string(),
+    NEXT_PUBLIC_SOKETI_HOST: z.string(),
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
 });
 
@@ -52,8 +56,10 @@ const processEnv = {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    HOP_TOKEN: process.env.HOP_TOKEN,
-    NEXT_PUBLIC_HOP_PROJECT_ID: process.env.NEXT_PUBLIC_HOP_PROJECT_ID,
+    SOKETI_TOKEN: process.env.SOKETI_TOKEN,
+    SOKETI_APP_ID: process.env.SOKETI_APP_ID,
+    NEXT_PUBLIC_SOKETI_APP_KEY: process.env.NEXT_PUBLIC_SOKETI_APP_KEY,
+    NEXT_PUBLIC_SOKETI_HOST: process.env.NEXT_PUBLIC_SOKETI_HOST,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     PROD: process.env.NODE_ENV,

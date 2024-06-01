@@ -1,9 +1,6 @@
-import { env } from '@/env.mjs';
 import '@/styles/globals.css';
-import { useEffect } from 'react';
 import { type AppType } from 'next/app';
 import { useRouter } from 'next/router';
-import { hop } from '@onehop/client';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { type Session } from 'next-auth';
@@ -17,13 +14,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
     pageProps: { session, ...pageProps },
 }) => {
     const router = useRouter();
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-
-        hop.init({
-            projectId: env.NEXT_PUBLIC_HOP_PROJECT_ID,
-        });
-    }, []);
 
     return (
         <SessionProvider session={session}>

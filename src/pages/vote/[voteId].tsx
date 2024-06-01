@@ -22,7 +22,7 @@ import {
 import { VoteButton } from '@/components/vote/vote-button';
 import { voteOptions } from '@/constants';
 import { useVoteControls, useVotes } from '@/hooks/poker-hooks';
-import { useUserJoined } from '@/hooks/use-hop-updates';
+import { useUserJoined } from '@/hooks/use-updates';
 
 const Vote = () => {
     const {
