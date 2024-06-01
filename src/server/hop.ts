@@ -1,28 +1,23 @@
-import {
-    ChannelType,
-    Hop,
-    HopAPIError,
-    type APIAuthentication,
-} from '@onehop/js';
 import { stringify } from 'superjson';
 
+import { pusherClient } from '@/utils/pusher';
 import { to } from '@/utils/to';
 import { LANDING_CHANNEL_ID } from '@/constants';
-import { env } from '@/env.mjs';
 import { ChannelEvents } from './channel-events';
 
 export type ChannelEvent = typeof ChannelEvents[keyof typeof ChannelEvents];
 
-export const hop = new Hop(env.HOP_TOKEN as APIAuthentication);
+// export const hop = new Hop(env.HOP_TOKEN as APIAuthentication);
 
 export const dispatchVoteUpdateEvent = async ({ vote }: { vote: Vote }) => {
     const [, updateChannelStateError] = await to(
-        hop.channels.publishMessage(
+        pusherClient.trigger(
             `poker_${vote.pokerVote.poker.id}`,
             ChannelEvents.VOTE_UPDATE,
             {
                 data: stringify(vote),
-            }
+            },
+            { info: 'info' }
         )
     );
 
@@ -51,13 +46,9 @@ export const dispatchUserJoinedEvent = async ({
     users: UsersInVote;
 }) => {
     const [, updateChannelStateError] = await to(
-        hop.channels.publishMessage(
-            `poker_${pokerId}`,
-            ChannelEvents.USER_JOINED,
-            {
-                users,
-            }
-        )
+        pusherClient.trigger(`poker_${pokerId}`, ChannelEvents.USER_JOINED, {
+            users,
+        })
     );
 
     if (updateChannelStateError) {
@@ -79,7 +70,7 @@ export const dispatchPokerStateUpdateEvent = async (event: {
     data: unknown;
 }) => {
     const [, updateChannelStateError] = await to(
-        hop.channels.publishMessage(`poker_${event.pokerId}`, event.event, {
+        pusherClient.trigger(`poker_${event.pokerId}`, event.event, {
             data: stringify(event.data),
         })
     );
@@ -102,48 +93,11 @@ export const dispatchLandingVoteUpdateEvent = async ({
 }: {
     vote: LandingPageVote;
 }) => {
-    let [, updateChannelStateError] = await to(
-        hop.channels.publishMessage(
-            LANDING_CHANNEL_ID,
-            ChannelEvents.VOTE_UPDATE,
-            {
-                data: stringify(vote),
-            }
-        )
+    const [, updateChannelStateError] = await to(
+        pusherClient.trigger(LANDING_CHANNEL_ID, ChannelEvents.VOTE_UPDATE, {
+            data: stringify(vote),
+        })
     );
-
-    if (
-        (updateChannelStateError as unknown as HopAPIError)?.data?.error
-            .code === 'channel_not_found'
-    ) {
-        console.error(
-            `Could not publish votes for LANDING_CHANNEL as it didnt exist, will create it and re publish`
-        );
-        const [, createChannelError] = await to(
-            hop.channels.create(ChannelType.UNPROTECTED, LANDING_CHANNEL_ID)
-        );
-
-        if (createChannelError) {
-            console.error(
-                `Could not create channel LANDING_CHANNEL error: ${
-                    createChannelError.message ?? 'no error message'
-                } ${createChannelError.stack ?? 'no stack'} \n ${JSON.stringify(
-                    createChannelError
-                )}`
-            );
-        }
-        updateChannelStateError = null;
-
-        [, updateChannelStateError] = await to(
-            hop.channels.publishMessage(
-                LANDING_CHANNEL_ID,
-                ChannelEvents.VOTE_UPDATE,
-                {
-                    data: stringify(vote),
-                }
-            )
-        );
-    }
 
     if (updateChannelStateError) {
         console.error(

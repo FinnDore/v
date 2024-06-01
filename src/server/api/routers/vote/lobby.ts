@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
+import { pusherClient } from '@/utils/pusher';
 import { RateLimitPrefix } from '@/utils/rate-limit';
 import { to } from '@/utils/to';
 import {
@@ -11,7 +12,7 @@ import {
 } from '@/server/api/trpc';
 import { ChannelEvents } from '@/server/channel-events';
 import { prisma } from '@/server/db';
-import { hop, type UsersInVote } from '@/server/hop';
+import { type UsersInVote } from '@/server/hop';
 
 const usersInVoteSelect = {
     updatedAt: true,
@@ -292,15 +293,10 @@ const dispatchVoteUpdate = async ({
     users: UsersInVote;
 }) => {
     const [, updateChannelStateError] = await to(
-        hop.channels.publishMessage(
-            `poker_${pokerId}`,
-            ChannelEvents.USER_JOINED,
-            {
-                users,
-            }
-        )
+        pusherClient.trigger(`poker_${pokerId}`, ChannelEvents.USER_JOINED, {
+            data: users,
+        })
     );
-
     if (updateChannelStateError) {
         console.error(
             `Could not publish updated users for for poker_${pokerId} due to error: ${

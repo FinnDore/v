@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useChannelMessage } from '@onehop/react';
 import { atom, useAtom } from 'jotai';
 import { parse } from 'superjson';
 
@@ -9,6 +8,7 @@ import { cloneArray, updateArrayItem } from '@/utils/helpers';
 import { useAnonUser, useUser } from '@/utils/local-user';
 import { ChannelEvents } from '@/server/channel-events';
 import { type Vote } from '@/server/hop';
+import { useChannelMessage } from './use-updates';
 
 const currentVoteIdAtom = atom<string | null>(null);
 
@@ -141,9 +141,7 @@ export const useVotes = () => {
     });
 
     const channelId = `poker_${pokerId ?? ''}`;
-    useChannelMessage(
-        channelId,
-        ChannelEvents.VOTE_UPDATE,
+    const voteUpdatedCallback = useCallback(
         (e: { data: string }) => {
             const updatedVoteChoice: Vote = parse(e.data);
             if (!pokerId) return;
@@ -207,12 +205,16 @@ export const useVotes = () => {
                     return newState;
                 }
             );
-        }
+        },
+        [utils, pokerId, anonUser]
     );
-
     useChannelMessage(
         channelId,
-        ChannelEvents.CHANGE_VOTE,
+        ChannelEvents.VOTE_UPDATE,
+        voteUpdatedCallback
+    );
+
+    const changeVote = useCallback(
         (e: { data: string }) => {
             const event: { currentVote: string } = parse(e.data);
             if (!pokerId) return;
@@ -234,12 +236,12 @@ export const useVotes = () => {
                     };
                 }
             );
-        }
+        },
+        [utils, pokerId, anonUser]
     );
+    useChannelMessage(channelId, ChannelEvents.CHANGE_VOTE, changeVote);
 
-    useChannelMessage(
-        channelId,
-        ChannelEvents.TOGGLE_RESULTS,
+    const toggleResults = useCallback(
         (e: { data: string }) => {
             const {
                 showResults,
@@ -260,8 +262,10 @@ export const useVotes = () => {
                     };
                 }
             );
-        }
+        },
+        [utils, pokerId, anonUser]
     );
+    useChannelMessage(channelId, ChannelEvents.TOGGLE_RESULTS, toggleResults);
 
     type VoteMap = Record<
         string,

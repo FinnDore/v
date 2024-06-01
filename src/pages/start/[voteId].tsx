@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { useChannelMessage } from '@onehop/react';
 import { CheckIcon, Cross2Icon, Link2Icon } from '@radix-ui/react-icons';
 
 import { api } from '@/utils/api';
@@ -14,7 +13,7 @@ import {
     TooltipTrigger,
 } from '@/components/tool-tip';
 import { usePokerId } from '@/hooks/poker-hooks';
-import { useUserJoined } from '@/hooks/use-hop-updates';
+import { useChannelMessage, useUserJoined } from '@/hooks/use-updates';
 import { ChannelEvents } from '@/server/channel-events';
 import { type UsersInVote } from '@/server/hop';
 
@@ -44,16 +43,16 @@ const Start = () => {
             }
         );
 
-    useChannelMessage(
-        channelId,
-        ChannelEvents.USER_JOINED,
+    const userJoined = useCallback(
         ({ users: incomingUsers }: { users: UsersInVote }) => {
             utils.vote.lobby.listUsersInVote.setData(
                 { voteId: pokerId ?? '' },
                 () => incomingUsers
             );
-        }
+        },
+        [utils, pokerId]
     );
+    useChannelMessage(channelId, ChannelEvents.USER_JOINED, userJoined);
 
     const noUsers = !users?.length;
     const lastUser = users?.[0];

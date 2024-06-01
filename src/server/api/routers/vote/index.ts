@@ -1,4 +1,3 @@
-import { ChannelType } from '@onehop/js';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
@@ -12,7 +11,6 @@ import {
 } from '@/server/api/trpc';
 import {
     dispatchVoteUpdateEvent,
-    hop,
     selectPokerVote,
     type Vote,
 } from '@/server/hop';
@@ -98,23 +96,6 @@ const createPokerSession = rateLimitedAnonOrUserProcedure(
             });
         }
 
-        const [, createChannelError] = await to(
-            hop.channels.create(ChannelType.UNPROTECTED, `poker_${vote.id}`)
-        );
-
-        if (createChannelError) {
-            console.error(
-                `Could not create channel poker_${vote.id} error: ${
-                    createChannelError.message ?? 'no error message'
-                } ${createChannelError.stack ?? 'no stack'} \n ${JSON.stringify(
-                    createChannelError
-                )}`
-            );
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-            });
-        }
-
         return vote;
     });
 
@@ -146,22 +127,6 @@ const deletePokerSession = anonOrUserProcedure
 
         if (deleteVoteError) {
             console.error(`Could not delete vote ${deleteVoteError.message})`);
-            throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-            });
-        }
-
-        const [, deleteChannelError] = await to(
-            hop.channels.delete(`poker_${vote.id}`)
-        );
-
-        if (deleteChannelError) {
-            console.error(
-                `Could not delete channel poker_${vote.id}: ${
-                    deleteChannelError.message ?? 'no error message'
-                } ${deleteChannelError.stack ?? 'no stack'}`
-            );
-            console.log(JSON.stringify(deleteChannelError));
             throw new TRPCError({
                 code: 'INTERNAL_SERVER_ERROR',
             });
