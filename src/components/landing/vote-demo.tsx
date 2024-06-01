@@ -4,46 +4,6 @@ import { useUser } from '@/utils/local-user';
 import { voteOptions } from '@/constants';
 import { VoteButton } from '../vote/vote-button';
 
-type Vote = {
-    choice: string;
-    id: number;
-    userId: string;
-    pfpUrl?: string;
-    pfpHash?: string;
-    name: string;
-};
-
-const votes: Vote[] = [
-    {
-        choice: '1',
-        id: 1,
-        userId: '1',
-        pfpUrl: 'https://i.imgur.com/1.jpg',
-        name: 'User 1',
-    },
-    {
-        choice: '2',
-        id: 2,
-        userId: '2',
-        pfpUrl: 'https://i.imgur.com/2.jpg',
-        name: 'User 2',
-    },
-    {
-        choice: '3',
-        id: 3,
-        userId: '3',
-        pfpUrl: 'https://i.imgur.com/3.jpg',
-        name: 'User 3',
-    },
-    {
-        choice: '5',
-        id: 4,
-        userId: '4',
-        pfpUrl: 'https://i.imgur.com/4.jpg',
-        name: 'User 4',
-    },
-];
-
 const random = (max: number, min = 0) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
 

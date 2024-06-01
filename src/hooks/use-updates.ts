@@ -23,7 +23,7 @@ const channelEventMap: {
     subs: number;
 }[] = [];
 
-export const useChannelMessage = <T extends any>(
+export const useChannelMessage = <T>(
     channelId: string,
     event: ChannelEvent,
     callback: (data: T) => void
@@ -31,7 +31,7 @@ export const useChannelMessage = <T extends any>(
     useEffect(() => {
         const channel = pusherClient
             .subscribe(channelId)
-            .bind(event, (message: any) => {
+            .bind(event, (message: T) => {
                 callback(message);
             });
         const channelEvent = channelEventMap.find(
@@ -82,7 +82,7 @@ export const useUserJoined = (): { channelId: string } => {
                 anonUser,
             });
         },
-        [utils, pokerId]
+        [utils, pokerId, anonUser]
     );
     useChannelMessage(channelId, ChannelEvents.USER_JOINED, userJoined);
 

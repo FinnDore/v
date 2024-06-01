@@ -206,7 +206,7 @@ export const useVotes = () => {
                 }
             );
         },
-        [utils, pokerId, anonUser]
+        [session.user?.id, utils, pokerId, anonUser]
     );
     useChannelMessage(
         channelId,
