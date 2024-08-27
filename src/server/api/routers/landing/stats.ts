@@ -1,9 +1,9 @@
 import { TRPCError } from '@trpc/server';
 
-import { RateLimitPrefix } from '@/utils/rate-limit';
-import { to } from '@/utils/to';
 import { env } from '@/env.mjs';
 import { prisma } from '@/server/db';
+import { RateLimitPrefix } from '@/utils/rate-limit';
+import { to } from '@/utils/to';
 import { rateLimitedTrpcProc } from '../../trpc';
 
 export const landingStats = rateLimitedTrpcProc(
@@ -28,7 +28,7 @@ export const landingStats = rateLimitedTrpcProc(
         >`SELECT SUM(CAST(choice AS UNSIGNED)) AS count FROM LandingPokerVoteChoice`,
     ];
 
-    if (env.PROD) {
+    if (env.PROD && env.BOOST_QUERIES) {
         querys.unshift(
             prisma.$queryRaw<number>`SET @@boost_cached_queries = true`
         );

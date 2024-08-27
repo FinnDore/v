@@ -31,6 +31,10 @@ const server = z.object({
     PROD: NodeEnv.pipe(
         z.preprocess(() => process.env.NODE_ENV === 'production', z.boolean())
     ),
+    BOOST_QUERIES: z.preprocess(
+        () => process.env.BOOST_QUERIES === 'true',
+        z.boolean()
+    ),
 });
 
 /**
@@ -63,6 +67,7 @@ const processEnv = {
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     PROD: process.env.NODE_ENV,
+    BOOST_QUERIES: process.env.BOOST_QUERIES,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
