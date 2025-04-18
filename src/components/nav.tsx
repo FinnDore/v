@@ -12,19 +12,22 @@ export const Nav = () => {
 
     return (
         <nav className="mx-auto flex h-[70px] w-full min-w-max px-6 py-4 sm:px-12 lg:max-w-screen-lg">
-            <Link className="flex text-2xl" href="/">
+            <Link className="flex cursor-pointer text-2xl" href="/">
                 <b>V</b>
                 <Glitch text="ote" />
             </Link>
             {user && (
                 <>
-                    <Link href="/create" className="me-2 ms-auto">
+                    <Link
+                        href="/create"
+                        className="ms-auto me-2 cursor-pointer"
+                    >
                         <button className="rounded-md border border-transparent px-3 py-2 text-sm transition-colors hover:border-black/50 dark:hover:border-white/50 dark:hover:bg-white/10">
                             Create Vote
                         </button>
                     </Link>
 
-                    <Link href="/me" className="me-6">
+                    <Link href="/me" className="me-6 cursor-pointer">
                         <button className="rounded-md border border-transparent px-3 py-2 text-sm transition-colors hover:border-black/50 dark:hover:border-white/50 dark:hover:bg-white/10">
                             My Votes
                         </button>
@@ -41,7 +44,7 @@ export const Nav = () => {
             {status === 'unauthenticated' && (
                 <button
                     onClick={() => void router.push(`/login`)}
-                    className="ms-auto flex rounded-md border border-transparent px-3 py-2 transition-colors hover:border-black/50 dark:hover:border-white/50 dark:hover:bg-white/10 dark:hover:text-white"
+                    className="ms-auto flex cursor-pointer rounded-md border border-transparent px-3 py-2 transition-colors hover:border-black/50 dark:hover:border-white/50 dark:hover:bg-white/10 dark:hover:text-white"
                 >
                     <span className="my-auto flex">
                         <EnterIcon className="my-auto mr-2" />
