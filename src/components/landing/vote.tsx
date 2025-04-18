@@ -50,7 +50,7 @@ export const Vote = () => {
                 return newStats;
             });
         },
-        [utils.landing.landingStats]
+        [utils.landing.landingStats],
     );
 
     const voteMutation = api.landing.vote.useMutation({
@@ -65,7 +65,7 @@ export const Vote = () => {
                         (session.user?.id &&
                             (session.user.id === x.user?.id ||
                                 session.user.id === x.anonUser?.id)) ||
-                        (localVoteId && localVoteId === x.id)
+                        (localVoteId && localVoteId === x.id),
                 );
 
                 if (newVoteIndex === -1) return prev;
@@ -106,7 +106,7 @@ export const Vote = () => {
                 (session?.user?.id &&
                     (session?.user?.id === v.user?.id ||
                         session.user.id === v.anonUser?.id)) ||
-                (localVoteId && localVoteId === v.id)
+                (localVoteId && localVoteId === v.id),
         );
 
         if (!votesQuery.data) {
@@ -128,24 +128,24 @@ export const Vote = () => {
                         v.user ?? v.anonUser,
                     ].filter(
                         (
-                            x
+                            x,
                         ): x is {
                             id: string;
                             name: string;
                             image?: string;
                             pfpHash?: string;
-                        } => !!x
+                        } => !!x,
                     ),
                 },
             }),
-            {} as VoteMap
+            {} as VoteMap,
         );
 
         // get the highest vote
         const highestVote = Object.entries(votesMap).reduce(
             (a, e): [string, number] =>
                 e[1].count > a[1] ? [e[0], e[1].count] : a,
-            ['-1', 0] as [string, number]
+            ['-1', 0] as [string, number],
         );
 
         return { currentVote, votesMap, highestVote };
@@ -161,7 +161,7 @@ export const Vote = () => {
                         (session.user?.id &&
                             (vote.user?.id === session.user.id ||
                                 vote.anonUser?.id === session.user.id)) ||
-                        (localVoteId && localVoteId === vote.id)
+                        (localVoteId && localVoteId === vote.id),
                 );
 
             const timeSinceLastUpdate = Date.now() - voteLastUpdated.current;
@@ -182,7 +182,7 @@ export const Vote = () => {
                 const newState = [...prev];
 
                 const indexOfVoteToUpdate = newState.findIndex(
-                    v => v.id === vote.id
+                    v => v.id === vote.id,
                 );
                 if (indexOfVoteToUpdate === -1) return [...prev, vote];
                 const voteToUpdate = newState[indexOfVoteToUpdate];
@@ -194,16 +194,16 @@ export const Vote = () => {
                 return newState;
             });
         },
-        [session.user?.id, utils, updateClumativePoints, localVoteId]
+        [session.user?.id, utils, updateClumativePoints, localVoteId],
     );
     useChannelMessage(
         LANDING_CHANNEL_ID,
         ChannelEvents.VOTE_UPDATE,
-        voteUpdate
+        voteUpdate,
     );
 
     return (
-        <div className="relative mx-auto mt-12 flex animate-fade-in flex-wrap justify-center gap-2 opacity-0 [animation-delay:_750ms] md:gap-4">
+        <div className="animate-fade-in relative mx-auto mt-12 flex flex-wrap justify-center gap-2 opacity-0 [animation-delay:_750ms] md:gap-4">
             {voteOptions.map(vote => (
                 <VoteButton
                     key={vote}
@@ -222,7 +222,7 @@ export const Vote = () => {
                             choice: vote,
                             anonUser,
                             voteId: !session.user
-                                ? localVoteId ?? undefined
+                                ? (localVoteId ?? undefined)
                                 : undefined,
                         });
                     }}

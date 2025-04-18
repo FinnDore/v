@@ -1,5 +1,5 @@
 import { type AnonUser } from '@prisma/client';
-import { TRPCError, initTRPC } from '@trpc/server';
+import { initTRPC, TRPCError } from '@trpc/server';
 import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { type Session } from 'next-auth';
 import superjson from 'superjson';
@@ -66,7 +66,8 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 
 export const anonProcedure = t.procedure.use(async ({ ctx, next }) => {
-    if (ctx.session?.user) { throw new TRPCError({ code: 'UNAUTHORIZED' });
+    if (ctx.session?.user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' });
     }
     return next({
         ctx,
@@ -77,7 +78,7 @@ export const anonOrUserProcedure = t.procedure
     .input(
         z.object({
             anonUser: anonUserSchema,
-        })
+        }),
     )
     .use(async ({ ctx, input, next }) => {
         let result: {
@@ -111,7 +112,7 @@ export const anonOrUserProcedure = t.procedure
                 console.error(
                     `anonOrUserProcedure: Could not find anon user due to error: ${
                         getAnonUserError.message
-                    } ${getAnonUserError.stack ?? 'no stack'}`
+                    } ${getAnonUserError.stack ?? 'no stack'}`,
                 );
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',
@@ -120,7 +121,7 @@ export const anonOrUserProcedure = t.procedure
 
             if (!anonUser) {
                 console.warn(
-                    `anonOrUserProcedure: Could not find anon user with id: ${input.anonUser.id}`
+                    `anonOrUserProcedure: Could not find anon user with id: ${input.anonUser.id}`,
                 );
                 throw new TRPCError({
                     code: 'UNAUTHORIZED',
@@ -146,7 +147,7 @@ export const procedureWithUserOrAnon = t.procedure
     .input(
         z.object({
             anonUser: anonUserSchema,
-        })
+        }),
     )
     .use(async ({ ctx, input, next }) => {
         let result: {
@@ -182,7 +183,7 @@ export const procedureWithUserOrAnon = t.procedure
                 console.error(
                     `anonOrUserProcedure: Could not find anon user due to error: ${
                         getAnonUserError.message
-                    } ${getAnonUserError.stack ?? 'no stack'}`
+                    } ${getAnonUserError.stack ?? 'no stack'}`,
                 );
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',
@@ -191,7 +192,7 @@ export const procedureWithUserOrAnon = t.procedure
 
             if (!anonUser) {
                 console.warn(
-                    `anonOrUserProcedure: Could not find anon user with id: ${input.anonUser.id}`
+                    `anonOrUserProcedure: Could not find anon user with id: ${input.anonUser.id}`,
                 );
                 throw new TRPCError({
                     code: 'UNAUTHORIZED',
@@ -216,7 +217,7 @@ export const procedureWithUserOrAnon = t.procedure
 
 export const rateLimitedAnonOrUserProcedure = (
     rateLimitPrefix: RateLimitPrefix,
-    byIp?: boolean
+    byIp?: boolean,
 ) =>
     anonOrUserProcedure.use(async ({ ctx, next }) => {
         await rateLimitTrpcProc({
@@ -230,9 +231,9 @@ export const rateLimitedAnonOrUserProcedure = (
     });
 
 export const rateLimitedProcedureWithUserOrAnon = (
-    rateLimitPrefix: RateLimitPrefix
+    rateLimitPrefix: RateLimitPrefix,
 ) =>
-    procedureWithUserOrAnon.use(async ({ ctx, next }) => {
+    procedureWithUserOrAnon.use(async ({ ctx, next }: any) => {
         await rateLimitTrpcProc({
             prefix: rateLimitPrefix,
             ip: ctx.ip,
@@ -259,7 +260,7 @@ export const pokerOwnerProcedure = anonOrUserProcedure
     .input(
         z.object({
             pokerId: z.string().cuid(),
-        })
+        }),
     )
     .use(async ({ input, ctx, next }) => {
         const [pokerSession, getPokerSessionError] = await to(
@@ -269,14 +270,14 @@ export const pokerOwnerProcedure = anonOrUserProcedure
                     createdByAnonUserId: ctx.anonSession?.id ?? null,
                     createdByUserId: ctx.session?.user?.id ?? null,
                 },
-            })
+            }),
         );
 
         if (getPokerSessionError) {
             console.error(
                 `pokerOwnerProcedure: Could not find poker session to verify ownership: ${
                     getPokerSessionError.message
-                } ${getPokerSessionError.stack ?? 'no stack'}`
+                } ${getPokerSessionError.stack ?? 'no stack'}`,
             );
             throw new TRPCError({
                 code: 'INTERNAL_SERVER_ERROR',

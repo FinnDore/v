@@ -18,12 +18,15 @@ export function useThrottle<T>(value: T, limit = 1000, defaultValue?: T) {
     const lastRan = useRef(Date.now());
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            if (Date.now() - lastRan.current >= limit) {
-                setThrottledValue(value);
-                lastRan.current = Date.now();
-            }
-        }, limit - (Date.now() - lastRan.current));
+        const handler = setTimeout(
+            () => {
+                if (Date.now() - lastRan.current >= limit) {
+                    setThrottledValue(value);
+                    lastRan.current = Date.now();
+                }
+            },
+            limit - (Date.now() - lastRan.current),
+        );
 
         return () => {
             clearTimeout(handler);
@@ -47,7 +50,7 @@ const Me = () => {
                 <h1 className="mb-3 text-2xl">My Votes</h1>
             </div>
             <div className="flex w-full flex-col gap-3">
-                {status === 'loading' && (
+                {status === 'pending' && (
                     <div className="relative flex w-full flex-col gap-3">
                         <div className="flex h-[58px] w-full animate-pulse justify-center rounded-md border border-black/25 bg-black/10 dark:border-white/25 dark:bg-white/10"></div>
                         <div className="flex h-[58px] w-full animate-pulse justify-center rounded-md border border-black/25 bg-black/10 dark:border-white/25 dark:bg-white/10"></div>
@@ -61,7 +64,7 @@ const Me = () => {
                     </div>
                 )}
 
-                {myVotesQuery.data?.length === 0 && status !== 'loading' && (
+                {myVotesQuery.data?.length === 0 && status !== 'pending' && (
                     <div className="flex w-full justify-center">
                         <h1>You have no votes</h1>
                     </div>
@@ -101,7 +104,7 @@ const VoteItem = ({
                 {
                     'opacity-75 [&>*]:pointer-events-none':
                         deletingVote === vote.id,
-                }
+                },
             )}
         >
             {deletingVote === vote.id && (
@@ -154,7 +157,7 @@ const VoteItem = ({
                     <TooltipTrigger asChild>
                         <button
                             onClick={e => {
-                                if (deletePokerSessionMutation.isLoading)
+                                if (deletePokerSessionMutation.isPending)
                                     return;
                                 deletePokerSessionMutation.mutate({
                                     pokerId: vote.id,

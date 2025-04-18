@@ -15,7 +15,7 @@ type LocalUserStore = {
 
 // We dont use zod as this is used on the front page and zod is large
 const parseUerStore = <T extends LocalUserStore | null>(
-    userStore: T
+    userStore: T,
 ):
     | { success: true; data: LocalUserStore }
     | { success: false; data: null; error: string } => {
@@ -68,7 +68,7 @@ export function useAnonUser() {
 
 export function storeUser(user: AnonUser) {
     const existingUsersParseResult = parseUerStore(
-        JSON.parse(localStorage.getItem('users') || 'null')
+        JSON.parse(localStorage.getItem('users') || 'null'),
     );
 
     const existingUser = existingUsersParseResult.success
@@ -99,12 +99,12 @@ export function storeUser(user: AnonUser) {
 
 function getLocalUserStore() {
     const existingUsersParseResult = parseUerStore(
-        JSON.parse(localStorage.getItem('user') || 'null')
+        JSON.parse(localStorage.getItem('user') || 'null'),
     );
     if (!existingUsersParseResult.success) {
         console.error(
             'Failed to parse existing users',
-            existingUsersParseResult.error
+            existingUsersParseResult.error,
         );
         return null;
     }
@@ -122,7 +122,7 @@ export const useUser = ():
           };
       }
     | {
-          status: 'loading';
+          status: 'pending';
           user: null;
       }
     | {
@@ -142,7 +142,7 @@ export const useUser = ():
 
     if (loading) {
         return {
-            status,
+            status: status === 'loading' ? 'pending' : status,
             user: null,
         };
     } else if (session) {

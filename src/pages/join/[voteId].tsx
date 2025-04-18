@@ -22,7 +22,7 @@ const Home: NextPage = () => {
         api.vote.lobby.joinVote.useMutation();
 
     const joinVoteAndRedirect = useCallback(async () => {
-        if (!voteId || joinVoteStatus === 'loading') return;
+        if (!voteId || joinVoteStatus === 'pending') return;
         await joinVote({ voteId, anonUser: anonUser });
         void router.push(`/vote/${encodeURIComponent(voteId)}`);
     }, [anonUser, joinVote, joinVoteStatus, router, voteId]);
@@ -32,7 +32,7 @@ const Home: NextPage = () => {
         async function tryJoin() {
             if (
                 !voteId ||
-                status === 'loading' ||
+                status === 'pending' ||
                 (!user && !anonUser) ||
                 attemptedToJoin.current
             ) {
@@ -49,7 +49,7 @@ const Home: NextPage = () => {
 
     return (
         <div className="grid h-screen w-screen place-items-center">
-            {!user && status !== 'loading' && <SignIn />}
+            {!user && status !== 'pending' && <SignIn />}
             {status === 'anon' && (
                 <div className="flex w-48 flex-col">
                     <Button
@@ -61,7 +61,7 @@ const Home: NextPage = () => {
                         join vote as {user.name}
                     </Button>
                     <div className="my-2 flex w-full content-center items-center text-xs">
-                        <Separator className=" w-full" />
+                        <Separator className="w-full" />
 
                         <b className="mx-2">OR</b>
                         <Separator className="w-full" />
@@ -78,7 +78,7 @@ const Home: NextPage = () => {
             {status === 'authenticated' && (
                 <Button
                     variant="outline"
-                    className="hover:!bg-[#00000000]  dark:border-white"
+                    className="hover:!bg-[#00000000] dark:border-white"
                     onClick={() => void joinVoteAndRedirect()}
                 >
                     Join vote as {user.name} <GitHubLogoIcon className="ml-2" />

@@ -26,7 +26,7 @@ const Start = () => {
     const url = useMemo(() => {
         if (typeof window !== undefined && pokerId) {
             return `/api/qrcode/${encodeURIComponent(
-                window.location.origin + '/join/' + (pokerId ?? '')
+                window.location.origin + '/join/' + (pokerId ?? ''),
             )}`;
         }
 
@@ -40,17 +40,17 @@ const Start = () => {
             },
             {
                 enabled: !!pokerId,
-            }
+            },
         );
 
     const userJoined = useCallback(
         ({ users: incomingUsers }: { users: UsersInVote }) => {
             utils.vote.lobby.listUsersInVote.setData(
                 { voteId: pokerId ?? '' },
-                () => incomingUsers
+                () => incomingUsers,
             );
         },
-        [utils, pokerId]
+        [utils, pokerId],
     );
     useChannelMessage(channelId, ChannelEvents.USER_JOINED, userJoined);
 
@@ -67,11 +67,11 @@ const Start = () => {
                             {lastUser && (
                                 <picture>
                                     <img
-                                        className="-z-1 absolute aspect-square w-full rounded-full opacity-50 blur-2xl duration-1000 motion-safe:animate-[spin_3s_linear_infinite]"
+                                        className="absolute -z-1 aspect-square w-full rounded-full opacity-50 blur-2xl duration-1000 motion-safe:animate-[spin_3s_linear_infinite]"
                                         src={
                                             lastUser.image ??
                                             `/api/gradient/${encodeURIComponent(
-                                                lastUser.pfpHash ?? ''
+                                                lastUser.pfpHash ?? '',
                                             )}`
                                         }
                                         alt="Blurred gradient background behind the join QR code"
@@ -82,7 +82,7 @@ const Start = () => {
 
                             <picture>
                                 <img
-                                    className=" absolute z-10 aspect-square w-full rounded-md border border-black/20 dark:border-white"
+                                    className="absolute z-10 aspect-square w-full rounded-md border border-black/20 dark:border-white"
                                     src={url}
                                     alt={`QR code to join vote ${
                                         pokerId ?? ''
@@ -106,7 +106,7 @@ const Start = () => {
                                             void navigator.clipboard.writeText(
                                                 window.location.origin +
                                                     '/join/' +
-                                                    pokerId
+                                                    pokerId,
                                             );
                                         }}
                                     >
@@ -120,7 +120,7 @@ const Start = () => {
                         </div>
                     </div>
                 )}
-                <div className="-ml-4 flex max-h-[285px] w-full flex-col overflow-y-auto overflow-x-visible pb-4 ps-4 text-center sm:ml-0 sm:w-64 sm:ps-8 sm:text-start">
+                <div className="-ml-4 flex max-h-[285px] w-full flex-col overflow-x-visible overflow-y-auto ps-4 pb-4 text-center sm:ml-0 sm:w-64 sm:ps-8 sm:text-start">
                     <div className="mb-3 text-2xl font-bold">
                         Users{' '}
                         {!!users?.length && (
@@ -146,7 +146,7 @@ const Start = () => {
                                     <WhiteListOrKick user={item} />
                                 </li>
                             ))}
-                        {noUsers && userStatus !== 'loading' && (
+                        {noUsers && userStatus !== 'pending' && (
                             <div className="text-sm opacity-75">
                                 There is no one here yet! Scan the QR code or
                                 share the join link
@@ -193,7 +193,7 @@ const WhiteListOrKick = ({ user }: { user: UsersInVote[number] }) => {
                 kick,
                 anonUser,
             }),
-        [kickOrWhitelistMutation, pokerId, user, anonUser]
+        [kickOrWhitelistMutation, pokerId, user, anonUser],
     );
 
     if (user.whiteListed) {
@@ -222,7 +222,7 @@ const WhiteListOrKick = ({ user }: { user: UsersInVote[number] }) => {
                         onClick={() => {
                             kickOrWhiteList(false);
                         }}
-                        className="my-auto ms-auto h-max  w-max rounded-sm px-[2px] py-[2px] text-green-500"
+                        className="my-auto ms-auto h-max w-max rounded-sm px-[2px] py-[2px] text-green-500"
                     >
                         <CheckIcon className="ms-auto" />
                     </button>

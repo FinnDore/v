@@ -7,7 +7,7 @@ import {
     EyeOpenIcon,
 } from '@radix-ui/react-icons';
 import { TooltipTrigger } from '@radix-ui/react-tooltip';
-import { animated } from '@react-spring/web';
+import { a } from '@react-spring/web';
 import clsx from 'clsx';
 
 import { pickHex } from '@/utils/pick-hex';
@@ -24,6 +24,8 @@ import { voteOptions } from '@/constants';
 import { useVoteControls, useVotes } from '@/hooks/poker-hooks';
 import { useUserJoined } from '@/hooks/use-updates';
 
+const animated = a as any;
+
 const Vote = () => {
     const {
         doVote,
@@ -37,7 +39,7 @@ const Vote = () => {
         currentUserId,
     } = useVotes();
     useUserJoined();
-    if (status === 'loading') return null;
+    if (status === 'pending') return null;
     const createdByUser =
         pokerState?.createdByUser ?? pokerState?.createdByAnonUser;
 
@@ -124,7 +126,7 @@ const VoteDescription = () => {
             return pickHex(
                 [34, 197, 94],
                 [190, 18, 60],
-                stats.votePercent / 100
+                stats.votePercent / 100,
             );
         }
     }, [stats?.votePercent]);
@@ -139,10 +141,10 @@ const VoteDescription = () => {
                     <Title
                         title={activeVote.title}
                         url={activeVote.url}
-                        loading={status === 'loading'}
+                        loading={status === 'pending'}
                     />
                 </h1>
-                <p className="max-h-56 max-w-full overflow-auto break-words text-sm md:text-base">
+                <p className="max-h-56 max-w-full overflow-auto text-sm break-words md:text-base">
                     {activeVote?.description}
                 </p>
             </div>

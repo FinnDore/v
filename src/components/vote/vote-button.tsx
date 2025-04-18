@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { animated, config, useSpring } from '@react-spring/web';
+import { a, config, useSpring } from '@react-spring/web';
 import clsx from 'clsx';
 
 import { Pfp } from '../pfp';
@@ -11,6 +11,9 @@ import {
 } from '../tool-tip';
 
 type Users = { name: string; id: string; image?: string; pfpHash?: string }[];
+
+const animated = a as any;
+
 export const VoteButton = ({
     vote,
     doVote,
@@ -66,12 +69,12 @@ export const VoteButton = ({
             const index = splitUsers.extraUsers.findIndex(
                 typeof currentUserId === 'function'
                     ? currentUserId
-                    : user => user.id === currentUserId
+                    : user => user.id === currentUserId,
             );
             const currentUser = splitUsers.extraUsers.splice(index, 1)[0];
             const firstUserToSwitch = splitUsers.firstUsers.splice(
                 splitUsers.firstUsers.length - 1,
-                1
+                1,
             )[0];
             if (currentUser && firstUserToSwitch) {
                 splitUsers.firstUsers.push(currentUser);
@@ -84,7 +87,7 @@ export const VoteButton = ({
 
     return (
         <TooltipProvider delayDuration={300}>
-            <div className="my-2 flex select-none flex-col">
+            <div className="my-2 flex flex-col select-none">
                 <animated.div
                     className="relative mx-auto mb-1 rotate-180"
                     style={outerStyles}
@@ -96,37 +99,37 @@ export const VoteButton = ({
                             {
                                 '!w-[1.45rem]': small,
                             },
-                            'w-[1.45rem] rounded-b-md border-2 border-orange-400 border-t-transparent bg-orange-600 md:w-8'
+                            'w-[1.45rem] rounded-b-md border-2 border-orange-400 border-t-transparent bg-orange-600 md:w-8',
                         )}
                     ></animated.div>
                 </animated.div>
                 <button
                     role="button"
                     className={clsx(
-                        'btn-shadow relative z-20 h-9 w-12 text-white transition-all dark:shadow-none md:h-12 md:w-16',
+                        'btn-shadow relative z-20 h-9 w-12 text-white transition-all md:h-12 md:w-16 dark:shadow-none',
                         {
                             'opacity-60': !current,
                             '!h-9 !w-12': small,
-                        }
+                        },
                     )}
                     onClick={() => doVote(vote)}
                 >
-                    <div className="-z-1 absolute -bottom-1 left-0 h-4 w-full rounded-b-sm bg-orange-600"></div>
+                    <div className="absolute -bottom-1 left-0 -z-1 h-4 w-full rounded-b-sm bg-orange-600"></div>
                     <div
                         className={clsx(
-                            'z-1 absolute top-0 flex h-full w-full rounded-sm border-2 border-orange-400 bg-orange-600 text-white transition-all hover:bg-orange-500',
+                            'absolute top-0 z-1 flex h-full w-full rounded-sm border-2 border-orange-400 bg-orange-600 text-white transition-all hover:bg-orange-500',
                             {
                                 '-top-1 border shadow-[inset_1px_1px_12px_#0000004f]':
                                     current,
-                            }
+                            },
                         )}
                     >
-                        <div className="m-auto select-none text-xs md:text-base">
+                        <div className="m-auto text-xs select-none md:text-base">
                             {vote}
                         </div>
                     </div>
                     {showVotes && firstUsers?.length && (
-                        <div className="absolute -right-0 -top-2 h-4 w-full ">
+                        <div className="absolute -top-2 -right-0 h-4 w-full">
                             <div className="relative">
                                 {firstUsers.map((user, i) => (
                                     <Tooltip key={user.id}>

@@ -15,9 +15,9 @@ export const vote = rateLimitedProcedureWithUserOrAnon(RateLimitPrefix.vote)
         z.object({
             voteId: z.string().cuid().optional().default(cuid),
             choice: voteOptionSchema,
-        })
+        }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }: any) => {
         let voteId = null;
         if (input.voteId && !ctx.session && !ctx.anonSession) {
             const [vote, voteError] = await to(
@@ -33,14 +33,14 @@ export const vote = rateLimitedProcedureWithUserOrAnon(RateLimitPrefix.vote)
                         id: input.voteId,
                         choice: input.choice.toString(),
                     },
-                })
+                }),
             );
 
             if (voteError) {
                 console.log(
                     `Could not upsert anonymus landing  vote due to error: ${
                         voteError.message
-                    } ${voteError.stack ?? 'no stack'}`
+                    } ${voteError.stack ?? 'no stack'}`,
                 );
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',
@@ -65,14 +65,14 @@ export const vote = rateLimitedProcedureWithUserOrAnon(RateLimitPrefix.vote)
                         anonUserId: ctx.anonSession?.id,
                         choice: input.choice.toString(),
                     },
-                })
+                }),
             );
 
             if (voteError) {
                 console.log(
                     `Could not upsert landing  vote due to error: ${
                         voteError.message
-                    } ${voteError.stack ?? 'no stack'}`
+                    } ${voteError.stack ?? 'no stack'}`,
                 );
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',

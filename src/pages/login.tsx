@@ -10,7 +10,7 @@ const Login = () => {
     const { status } = useUser();
     const router = useRouter();
 
-    if (status === 'loading') return null;
+    if (status === 'pending') return null;
 
     if (status === 'authenticated') {
         if (status === 'authenticated') {
@@ -23,7 +23,7 @@ const Login = () => {
             <div className="m-auto">
                 <Button
                     variant="outline"
-                    className="border-black hover:!bg-[#00000000]  dark:border-white"
+                    className="border-black hover:!bg-[#00000000] dark:border-white"
                     onClick={() => void signIn('github')}
                 >
                     Sign in with Github <GitHubLogoIcon className="ml-2" />
