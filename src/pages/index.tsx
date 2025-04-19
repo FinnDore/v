@@ -43,7 +43,7 @@ const Home: NextPage = () => {
     return (
         <>
             <div className="mx-auto flex h-max w-max max-w-full flex-col place-items-center px-4 pb-6 lg:max-w-screen-lg">
-                <div className="absolute left-0 top-0 -z-20 h-screen w-screen max-w-[100vw] animate-fade-in overflow-x-clip opacity-0 ">
+                <div className="animate-fade-in absolute top-0 left-0 -z-20 h-screen w-screen max-w-[100vw] overflow-x-clip opacity-0">
                     <picture>
                         <source
                             media="(prefers-color-scheme: dark)"
@@ -59,10 +59,10 @@ const Home: NextPage = () => {
                     </picture>
                 </div>
                 <Provider>
-                    <h1 className="w-full animate-fade-in text-center text-4xl font-bold opacity-0 [animation-delay:_200ms] md:mt-8 md:text-6xl ">
+                    <h1 className="animate-fade-in w-full text-center text-4xl font-bold opacity-0 [animation-delay:_200ms] md:mt-8 md:text-6xl">
                         <Balancer>The better way to point things</Balancer>
                     </h1>
-                    <h2 className="mt-4 w-full animate-fade-in text-center text-sm text-gray-700 opacity-0 [animation-delay:_300ms] dark:text-gray-300 md:mt-6 md:text-base">
+                    <h2 className="animate-fade-in mt-4 w-full text-center text-sm text-gray-700 opacity-0 [animation-delay:_300ms] md:mt-6 md:text-base dark:text-gray-300">
                         <Balancer>
                             Spin up pointing poker sessions for your team in
                             seconds, no sign up required allowing for
@@ -89,7 +89,7 @@ const Home: NextPage = () => {
                 <Vote />
                 <Link
                     href="/create"
-                    className="mx-auto mt-10 animate-fade-in opacity-0 [animation-delay:_750ms]"
+                    className="animate-fade-in mx-auto mt-10 opacity-0 [animation-delay:_750ms]"
                 >
                     <Button
                         variant="outline"
@@ -97,13 +97,13 @@ const Home: NextPage = () => {
                     >
                         <span className="my-auto flex">
                             <span className="my-auto leading-none">
-                                create Vote
+                                Create Vote
                             </span>
                         </span>
                     </Button>
                 </Link>
 
-                <div className="mt-10 flex animate-fade-in flex-col justify-center gap-2 text-center opacity-0 [animation-delay:_1000ms]">
+                <div className="animate-fade-in mt-10 flex flex-col justify-center gap-2 text-center opacity-0 [animation-delay:_1000ms]">
                     <h1 className="text-2xl font-extrabold">
                         {hoveredFeature}
                     </h1>
@@ -112,7 +112,7 @@ const Home: NextPage = () => {
 
                 <div className="mt-10 flex w-full max-w-lg grid-cols-1 flex-wrap items-center justify-center gap-5 px-4 md:mx-auto md:grid md:min-w-[80vw] md:grid-cols-2 md:grid-rows-2 lg:min-w-[900px] lg:grid-cols-3">
                     <div
-                        className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1000ms] dark:bg-black"
+                        className="group animate-fade-in relative h-48 w-full bg-white opacity-0 [animation-delay:_1000ms] dark:bg-black"
                         onMouseEnter={() =>
                             setHoveredFeature('Linear integration')
                         }
@@ -128,13 +128,13 @@ const Home: NextPage = () => {
                     </div>
 
                     <div
-                        className="group  relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1150ms] dark:bg-black md:row-span-2 md:h-full lg:col-span-2 lg:h-48 lg:[grid-row:_unset]"
+                        className="group animate-fade-in relative h-48 w-full bg-white opacity-0 [animation-delay:_1150ms] md:row-span-2 md:h-full lg:col-span-2 lg:[grid-row:_unset] lg:h-48 dark:bg-black"
                         onMouseEnter={() =>
                             setHoveredFeature('Realtime voting')
                         }
                     >
                         <FeatureTitle title="Realtime voting" />
-                        <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors hover:border-black dark:border-white/50 dark:hover:border-white ">
+                        <div className="relative flex h-full w-full overflow-hidden rounded border border-black/50 transition-colors hover:border-black dark:border-white/50 dark:hover:border-white">
                             <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                             <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
 
@@ -143,7 +143,7 @@ const Home: NextPage = () => {
                     </div>
 
                     <div
-                        className="group relative h-48 w-full animate-fade-in bg-white opacity-0 [animation-delay:_1300ms] dark:bg-black"
+                        className="group animate-fade-in relative h-48 w-full bg-white opacity-0 [animation-delay:_1300ms] dark:bg-black"
                         onMouseEnter={() =>
                             setHoveredFeature('Anonymous login')
                         }
@@ -161,7 +161,7 @@ const Home: NextPage = () => {
                         </div>
                     </div>
 
-                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 bg-white opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:bg-black dark:hover:border-white">
+                    <div className="group animate-fade-in relative grid h-48 w-full place-content-center overflow-hidden rounded border border-black/50 bg-white opacity-0 transition-colors [animation-delay:_1600ms] hover:border-black dark:border-white/50 dark:bg-black dark:hover:border-white">
                         <Tweet
                             quote="If I wanted to point something it'd be this website for how useless it is"
                             name="Samuel Gunter"
@@ -172,7 +172,7 @@ const Home: NextPage = () => {
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
                     </div>
 
-                    <div className="group relative grid h-48 w-full animate-fade-in place-content-center overflow-hidden rounded border border-black/50 bg-white opacity-0 transition-colors [animation-delay:_1750ms] hover:border-black dark:border-white/50 dark:bg-black dark:hover:border-white">
+                    <div className="group animate-fade-in relative grid h-48 w-full place-content-center overflow-hidden rounded border border-black/50 bg-white opacity-0 transition-colors [animation-delay:_1750ms] hover:border-black dark:border-white/50 dark:bg-black dark:hover:border-white">
                         <div className="absolute -z-10 h-full w-full bg-white/50 blur-md dark:bg-black/50"></div>
                         <div className="absolute -z-10 h-full w-full bg-orange-600 opacity-10 blur-lg transition-opacity group-hover:opacity-20"></div>
 
@@ -192,7 +192,7 @@ const Home: NextPage = () => {
 export default Home;
 
 const Stat = (props: { name: string; value: number | undefined }) => (
-    <h3 className="gap flex animate-fade-in flex-col opacity-0 [animation-delay:_500ms] md:gap-1">
+    <h3 className="gap animate-fade-in flex flex-col opacity-0 [animation-delay:_500ms] md:gap-1">
         <div className="h-8 text-xl font-bold sm:text-2xl">
             {props.value && formatCompactNumber(props.value)}
         </div>
@@ -232,10 +232,10 @@ const FeatureTitle = (props: { title: string; className?: string }) => (
     <div
         className={clsx(
             props.className,
-            'user-select-none absolute left-1/2 z-10 w-max -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-black/40 px-6 py-1.5 text-sm font-bold transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white'
+            'user-select-none absolute left-1/2 z-10 w-max -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-black/40 px-6 py-1.5 text-sm font-bold transition-colors group-hover:border-black dark:border-white/50 group-hover:dark:border-white',
         )}
     >
-        <div className="absolute left-0 top-0 -z-10 h-full w-full bg-white dark:bg-black"></div>
+        <div className="absolute top-0 left-0 -z-10 h-full w-full bg-white dark:bg-black"></div>
         <h2>{props.title}</h2>
     </div>
 );
